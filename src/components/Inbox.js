@@ -8,6 +8,8 @@ import i18n from '../../locale/i18n'
 import {NavigationEvents} from "react-navigation";
 import MapView from 'react-native-maps';
 import { Video, Audio } from 'expo-av';
+import {Recorder, Player} from 'react-native-audio-player-recorder-no-linking';
+
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
@@ -34,6 +36,10 @@ const themeImages = {
         back: require('../../assets/images/dark_mode/back.png'),
         tick_blue: require('../../assets/images/dark_mode/tick_blue.png'),
         play_button_big: require('../../assets/images/dark_mode/play_button_big.png'),
+        location_irbble: require('../../assets/images/light_mode/location_irbble.png'),
+        microphone: require('../../assets/images/light_mode/microphone.png'),
+        send: require('../../assets/images/dark_mode/send.png'),
+        pause_button: require('../../assets/images/light_mode/pause_button.png'),
     },
     darkImages: {
         big_logo : require('../../assets/images/dark_mode/big_logo.png'),
@@ -56,6 +62,10 @@ const themeImages = {
         back: require('../../assets/images/dark_mode/back.png'),
         tick_blue: require('../../assets/images/dark_mode/tick_blue.png'),
         play_button_big: require('../../assets/images/dark_mode/play_button_big.png'),
+        location_irbble: require('../../assets/images/dark_mode/location_irbble.png'),
+        microphone: require('../../assets/images/dark_mode/microphone.png'),
+        send: require('../../assets/images/dark_mode/send.png'),
+        pause_button: require('../../assets/images/light_mode/pause_button.png'),
     }
 }
 
@@ -114,7 +124,9 @@ class Inbox extends Component {
             messages,
             lat: null,
             long: null,
-            playedVideo: null
+            playedVideo: null,
+            playedAudio: null,
+            audioPath: null
         }
     }
 
@@ -127,6 +139,25 @@ class Inbox extends Component {
             this.setState({ playedVideo: null })
         else
             this.setState({ playedVideo: id })
+    }
+
+    async playAudio(id, path){
+        if (this.state.playedVideo == id)
+            this.setState({ playedAudio: null, audioPath: null })
+        else
+            this.setState({ playedAudio: id, audioPath: path })
+
+        const soundObject = new Audio.Sound();
+        try {
+            await soundObject.loadAsync({ uri: path });
+            await soundObject.playAsync();
+
+            const status = await soundObject.getStatusAsync();
+            console.log('status....', status)
+
+        } catch (error) {
+            // An error occurred!
+        }
     }
 
     renderMsg(message, i, styles, colors, images){
@@ -180,7 +211,7 @@ class Inbox extends Component {
                                 style={{ width: '100%', height: 160 }}
                             />
                             <TouchableOpacity onPress={() => this.videoControl(message.id)} style={{ position: 'absolute', alignItems: 'center', justifyContent: 'center', flex: 1, top: '30%', right: '41%' }}>
-                                <Image source={this.state.playedVideo == message.id ? images.play_button_big : images.play_button_big} style={{ width: 50, height: 50, alignSelf: 'center' }} resizeMode={'contain'} />
+                                <Image source={this.state.playedVideo == message.id ? images.pause_button : images.play_button_big} style={{ width: 50, height: 50, alignSelf: 'center' }} resizeMode={'contain'} />
                             </TouchableOpacity>
                         </View>
                         <View style={{ flexDirection: 'row', alignSelf: 'flex-end', padding: 10 }}>
@@ -240,7 +271,7 @@ class Inbox extends Component {
                                 style={{ width: '100%', height: 160 }}
                             />
                             <TouchableOpacity onPress={() => this.videoControl(message.id)} style={{ position: 'absolute', alignItems: 'center', justifyContent: 'center', flex: 1, top: '30%', right: '41%' }}>
-                                <Image source={this.state.playedVideo == message.id ? images.play_button_big : images.play_button_big} style={{ width: 50, height: 50, alignSelf: 'center' }} resizeMode={'contain'} />
+                                <Image source={this.state.playedVideo == message.id ? images.pause_button : images.play_button_big} style={{ width: 50, height: 50, alignSelf: 'center' }} resizeMode={'contain'} />
                             </TouchableOpacity>
                         </View>
                         <View style={{ flexDirection: 'row', alignSelf: 'flex-end', padding: 10 }}>
@@ -251,17 +282,38 @@ class Inbox extends Component {
                 )
             }else if(message.type == 4){
                 return (
-                    <View key={i} style={{ width: (width*80)/100, backgroundColor: colors.receiverMsg, borderRadius: 20, alignSelf: 'flex-end', marginHorizontal: 20, marginVertical: 10, padding: 10, marginBottom:  50 }}>
-                        <View>
-                            <Slider
-                                style={{ backgroundColor: '#000' }}
-                                value={20}
-                                onValueChange={(value) => console.log(value)}
-                                // onSlidingComplete={alert('done')}
-                                // disabled={
-                                //     !this.state.isPlaybackAllowed || this.state.isLoading
-                                // }
+                    <View key={i} style={{ width: (width*80)/100, backgroundColor: colors.receiverMsg, borderRadius: 20, alignSelf: 'flex-end', marginHorizontal: 20, marginVertical: 10, padding: 10, marginBottom:  65 }}>
+                        <View style={{ flexDirection: 'row' }}>
+                            <Player
+                                style={{ flex: 1 }}
+                                completeButtonText={'Return Home'}
+                                uri={message.file}
+                                plyImg={images.play_button_big}
+                                pusImg={images.pause_button}
+                                showDebug={false}
+                                showTimeStamp={false}
+                                showBackButton={true}
+                                playbackSlider={(renderProps) => {
+                                    return (
+                                        <Slider
+                                            style={{ transform: [ { scaleY: 1.5 }], width: '90%' }}
+                                            value={20}
+                                            onValueChange={(value) => console.log(value)}
+                                            thumbTintColor={'#000'}
+                                            maximumTrackTintColor={"#fffdf7"}
+                                            minimumTrackTintColor={colors.orange}
+                                            minimimValue={0}
+                                            maximumValue={renderProps.maximumValue}
+                                            onValueChange={renderProps.onSliderValueChange}
+                                            value={renderProps.value}
+                                            disabled={true}
+                                        />
+                                    );
+                                }}
                             />
+                            <View style={{ height: 35, width: 35, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
+                                <Image source={images.person_two} resizeMode={'contain'} style={{ width: 50, height: 50 }} />
+                            </View>
                         </View>
                         <View style={{ flexDirection: 'row', alignSelf: 'flex-start', marginTop: 5 }}>
                             <Text style={{ color: colors.receiverFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 12 }}>{message.time}</Text>
@@ -318,29 +370,84 @@ class Inbox extends Component {
                 </Header>
                 <Content style={{ backgroundColor: colors.darkBackground, marginTop: -25 }} contentContainerStyle={{ flexGrow: 1 }}>
                     <View>
-                        <View style={{ marginTop: 10, backgroundColor: colors.lightBackground, borderTopColor: '#ddd', borderTopWidth: 1}}>
+                        <View style={{ marginTop: 10, backgroundColor: colors.lightBackground, borderTopColor: '#ddd', borderTopWidth: 1, height: height-80}}>
                             <View style={{width: 0, height: 0, backgroundColor: 'transparent', borderStyle: 'solid', borderLeftWidth: 50, borderTopWidth: 50, borderLeftColor: 'transparent', borderTopColor: colors.darkBackground, right: 0, position: 'absolute', top: -1 }} />
-                            <View style={{ flex: 1, height: 10, width: '100%' }}/>
+                            <View style={{ height: 10, width: '100%' }}/>
                             <View style={{ width: 1, height: 70, backgroundColor: '#ddd', transform: [{ rotate: '45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
+                            <Recorder
+                                style={{ flex: 1 }}
+                                onComplete={this.recorderComplete}
+                                maxDurationMillis={150000}
+                                showDebug={true}
+                                showBackButton={true}
+                                audioMode={{
+                                    allowsRecordingIOS: true,
+                                    interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+                                    playsInSilentModeIOS: true,
+                                    playsInSilentLockedModeIOS: true,
+                                    staysActiveInBackground: true,
+                                    shouldDuckAndroid: true,
+                                    interruptionModeAndroid:
+                                    Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
+                                    playThroughEarpieceAndroid: false
+                                }}
 
-                            <KeyboardAvoidingView behavior={'position'} style={{width:'100%', flexDirection:'column', flex: 1, zIndex: -1, marginTop: -77 }}>
+                                recordingCompleteButton={(renderProps) => {
+                                    return (
+                                        <Button
+                                            onPress={renderProps.onPress}
+                                            block
+                                            success
+                                            style={{ marginVertical: 5 }}
+                                        >
+                                            <Text>Finish</Text>
+                                        </Button>
+                                    );
+                                }}
+                                playbackSlider={(renderProps) => {
+                                    console.log({'maximumValue: ': renderProps.maximumValue});
+                                    return (
+                                        <Slider
+                                            minimimValue={0}
+                                            maximumValue={renderProps.maximumValue}
+                                            onValueChange={renderProps.onSliderValueChange}
+                                            value={renderProps.value}
+                                            style={{
+                                                width: '100%'
+                                            }}
+                                        />
+                                    );
+                                }}
+                            />
+                            <KeyboardAvoidingView behavior={'height'} style={{width:'100%', flexDirection:'column', flex: 1, zIndex: -1, marginTop: -77 }}>
                                 <ScrollView
                                     ref={ref => this.scrollView = ref}
                                     onContentSizeChange={(contentWidth, contentHeight)=>{
                                         this.scrollView.scrollToEnd({animated: true});
-                                    }}
-                                    style={{height:height-70 }}>
+                                    }} >
                                     {
                                         this.state.messages.map((msg, i) => this.renderMsg(msg, i, styles, colors, images))
                                     }
                                 </ScrollView>
-                                <View style={{ backgroundColor:'#fff' , borderTopWidth:3 , borderColor:'#eee' , flexDirection:'row' , flex: 1, width: '100%',height:60, position:'absolute' , bottom:0}}>
-                                    <Item  style={{flex:1,zIndex:2222 , borderWidth:1 , borderColor:'#eee', borderRadius:50, height:45 , alignSelf:'flex-end' , marginBottom:5}}>
-                                        <Input placeholder="أكتب رسالتك..." onChangeText={(msg) => this.setState({ msg })} value={this.state.msg}
-                                               style={{ flex:1, width:'100%', paddingLeft:15 , paddingRight:15,marginRight:15 , borderWidth:1 , borderColor:'#eee', borderRadius:50, paddingBottom:10 , color: '#797979' , textAlign:'right' , backgroundColor:'#fff'}}
-                                               // placeholderTextColor={{ color: '#a7a7a7' }}
-                                        />
-                                    </Item>
+
+                                <View style={{ backgroundColor: colors.inboxInputBackground, flexDirection:'row' , flex: 1, width: '100%',height:55, position:'absolute' , bottom:0, padding: 3, marginBottom: 6}}>
+                                    <View style={{ width: '84%', paddingHorizontal: 20, paddingBottom: 10, marginLeft: -15 }}>
+                                        <View style={{ borderRadius: 30, borderWidth: 1, borderColor: colors.labelFont, height: 40, marginTop: 5, padding: 5, flexDirection: 'row', backgroundColor: colors.inboxInput  }}>
+                                            <Item style={{ alignSelf: 'flex-start', borderBottomWidth: 0, top: -18, marginTop: 0 ,position:'absolute', width:'88%', paddingHorizontal: 5,  }} bordered>
+                                                <Input placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('search') + '...'} onChangeText={(search) => this.setState({search})} style={{ width: '100%', fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontSize: 15, top: 10 }}  />
+                                            </Item>
+                                            <TouchableOpacity style={{ position: 'absolute', flex: 1, right: 10, top: 5 }}>
+                                                <Image source={images.send} style={{ height: 27, width: 27 }} resizeMode={'contain'} />
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>
+                                    <TouchableOpacity style={{ flex: 1, marginTop: 15, marginLeft: -7 }}>
+                                        <Image source={images.location_irbble} style={{ width: 25, height: 25 }} resizeMode={'contain'} />
+                                    </TouchableOpacity>
+                                    <View style={{ height: 40, width: 1, backgroundColor: '#ddd', marginRight: 9, marginTop: 7 }} />
+                                    <TouchableOpacity style={{ flex: 1, marginTop: 15, marginRight: -10 }}>
+                                        <Image source={images.microphone} style={{ width: 25, height: 25 }} resizeMode={'contain'} />
+                                    </TouchableOpacity>
                                 </View>
                             </KeyboardAvoidingView>
 
