@@ -75,6 +75,7 @@ class Login extends Component {
             Toast.show({
                 text: msg,
                 type: "danger",
+                style : {textAlign : 'center' ,  fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans'} ,
                 duration: 3000
             });
         }
