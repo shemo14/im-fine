@@ -44,6 +44,7 @@ export default {
         email: require('../../assets/images/dark_mode/email.png'),
         location: require('../../assets/images/light_mode/my_location_yellow.png'),
         small_logo: require('../../assets/images/dark_mode/small_logo.png'),
+        right_wight_arrow_drop: require('../../assets/images/dark_mode/right_wight_arrow_drop.png'),
     },
     darkImages: {
         big_logo: require('../../assets/images/dark_mode/big_logo.png'),
@@ -81,5 +82,6 @@ export default {
         email: require('../../assets/images/dark_mode/email.png'),
         location: require('../../assets/images/dark_mode/my_location_yellow.png'),
         small_logo: require('../../assets/images/dark_mode/small_logo.png'),
+        right_wight_arrow_drop: require('../../assets/images/dark_mode/right_wight_arrow_drop.png'),
     }
 }

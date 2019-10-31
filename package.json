@@ -42,7 +42,9 @@
     "redux-thunk": "^2.3.0"
   },
   "devDependencies": {
-    "babel-preset-expo": "^7.0.0"
+    "babel-preset-expo": "^7.0.0",
+    "reactotron-react-native": "^2.1.0",
+    "reactotron-redux": "^3.1.2"
   },
   "private": true
 }
