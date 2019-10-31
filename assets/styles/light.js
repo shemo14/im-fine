@@ -275,7 +275,7 @@ const styles = ({
     logoStyle: {
         width: 180,
         height: 150,
-        marginTop: (height*30)/100
+        marginTop: (height*20)/100
     },
     inputMarginTop:{
         marginTop:35
@@ -316,7 +316,7 @@ const styles = ({
         width: '100%',
         // height: (height*60)/100,
         alignItems: 'center',
-        padding: 20,
+        padding: 10,
         justifyContent: 'center'
     },
     itemView : {
@@ -383,12 +383,12 @@ const styles = ({
     },
     loginBtn:{
         borderRadius: 2,
-        width: 130,
+        width: 150,
         height: 35,
         alignItems: 'center',
         justifyContent: 'center',
         alignSelf: 'center' ,
-        backgroundColor: COLORS.yellow
+        backgroundColor: COLORS.orange
     },
     createAcc:{
         borderRadius: 5,
@@ -961,11 +961,11 @@ const styles = ({
     itemPicker : {
         borderWidth: 1,
         borderColor:COLORS.mediumgray,
-        height: 50,
+        height: 45,
         marginTop: 25,
-        borderRadius: 0,
+        borderRadius: 3,
         width: '100%',
-        padding: 0,
+        padding: 5,
         flexDirection: 'row' ,
         textAlign: I18nManager.isRTL ?'right' : 'left',
     },

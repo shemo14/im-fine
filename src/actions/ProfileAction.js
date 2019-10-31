@@ -4,12 +4,12 @@ import {Toast} from "native-base";
 import {AsyncStorage} from "react-native";
 
 
-export const profile = (token) => {
+export const profile = (id, lang) => {
     return (dispatch) => {
         axios({
             method: 'POST',
-            url: CONST.url + 'user_data',
-            headers: {Authorization: "Bearer " + token}
+            url: CONST.url + 'profile',
+            data: {id, lang}
         }).then(response => {
             const data = response.data.data;
             dispatch({type: 'profile_data', data})

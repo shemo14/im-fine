@@ -2,11 +2,11 @@ import axios from 'axios';
 import { AsyncStorage } from 'react-native';
 import CONST from '../consts';
 
-export const userLogin = ({phone, password, token}, lang) => {
+export const userLogin = ({id, code}, lang) => {
     return (dispatch) => {
         dispatch({type: 'user_login'});
 
-        axios.post( CONST.url + 'login', {phone, password, device_id: token, lang})
+        axios.post( CONST.url + 'activate', {id, code, lang})
             .then(response => handelLogin(dispatch, response.data))
             .catch(error => console.warn(error.data));
     };
@@ -30,7 +30,7 @@ const handelLogin = (dispatch, data) => {
 
 
 const loginSuccess = (dispatch, data) => {
-    AsyncStorage.setItem('token', JSON.stringify(data.data.token))
+    AsyncStorage.setItem('userId', JSON.stringify(data.data.id))
         .then(() => dispatch({type: 'login_success', data }));
 
     dispatch({type: 'login_success', data});

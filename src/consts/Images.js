@@ -44,12 +44,16 @@ export default {
         email: require('../../assets/images/dark_mode/email.png'),
         location: require('../../assets/images/light_mode/my_location_yellow.png'),
         small_logo: require('../../assets/images/dark_mode/small_logo.png'),
+<<<<<<< HEAD
         modeImg: require('../../assets/images/light_mode/light_mode.png'),
         iphone: require('../../assets/images/light_mode/iphone_x.png'),
         mail: require('../../assets/images/light_mode/mail.png'),
         loc: require('../../assets/images/light_mode/location.png'),
         share: require('../../assets/images/light_mode/share.png'),
         warning: require('../../assets/images/light_mode/warning.png'),
+=======
+        right_wight_arrow_drop: require('../../assets/images/dark_mode/right_wight_arrow_drop.png'),
+>>>>>>> 2dc9441246045354ee8be556b725a6254b936911
     },
     darkImages: {
         big_logo: require('../../assets/images/dark_mode/big_logo.png'),
@@ -87,6 +91,7 @@ export default {
         email: require('../../assets/images/dark_mode/email.png'),
         location: require('../../assets/images/dark_mode/my_location_yellow.png'),
         small_logo: require('../../assets/images/dark_mode/small_logo.png'),
+<<<<<<< HEAD
         cog: require('../../assets/images/dark_mode/cog.png'),
         modeImg: require('../../assets/images/dark_mode/dark_mode.png'),
         iphone: require('../../assets/images/dark_mode/phone.png'),
@@ -94,5 +99,8 @@ export default {
         loc: require('../../assets/images/dark_mode/location_irbble.png'),
         share: require('../../assets/images/dark_mode/share.png'),
         warning: require('../../assets/images/dark_mode/warning.png'),
+=======
+        right_wight_arrow_drop: require('../../assets/images/dark_mode/right_wight_arrow_drop.png'),
+>>>>>>> 2dc9441246045354ee8be556b725a6254b936911
     }
 }

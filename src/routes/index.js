@@ -13,12 +13,16 @@ import Inbox from "../components/Inbox";
 import NotFine from "../components/NotFine";
 import VideoRecorder from "../components/VideoRecorder";
 import ConfirmStatus from "../components/ConfirmStatus";
+<<<<<<< HEAD
 import Settings from "../components/Settings";
 import EmergencyList from "../components/EmergencyList";
 import Profile from "../components/Profile";
 import EditProfile from "../components/EditProfile";
 import ShareApp from "../components/ShareApp";
 import Complaint from "../components/Complaint";
+=======
+import InitScreen from "../components/InitScreen";
+>>>>>>> 2dc9441246045354ee8be556b725a6254b936911
 
 const width = Dimensions.get('window').width;
 const CustomDrawerContentComponent = (props) => (<CustomDrawer { ...props }/>);
@@ -111,15 +115,16 @@ const appStack = createStackNavigator({
     },
 });
 const authStack = createStackNavigator({
-    activeCode: {screen: ActiveCode, navigationOptions: {header: null}},
+    init: {screen: InitScreen, navigationOptions: {header: null}},
     login: {screen: Login, navigationOptions: {header: null}},
+    activeCode: {screen: ActiveCode, navigationOptions: {header: null}},
     register: {screen: Register, navigationOptions: {header: null}},
     loginOrRegister: {screen: LoginOrRegister, navigationOptions: {header: null}},
 });
 
 const AppNavigator = createSwitchNavigator({
-    app: appStack,
     auth: authStack,
+    app: appStack,
 });
 
 export default createAppContainer(AppNavigator);

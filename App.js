@@ -7,6 +7,7 @@ import Route from './src/routes'
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistedStore } from './src/store';
+import './ReactotronConfig'
 
 export default class App extends React.Component {
   constructor(props) {
@@ -14,6 +15,8 @@ export default class App extends React.Component {
     this.state = {
       isReady: false,
     };
+
+      // AsyncStorage.clear()
   }
 
   async componentDidMount() {
@@ -21,7 +24,7 @@ export default class App extends React.Component {
       if (theme == null) {
         AsyncStorage.setItem('theme', 'light');
       }
-    })
+    });
 
     await Font.loadAsync({
       tajawal: require('./assets/fonts/Tajawal-Regular.ttf'),
