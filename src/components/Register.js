@@ -13,32 +13,13 @@ import {connect} from "react-redux";
 import * as ImagePicker from 'expo-image-picker';
 import * as Permissions from 'expo-permissions';
 import * as Location from 'expo-location';
+import themeImages from '../consts/Images'
 import axios from 'axios'
 import Modal from "react-native-modal";
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
-const themeImages = {
-    lightImages: {
-        bg_for_pic: require('../../assets/images/dark_mode/bg_for_pic.png'),
-        upload_photo: require('../../assets/images/dark_mode/upload_photo.png'),
-        user: require('../../assets/images/dark_mode/User.png'),
-        phone: require('../../assets/images/dark_mode/phone.png'),
-        email: require('../../assets/images/dark_mode/email.png'),
-        location: require('../../assets/images/light_mode/my_location_yellow.png'),
-        cross: require('../../assets/images/dark_mode/cross.png'),
-        small_logo: require('../../assets/images/dark_mode/small_logo.png'),
-    },
-    darkImages: {
-        bg_for_pic: require('../../assets/images/light_mode/bg_for_pic.png'),
-        upload_photo: require('../../assets/images/dark_mode/upload_photo.png'),
-        user: require('../../assets/images/dark_mode/User.png'),
-        phone: require('../../assets/images/dark_mode/phone.png'),
-        email: require('../../assets/images/dark_mode/email.png'),
-        location: require('../../assets/images/dark_mode/my_location_yellow.png'),
-        small_logo: require('../../assets/images/dark_mode/small_logo.png'),
-    }
-}
+
 
 class Register extends Component {
     constructor(props){

@@ -7,51 +7,11 @@ import COLORS from '../consts/colors'
 import i18n from '../../locale/i18n'
 import {NavigationEvents} from "react-navigation";
 import DateTimePicker from "react-native-modal-datetime-picker";
-
+import themeImages from '../consts/Images'
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
 
-const themeImages = {
-    lightImages: {
-        big_logo : require('../../assets/images/dark_mode/big_logo.png'),
-        drawer: require('../../assets/images/light_mode/drawer.png'),
-        logo_tittle: require('../../assets/images/light_mode/logo_tittle.png'),
-        search: require('../../assets/images/dark_mode/search.png'),
-        chat_non: require('../../assets/images/dark_mode/chat_non.png'),
-        chat_active: require('../../assets/images/dark_mode/chat_active.png'),
-        bell_non: require('../../assets/images/dark_mode/bell_non.png'),
-        bell_active: require('../../assets/images/dark_mode/bell_active.png'),
-        stopwatch_non: require('../../assets/images/dark_mode/stopwatch_non.png'),
-        stopwatch_active: require('../../assets/images/dark_mode/stopwatch_active.png'),
-        person_one: require('../../assets/images/dark_mode/person_one.png'),
-        person_two: require('../../assets/images/dark_mode/person_two.png'),
-        emergency: require('../../assets/images/dark_mode/emergency.png'),
-        stop_watch_time: require('../../assets/images/dark_mode/stop_watch_time.png'),
-        choose_time: require('../../assets/images/dark_mode/choose_time.png'),
-        timer_twinty_four: require('../../assets/images/dark_mode/timer_twinty_four.png'),
-        cross: require('../../assets/images/dark_mode/cross.png'),
-    },
-    darkImages: {
-        big_logo : require('../../assets/images/dark_mode/big_logo.png'),
-        drawer: require('../../assets/images/dark_mode/drawer.png'),
-        logo_tittle: require('../../assets/images/light_mode/logo_tittle.png'),
-        search: require('../../assets/images/dark_mode/search.png'),
-        chat_non: require('../../assets/images/dark_mode/chat_non.png'),
-        chat_active: require('../../assets/images/dark_mode/chat_active.png'),
-        bell_non: require('../../assets/images/dark_mode/bell_non.png'),
-        bell_active: require('../../assets/images/dark_mode/bell_active.png'),
-        stopwatch_non: require('../../assets/images/dark_mode/stopwatch_non.png'),
-        stopwatch_active: require('../../assets/images/dark_mode/stopwatch_active.png'),
-        person_one: require('../../assets/images/dark_mode/person_one.png'),
-        person_two: require('../../assets/images/dark_mode/person_two.png'),
-        emergency: require('../../assets/images/dark_mode/emergency.png'),
-        stop_watch_time: require('../../assets/images/dark_mode/stop_watch_time.png'),
-        choose_time: require('../../assets/images/dark_mode/choose_time.png'),
-        timer_twinty_four: require('../../assets/images/dark_mode/timer_twinty_four.png'),
-        cross: require('../../assets/images/dark_mode/cross.png'),
-    }
-}
 
 class Home extends Component {
     constructor(props){
@@ -117,165 +77,167 @@ class Home extends Component {
         if (this.state.type == 1){
             return (
                 <View style={{ padding: 25, marginTop: -77 }}>
-                    <TouchableOpacity style={{ flexDirection: 'row', borderBottomColor: '#f0e2c0', borderBottomWidth: 1, paddingVertical: 10 }}>
-                        <View style={{ height: 60, width: 60, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
-                            <Image source={images.person_two} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
-                        </View>
-                        <View style={{ padding: 10 }}>
-                            <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 }}>اوامر الشركة</Text>
-                            <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>اخر نص للرسالة من المرسل</Text>
-                        </View>
-                        <View style={{ marginHorizontal: 20 }}>
-                            <Text style={{ color: colors.orange, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>12:00 am</Text>
-                            <View style={{ backgroundColor: colors.orange, borderRadius: 20, height: 20, width: 20, alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginTop: 10 }}>
-                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>4</Text>
+                    <View>
+                        <TouchableOpacity style={{ flexDirection: 'row', borderBottomColor: '#f0e2c0', borderBottomWidth: 1, paddingVertical: 10 }}>
+                            <View style={{ height: 60, width: 60, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
+                                <Image source={images.person_two} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
                             </View>
-                        </View>
-                    </TouchableOpacity>
+                            <View style={{ padding: 10 }}>
+                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 }}>اوامر الشركة</Text>
+                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>اخر نص للرسالة من المرسل</Text>
+                            </View>
+                            <View style={{ marginHorizontal: 20 }}>
+                                <Text style={{ color: colors.orange, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>12:00 am</Text>
+                                <View style={{ backgroundColor: colors.orange, borderRadius: 20, height: 20, width: 20, alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginTop: 10 }}>
+                                    <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>4</Text>
+                                </View>
+                            </View>
+                        </TouchableOpacity>
 
-                    <TouchableOpacity style={{ flexDirection: 'row', borderBottomColor: '#f0e2c0', borderBottomWidth: 1, paddingVertical: 10 }}>
-                        <View style={{ height: 60, width: 60, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
-                            <Image source={images.person_two} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
-                        </View>
-                        <View style={{ padding: 10 }}>
-                            <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 }}>اوامر الشركة</Text>
-                            <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>اخر نص للرسالة من المرسل</Text>
-                        </View>
-                        <View style={{ marginHorizontal: 20 }}>
-                            <Text style={{ color: colors.orange, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>12:00 am</Text>
-                            <View style={{ backgroundColor: colors.orange, borderRadius: 20, height: 20, width: 20, alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginTop: 10 }}>
-                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>4</Text>
+                        <TouchableOpacity style={{ flexDirection: 'row', borderBottomColor: '#f0e2c0', borderBottomWidth: 1, paddingVertical: 10 }}>
+                            <View style={{ height: 60, width: 60, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
+                                <Image source={images.person_two} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
                             </View>
-                        </View>
-                    </TouchableOpacity>
+                            <View style={{ padding: 10 }}>
+                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 }}>اوامر الشركة</Text>
+                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>اخر نص للرسالة من المرسل</Text>
+                            </View>
+                            <View style={{ marginHorizontal: 20 }}>
+                                <Text style={{ color: colors.orange, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>12:00 am</Text>
+                                <View style={{ backgroundColor: colors.orange, borderRadius: 20, height: 20, width: 20, alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginTop: 10 }}>
+                                    <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>4</Text>
+                                </View>
+                            </View>
+                        </TouchableOpacity>
 
-                    <TouchableOpacity style={{ flexDirection: 'row', borderBottomColor: '#f0e2c0', borderBottomWidth: 1, paddingVertical: 10 }}>
-                        <View style={{ height: 60, width: 60, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
-                            <Image source={images.person_two} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
-                        </View>
-                        <View style={{ padding: 10 }}>
-                            <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 }}>اوامر الشركة</Text>
-                            <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>اخر نص للرسالة من المرسل</Text>
-                        </View>
-                        <View style={{ marginHorizontal: 20 }}>
-                            <Text style={{ color: colors.orange, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>12:00 am</Text>
-                            <View style={{ backgroundColor: colors.orange, borderRadius: 20, height: 20, width: 20, alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginTop: 10 }}>
-                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>4</Text>
+                        <TouchableOpacity style={{ flexDirection: 'row', borderBottomColor: '#f0e2c0', borderBottomWidth: 1, paddingVertical: 10 }}>
+                            <View style={{ height: 60, width: 60, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
+                                <Image source={images.person_two} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
                             </View>
-                        </View>
-                    </TouchableOpacity>
+                            <View style={{ padding: 10 }}>
+                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 }}>اوامر الشركة</Text>
+                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>اخر نص للرسالة من المرسل</Text>
+                            </View>
+                            <View style={{ marginHorizontal: 20 }}>
+                                <Text style={{ color: colors.orange, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>12:00 am</Text>
+                                <View style={{ backgroundColor: colors.orange, borderRadius: 20, height: 20, width: 20, alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginTop: 10 }}>
+                                    <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>4</Text>
+                                </View>
+                            </View>
+                        </TouchableOpacity>
 
-                    <TouchableOpacity style={{ flexDirection: 'row', borderBottomColor: '#f0e2c0', borderBottomWidth: 1, paddingVertical: 10 }}>
-                        <View style={{ height: 60, width: 60, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
-                            <Image source={images.person_two} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
-                        </View>
-                        <View style={{ padding: 10 }}>
-                            <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 }}>اوامر الشركة</Text>
-                            <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>اخر نص للرسالة من المرسل</Text>
-                        </View>
-                        <View style={{ marginHorizontal: 20 }}>
-                            <Text style={{ color: colors.orange, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>12:00 am</Text>
-                            <View style={{ backgroundColor: colors.orange, borderRadius: 20, height: 20, width: 20, alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginTop: 10 }}>
-                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>4</Text>
+                        <TouchableOpacity style={{ flexDirection: 'row', borderBottomColor: '#f0e2c0', borderBottomWidth: 1, paddingVertical: 10 }}>
+                            <View style={{ height: 60, width: 60, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
+                                <Image source={images.person_two} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
                             </View>
-                        </View>
-                    </TouchableOpacity>
+                            <View style={{ padding: 10 }}>
+                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 }}>اوامر الشركة</Text>
+                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>اخر نص للرسالة من المرسل</Text>
+                            </View>
+                            <View style={{ marginHorizontal: 20 }}>
+                                <Text style={{ color: colors.orange, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>12:00 am</Text>
+                                <View style={{ backgroundColor: colors.orange, borderRadius: 20, height: 20, width: 20, alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginTop: 10 }}>
+                                    <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>4</Text>
+                                </View>
+                            </View>
+                        </TouchableOpacity>
 
-                    <TouchableOpacity style={{ flexDirection: 'row', borderBottomColor: '#f0e2c0', borderBottomWidth: 1, paddingVertical: 10 }}>
-                        <View style={{ height: 60, width: 60, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
-                            <Image source={images.person_two} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
-                        </View>
-                        <View style={{ padding: 10 }}>
-                            <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 }}>اوامر الشركة</Text>
-                            <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>اخر نص للرسالة من المرسل</Text>
-                        </View>
-                        <View style={{ marginHorizontal: 20 }}>
-                            <Text style={{ color: colors.orange, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>12:00 am</Text>
-                            <View style={{ backgroundColor: colors.orange, borderRadius: 20, height: 20, width: 20, alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginTop: 10 }}>
-                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>4</Text>
+                        <TouchableOpacity style={{ flexDirection: 'row', borderBottomColor: '#f0e2c0', borderBottomWidth: 1, paddingVertical: 10 }}>
+                            <View style={{ height: 60, width: 60, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
+                                <Image source={images.person_two} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
                             </View>
-                        </View>
-                    </TouchableOpacity>
+                            <View style={{ padding: 10 }}>
+                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 }}>اوامر الشركة</Text>
+                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>اخر نص للرسالة من المرسل</Text>
+                            </View>
+                            <View style={{ marginHorizontal: 20 }}>
+                                <Text style={{ color: colors.orange, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>12:00 am</Text>
+                                <View style={{ backgroundColor: colors.orange, borderRadius: 20, height: 20, width: 20, alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginTop: 10 }}>
+                                    <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>4</Text>
+                                </View>
+                            </View>
+                        </TouchableOpacity>
 
-                    <TouchableOpacity style={{ flexDirection: 'row', borderBottomColor: '#f0e2c0', borderBottomWidth: 1, paddingVertical: 10 }}>
-                        <View style={{ height: 60, width: 60, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
-                            <Image source={images.person_two} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
-                        </View>
-                        <View style={{ padding: 10 }}>
-                            <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 }}>اوامر الشركة</Text>
-                            <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>اخر نص للرسالة من المرسل</Text>
-                        </View>
-                        <View style={{ marginHorizontal: 20 }}>
-                            <Text style={{ color: colors.orange, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>12:00 am</Text>
-                            <View style={{ backgroundColor: colors.orange, borderRadius: 20, height: 20, width: 20, alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginTop: 10 }}>
-                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>4</Text>
+                        <TouchableOpacity style={{ flexDirection: 'row', borderBottomColor: '#f0e2c0', borderBottomWidth: 1, paddingVertical: 10 }}>
+                            <View style={{ height: 60, width: 60, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
+                                <Image source={images.person_two} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
                             </View>
-                        </View>
-                    </TouchableOpacity>
+                            <View style={{ padding: 10 }}>
+                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 }}>اوامر الشركة</Text>
+                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>اخر نص للرسالة من المرسل</Text>
+                            </View>
+                            <View style={{ marginHorizontal: 20 }}>
+                                <Text style={{ color: colors.orange, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>12:00 am</Text>
+                                <View style={{ backgroundColor: colors.orange, borderRadius: 20, height: 20, width: 20, alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginTop: 10 }}>
+                                    <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>4</Text>
+                                </View>
+                            </View>
+                        </TouchableOpacity>
 
-                    <TouchableOpacity style={{ flexDirection: 'row', borderBottomColor: '#f0e2c0', borderBottomWidth: 1, paddingVertical: 10 }}>
-                        <View style={{ height: 60, width: 60, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
-                            <Image source={images.person_two} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
-                        </View>
-                        <View style={{ padding: 10 }}>
-                            <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 }}>اوامر الشركة</Text>
-                            <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>اخر نص للرسالة من المرسل</Text>
-                        </View>
-                        <View style={{ marginHorizontal: 20 }}>
-                            <Text style={{ color: colors.orange, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>12:00 am</Text>
-                            <View style={{ backgroundColor: colors.orange, borderRadius: 20, height: 20, width: 20, alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginTop: 10 }}>
-                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>4</Text>
+                        <TouchableOpacity style={{ flexDirection: 'row', borderBottomColor: '#f0e2c0', borderBottomWidth: 1, paddingVertical: 10 }}>
+                            <View style={{ height: 60, width: 60, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
+                                <Image source={images.person_two} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
                             </View>
-                        </View>
-                    </TouchableOpacity>
+                            <View style={{ padding: 10 }}>
+                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 }}>اوامر الشركة</Text>
+                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>اخر نص للرسالة من المرسل</Text>
+                            </View>
+                            <View style={{ marginHorizontal: 20 }}>
+                                <Text style={{ color: colors.orange, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>12:00 am</Text>
+                                <View style={{ backgroundColor: colors.orange, borderRadius: 20, height: 20, width: 20, alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginTop: 10 }}>
+                                    <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>4</Text>
+                                </View>
+                            </View>
+                        </TouchableOpacity>
 
-                    <TouchableOpacity style={{ flexDirection: 'row', borderBottomColor: '#f0e2c0', borderBottomWidth: 1, paddingVertical: 10 }}>
-                        <View style={{ height: 60, width: 60, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
-                            <Image source={images.person_two} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
-                        </View>
-                        <View style={{ padding: 10 }}>
-                            <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 }}>اوامر الشركة</Text>
-                            <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>اخر نص للرسالة من المرسل</Text>
-                        </View>
-                        <View style={{ marginHorizontal: 20 }}>
-                            <Text style={{ color: colors.orange, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>12:00 am</Text>
-                            <View style={{ backgroundColor: colors.orange, borderRadius: 20, height: 20, width: 20, alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginTop: 10 }}>
-                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>4</Text>
+                        <TouchableOpacity style={{ flexDirection: 'row', borderBottomColor: '#f0e2c0', borderBottomWidth: 1, paddingVertical: 10 }}>
+                            <View style={{ height: 60, width: 60, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
+                                <Image source={images.person_two} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
                             </View>
-                        </View>
-                    </TouchableOpacity>
+                            <View style={{ padding: 10 }}>
+                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 }}>اوامر الشركة</Text>
+                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>اخر نص للرسالة من المرسل</Text>
+                            </View>
+                            <View style={{ marginHorizontal: 20 }}>
+                                <Text style={{ color: colors.orange, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>12:00 am</Text>
+                                <View style={{ backgroundColor: colors.orange, borderRadius: 20, height: 20, width: 20, alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginTop: 10 }}>
+                                    <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>4</Text>
+                                </View>
+                            </View>
+                        </TouchableOpacity>
 
-                    <TouchableOpacity style={{ flexDirection: 'row', borderBottomColor: '#f0e2c0', borderBottomWidth: 1, paddingVertical: 10 }}>
-                        <View style={{ height: 60, width: 60, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
-                            <Image source={images.person_two} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
-                        </View>
-                        <View style={{ padding: 10 }}>
-                            <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 }}>اوامر الشركة</Text>
-                            <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>اخر نص للرسالة من المرسل</Text>
-                        </View>
-                        <View style={{ marginHorizontal: 20 }}>
-                            <Text style={{ color: colors.orange, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>12:00 am</Text>
-                            <View style={{ backgroundColor: colors.orange, borderRadius: 20, height: 20, width: 20, alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginTop: 10 }}>
-                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>4</Text>
+                        <TouchableOpacity style={{ flexDirection: 'row', borderBottomColor: '#f0e2c0', borderBottomWidth: 1, paddingVertical: 10 }}>
+                            <View style={{ height: 60, width: 60, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
+                                <Image source={images.person_two} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
                             </View>
-                        </View>
-                    </TouchableOpacity>
+                            <View style={{ padding: 10 }}>
+                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 }}>اوامر الشركة</Text>
+                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>اخر نص للرسالة من المرسل</Text>
+                            </View>
+                            <View style={{ marginHorizontal: 20 }}>
+                                <Text style={{ color: colors.orange, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>12:00 am</Text>
+                                <View style={{ backgroundColor: colors.orange, borderRadius: 20, height: 20, width: 20, alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginTop: 10 }}>
+                                    <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>4</Text>
+                                </View>
+                            </View>
+                        </TouchableOpacity>
 
-                    <TouchableOpacity style={{ flexDirection: 'row', borderBottomColor: '#f0e2c0', borderBottomWidth: 1, paddingVertical: 10 }}>
-                        <View style={{ height: 60, width: 60, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
-                            <Image source={images.person_two} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
-                        </View>
-                        <View style={{ padding: 10 }}>
-                            <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 }}>اوامر الشركة</Text>
-                            <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>اخر نص للرسالة من المرسل</Text>
-                        </View>
-                        <View style={{ marginHorizontal: 20 }}>
-                            <Text style={{ color: colors.orange, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>12:00 am</Text>
-                            <View style={{ backgroundColor: colors.orange, borderRadius: 20, height: 20, width: 20, alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginTop: 10 }}>
-                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>4</Text>
+                        <TouchableOpacity style={{ flexDirection: 'row', borderBottomColor: '#f0e2c0', borderBottomWidth: 1, paddingVertical: 10 }}>
+                            <View style={{ height: 60, width: 60, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
+                                <Image source={images.person_two} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
                             </View>
-                        </View>
-                    </TouchableOpacity>
+                            <View style={{ padding: 10 }}>
+                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 }}>اوامر الشركة</Text>
+                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>اخر نص للرسالة من المرسل</Text>
+                            </View>
+                            <View style={{ marginHorizontal: 20 }}>
+                                <Text style={{ color: colors.orange, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>12:00 am</Text>
+                                <View style={{ backgroundColor: colors.orange, borderRadius: 20, height: 20, width: 20, alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginTop: 10 }}>
+                                    <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>4</Text>
+                                </View>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             );
         }else if(this.state.type == 2){
@@ -430,6 +392,15 @@ class Home extends Component {
                         </View>
                     </View>
                 </Content>
+                {
+                    this.state.type == 1 ? (
+                        <View style={{ bottom: 30, flex: 1, alignSelf: 'center', alignItems: 'center', position: 'absolute' }}>
+                            <TouchableOpacity onPress={() => this.props.navigation.navigate('notFine')} style={{ backgroundColor: colors.orange, width: 60, height: 60, transform: [{ rotate: '45deg'}], alignItems: 'center', justifyContent: 'center', alignSelf: 'center' }}>
+                                <Image source={require('../../assets/images/dark_mode/emergency.png')} style={{ height: 40, width: 40, transform: [{ rotate: '-45deg'}] }} resizeMode={'contain'} />
+                            </TouchableOpacity>
+                        </View>
+                    ) : (<View />)
+                }
             </Container>
         );
     }

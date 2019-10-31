@@ -4,70 +4,19 @@ import {Container, Content, Header, Left, Right, Body, Button, Icon, Item, Label
 import lightStyles from '../../assets/styles/light'
 import darkStyles from '../../assets/styles/dark'
 import COLORS from '../consts/colors'
+import themeImages from '../consts/Images'
 import i18n from '../../locale/i18n'
 import {NavigationEvents} from "react-navigation";
 import MapView from 'react-native-maps';
 import { Video, Audio } from 'expo-av';
 import {Recorder, Player} from 'react-native-audio-player-recorder-no-linking';
-
+import * as Location from 'expo-location';
+import axios from 'axios'
+import Modal from "react-native-modal";
+import * as Permissions from "expo-permissions";
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
-
-const themeImages = {
-    lightImages: {
-        big_logo : require('../../assets/images/dark_mode/big_logo.png'),
-        drawer: require('../../assets/images/light_mode/drawer.png'),
-        logo_tittle: require('../../assets/images/light_mode/logo_tittle.png'),
-        search: require('../../assets/images/dark_mode/search.png'),
-        chat_non: require('../../assets/images/dark_mode/chat_non.png'),
-        chat_active: require('../../assets/images/dark_mode/chat_active.png'),
-        bell_non: require('../../assets/images/dark_mode/bell_non.png'),
-        bell_active: require('../../assets/images/dark_mode/bell_active.png'),
-        stopwatch_non: require('../../assets/images/dark_mode/stopwatch_non.png'),
-        stopwatch_active: require('../../assets/images/dark_mode/stopwatch_active.png'),
-        person_one: require('../../assets/images/dark_mode/person_one.png'),
-        person_two: require('../../assets/images/dark_mode/person_two.png'),
-        emergency: require('../../assets/images/dark_mode/emergency.png'),
-        stop_watch_time: require('../../assets/images/dark_mode/stop_watch_time.png'),
-        choose_time: require('../../assets/images/dark_mode/choose_time.png'),
-        timer_twinty_four: require('../../assets/images/dark_mode/timer_twinty_four.png'),
-        cross: require('../../assets/images/dark_mode/cross.png'),
-        back: require('../../assets/images/dark_mode/back.png'),
-        tick_blue: require('../../assets/images/dark_mode/tick_blue.png'),
-        play_button_big: require('../../assets/images/dark_mode/play_button_big.png'),
-        location_irbble: require('../../assets/images/light_mode/location_irbble.png'),
-        microphone: require('../../assets/images/light_mode/microphone.png'),
-        send: require('../../assets/images/dark_mode/send.png'),
-        pause_button: require('../../assets/images/light_mode/pause_button.png'),
-    },
-    darkImages: {
-        big_logo : require('../../assets/images/dark_mode/big_logo.png'),
-        drawer: require('../../assets/images/dark_mode/drawer.png'),
-        logo_tittle: require('../../assets/images/light_mode/logo_tittle.png'),
-        search: require('../../assets/images/dark_mode/search.png'),
-        chat_non: require('../../assets/images/dark_mode/chat_non.png'),
-        chat_active: require('../../assets/images/dark_mode/chat_active.png'),
-        bell_non: require('../../assets/images/dark_mode/bell_non.png'),
-        bell_active: require('../../assets/images/dark_mode/bell_active.png'),
-        stopwatch_non: require('../../assets/images/dark_mode/stopwatch_non.png'),
-        stopwatch_active: require('../../assets/images/dark_mode/stopwatch_active.png'),
-        person_one: require('../../assets/images/dark_mode/person_one.png'),
-        person_two: require('../../assets/images/dark_mode/person_two.png'),
-        emergency: require('../../assets/images/dark_mode/emergency.png'),
-        stop_watch_time: require('../../assets/images/dark_mode/stop_watch_time.png'),
-        choose_time: require('../../assets/images/dark_mode/choose_time.png'),
-        timer_twinty_four: require('../../assets/images/dark_mode/timer_twinty_four.png'),
-        cross: require('../../assets/images/dark_mode/cross.png'),
-        back: require('../../assets/images/dark_mode/back.png'),
-        tick_blue: require('../../assets/images/dark_mode/tick_blue.png'),
-        play_button_big: require('../../assets/images/dark_mode/play_button_big.png'),
-        location_irbble: require('../../assets/images/dark_mode/location_irbble.png'),
-        microphone: require('../../assets/images/dark_mode/microphone.png'),
-        send: require('../../assets/images/dark_mode/send.png'),
-        pause_button: require('../../assets/images/light_mode/pause_button.png'),
-    }
-}
 
 const messages = [{
     id: 1,
@@ -97,7 +46,7 @@ const messages = [{
     message: null,
     lat: 31.0413814,
     long: 31.3478201,
-    file: "http://node.aait.sa/old/I'm_fine/public/uploads/videos/jyMuKOMx6c.mp4",
+    file: "https://shams.arabsdesign.com/im_fine/jyMuKOMx6c.mp4",
     time: 'منذ 3 دقائق'
 },{
     id: 4,
@@ -107,9 +56,9 @@ const messages = [{
     message: null,
     lat: 31.0413814,
     long: 31.3478201,
-    file: "http://node.aait.sa/old/I'm_fine/public/uploads/audios/2E05VwzUPG.mp3",
+    file: "file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540m_shams%252Fim-fine/Audio/recording-a7871be6-dd04-4c66-b10f-0ff8c58554b0.m4a",
     time: 'منذ 3 دقائق'
-},]
+}];
 
 class Inbox extends Component {
     constructor(props){
@@ -118,7 +67,7 @@ class Inbox extends Component {
             type: 1,
             isTimePickerVisible: false,
             timeType: 'start',
-            fadeAnim: new Animated.Value(-height),
+            fadeAnim: new Animated.Value(-55),
             availabel: 0,
             search: '',
             messages,
@@ -126,12 +75,57 @@ class Inbox extends Component {
             long: null,
             playedVideo: null,
             playedAudio: null,
-            audioPath: null
+            audioPath: null,
+            startRecord: false,
+            finishRecord: false,
+            resetRecord: false,
+            isModalVisible: false,
+            location: '',
+            mapRegion: null,
+            initMap: true,
         }
     }
 
-    componentWillMount() {
-        this.setState({ initMap: false });
+    async componentWillMount() {
+
+        let { status } = await Permissions.askAsync(Permissions.LOCATION);
+        if (status !== 'granted') {
+            alert('صلاحيات تحديد موقعك الحالي ملغاه');
+        }else {
+            const { coords: { latitude, longitude } } = await Location.getCurrentPositionAsync({});
+            const userLocation = { latitude, longitude };
+            this.setState({  mapRegion: userLocation, initMap: false });
+        }
+
+        let getCity = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=';
+        getCity += this.state.mapRegion.latitude + ',' + this.state.mapRegion.longitude;
+        getCity += '&key=AIzaSyCJTSwkdcdRpIXp2yG7DfSRKFWxKhQdYhQ&language=ar&sensor=true';
+
+        try {
+            const { data } = await axios.get(getCity);
+            this.setState({ location: data.results[0].formatted_address });
+        } catch (e) {
+            console.log(e);
+        }
+        this.playAudio(1, 'file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540m_shams%252Fim-fine/Audio/recording-d35cb168-49ab-42f0-96ab-dde3202d4fa9.m4a')
+    }
+
+    _handleMapRegionChange  = async (mapRegion) =>  {
+        this.setState({ mapRegion });
+
+        let getCity = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=';
+        getCity += mapRegion.latitude + ',' + mapRegion.longitude;
+        getCity += '&key=AIzaSyCJTSwkdcdRpIXp2yG7DfSRKFWxKhQdYhQ&language=ar&sensor=true';
+
+        console.log('locations data', getCity);
+
+        try {
+            const { data } = await axios.get(getCity);
+            this.setState({ location: data.results[0].formatted_address });
+
+        } catch (e) {
+            console.log(e);
+        }
     }
 
     videoControl(id){
@@ -141,22 +135,41 @@ class Inbox extends Component {
             this.setState({ playedVideo: id })
     }
 
-    async playAudio(id, path){
-        if (this.state.playedVideo == id)
-            this.setState({ playedAudio: null, audioPath: null })
-        else
-            this.setState({ playedAudio: id, audioPath: path })
-
+    async playAudio(id, info){
+        console.log(info);
         const soundObject = new Audio.Sound();
         try {
-            await soundObject.loadAsync({ uri: path });
+            await soundObject.loadAsync({ uri: info.url });
+            console.log('test audio', soundObject);
             await soundObject.playAsync();
 
             const status = await soundObject.getStatusAsync();
             console.log('status....', status)
 
         } catch (error) {
-            // An error occurred!
+            console.log('fuck error', error)
+        }
+    }
+
+    setAnimate(){
+        if (this.state.availabel === 0){
+            Animated.timing(
+                this.state.fadeAnim,
+                {
+                    toValue: 0,
+                    duration: 800,
+                },
+            ).start();
+            this.setState({ availabel: 1 });
+        }else {
+            Animated.timing(
+                this.state.fadeAnim,
+                {
+                    toValue: -55,
+                    duration: 800,
+                },
+            ).start();
+            this.setState({ availabel: 0 });
         }
     }
 
@@ -296,11 +309,9 @@ class Inbox extends Component {
                                 playbackSlider={(renderProps) => {
                                     return (
                                         <Slider
-                                            style={{ transform: [ { scaleY: 1.5 }], width: '90%' }}
-                                            value={20}
-                                            onValueChange={(value) => console.log(value)}
-                                            thumbTintColor={'#000'}
-                                            maximumTrackTintColor={"#fffdf7"}
+                                            style={{ width: '90%' }}
+                                            thumbTintColor={colors.orange}
+                                            maximumTrackTintColor={"#ffffff"}
                                             minimumTrackTintColor={colors.orange}
                                             minimimValue={0}
                                             maximumValue={renderProps.maximumValue}
@@ -323,6 +334,21 @@ class Inbox extends Component {
                 );
             }
         }
+    }
+
+    sendRecord(){
+        this.setAnimate();
+        this.setState({ finishRecord: true, resetRecord: false, startRecord: false })
+    }
+
+    startRecord(){
+        this.setAnimate();
+        this.setState({ startRecord: true, finishRecord: false, resetRecord: false, })
+    }
+
+    cansleRecord(){
+        this.setAnimate();
+        this.setState({ resetRecord: true, startRecord: false, finishRecord: false,  })
     }
 
     onFocus(){
@@ -374,51 +400,6 @@ class Inbox extends Component {
                             <View style={{width: 0, height: 0, backgroundColor: 'transparent', borderStyle: 'solid', borderLeftWidth: 50, borderTopWidth: 50, borderLeftColor: 'transparent', borderTopColor: colors.darkBackground, right: 0, position: 'absolute', top: -1 }} />
                             <View style={{ height: 10, width: '100%' }}/>
                             <View style={{ width: 1, height: 70, backgroundColor: '#ddd', transform: [{ rotate: '45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
-                            <Recorder
-                                style={{ flex: 1 }}
-                                onComplete={this.recorderComplete}
-                                maxDurationMillis={150000}
-                                showDebug={true}
-                                showBackButton={true}
-                                audioMode={{
-                                    allowsRecordingIOS: true,
-                                    interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
-                                    playsInSilentModeIOS: true,
-                                    playsInSilentLockedModeIOS: true,
-                                    staysActiveInBackground: true,
-                                    shouldDuckAndroid: true,
-                                    interruptionModeAndroid:
-                                    Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
-                                    playThroughEarpieceAndroid: false
-                                }}
-
-                                recordingCompleteButton={(renderProps) => {
-                                    return (
-                                        <Button
-                                            onPress={renderProps.onPress}
-                                            block
-                                            success
-                                            style={{ marginVertical: 5 }}
-                                        >
-                                            <Text>Finish</Text>
-                                        </Button>
-                                    );
-                                }}
-                                playbackSlider={(renderProps) => {
-                                    console.log({'maximumValue: ': renderProps.maximumValue});
-                                    return (
-                                        <Slider
-                                            minimimValue={0}
-                                            maximumValue={renderProps.maximumValue}
-                                            onValueChange={renderProps.onSliderValueChange}
-                                            value={renderProps.value}
-                                            style={{
-                                                width: '100%'
-                                            }}
-                                        />
-                                    );
-                                }}
-                            />
                             <KeyboardAvoidingView behavior={'height'} style={{width:'100%', flexDirection:'column', flex: 1, zIndex: -1, marginTop: -77 }}>
                                 <ScrollView
                                     ref={ref => this.scrollView = ref}
@@ -441,19 +422,128 @@ class Inbox extends Component {
                                             </TouchableOpacity>
                                         </View>
                                     </View>
-                                    <TouchableOpacity style={{ flex: 1, marginTop: 15, marginLeft: -7 }}>
+                                    <TouchableOpacity style={{ flex: 1, marginTop: 15, marginLeft: -7 }} onPress={() => this.setState({ isModalVisible: !this.state.isModalVisible })}>
                                         <Image source={images.location_irbble} style={{ width: 25, height: 25 }} resizeMode={'contain'} />
                                     </TouchableOpacity>
                                     <View style={{ height: 40, width: 1, backgroundColor: '#ddd', marginRight: 9, marginTop: 7 }} />
-                                    <TouchableOpacity style={{ flex: 1, marginTop: 15, marginRight: -10 }}>
+                                    <TouchableOpacity style={{ flex: 1, marginTop: 15, marginRight: -10 }} onPress={() => this.startRecord()}>
                                         <Image source={images.microphone} style={{ width: 25, height: 25 }} resizeMode={'contain'} />
                                     </TouchableOpacity>
                                 </View>
+                                <Animated.View style={{ backgroundColor: colors.inboxInputBackground, flexDirection:'row' , flex: 1, width: '100%',height: 55, position:'absolute' , bottom: this.state.fadeAnim, padding: 3, marginBottom: 6}}>
+                                    <View style={{ width: '84%', paddingHorizontal: 20, paddingBottom: 10, marginLeft: -15 }}>
+                                        <Recorder
+                                            style={{flex: 1}}
+                                            onComplete={(i) => this.playAudio(null, i)}
+                                            maxDurationMillis={150000}
+                                            showDebug={false}
+                                            startRecord={this.state.startRecord}
+                                            resetRecord={this.state.resetRecord}
+                                            finishRecord={this.state.finishRecord}
+                                            showBackButton={true}
+                                            audioMode={{
+                                                allowsRecordingIOS: true,
+                                                interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+                                                playsInSilentModeIOS: true,
+                                                playsInSilentLockedModeIOS: true,
+                                                staysActiveInBackground: true,
+                                                shouldDuckAndroid: true,
+                                                interruptionModeAndroid:
+                                                Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
+                                                playThroughEarpieceAndroid: false
+                                            }}
+                                            recordingCompleteButton={(renderProps) => {
+                                                return (
+                                                    <TouchableOpacity style={{ marginTop: 15, position: 'absolute', right: -80 }} onPress={renderProps.onPress}>
+                                                        <Image source={images.sendRecord} style={{ width: 30, height: 30 }} resizeMode={'contain'} />
+                                                    </TouchableOpacity>
+                                                );
+                                            }}
+                                            playbackSlider={(renderProps) => {
+                                                return (
+                                                    <Slider
+                                                        minimimValue={0}
+                                                        maximumValue={renderProps.maximumValue}
+                                                        onValueChange={renderProps.onSliderValueChange}
+                                                        value={renderProps.value}
+                                                        style={{ width: '100%', position: 'absolute' }}
+                                                        thumbTintColor={colors.orange}
+                                                        maximumTrackTintColor={"#dddddd"}
+                                                        minimumTrackTintColor={colors.orange}
+                                                    />
+                                                );
+                                            }}
+                                        />
+                                    </View>
+                                    <TouchableOpacity style={{ marginTop: 15, marginLeft: -7 }} onPress={() => this.cansleRecord() }>
+                                        <Image source={images.cansle} style={{ width: 20, height: 20 }} resizeMode={'contain'} />
+                                    </TouchableOpacity>
+                                    <View style={{ height: 40, width: 1, backgroundColor: '#ddd', marginRight: 9, marginTop: 7 }} />
+                                </Animated.View>
                             </KeyboardAvoidingView>
-
                         </View>
                     </View>
                 </Content>
+                <Modal onBackdropPress={()=> this.setState({ isModalVisible : false })} isVisible={this.state.isModalVisible}>
+                    <View style={{ height, width: '115%', backgroundColor: colors.darkBackground, right: 20 }}>
+                        <Right style={[ styles.flex0, { alignSelf: 'flex-start', marginLeft: 20 }]}>
+                            <View style={{ flexDirection: 'row', marginTop: 15 }}>
+                                <View style={{ height: 40, width: 40, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
+                                    <Image source={images.person_two} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
+                                </View>
+                                <View style={{ paddingHorizontal: 10 }}>
+                                    <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 }}>اوامر الشركة</Text>
+                                    <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>{ i18n.t('online') }</Text>
+                                </View>
+                            </View>
+                        </Right>
+                        <TouchableOpacity onPress={() => this.setState({ isModalVisible: !this.state.isModalVisible })} style={{ height: 45, width: 45, right: 35, position: 'absolute', flex: 1, }}>
+                            <Image source={images.cross} style={{ width: 25, height: 25, margin: 20,}} resizeMode={'contain'}/>
+                        </TouchableOpacity>
+
+                        <View style={{ marginTop: 10, height, backgroundColor: colors.lightBackground, borderTopColor: '#ddd', borderTopWidth: 1}}>
+                            <View style={{width: 0, height: 0, backgroundColor: 'transparent', borderStyle: 'solid', borderLeftWidth: 50, borderTopWidth: 50, borderLeftColor: 'transparent', borderTopColor: colors.darkBackground, right: 0, position: 'absolute', zIndex:1, top: -1 }} />
+                            <View style={{ height: 10, width: '100%' }}/>
+                            <View style={{ width: 1, height: 70, backgroundColor: '#ddd', transform: [{ rotate: '45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
+                            <View style={{ width: '100%', height: height-80, marginTop: -80 }}>
+                                {
+                                    !this.state.initMap ? (
+                                        <MapView
+                                            style={{ flex: 1, width: '100%', height }}
+                                            initialRegion={{
+                                                latitude: this.state.mapRegion.latitude,
+                                                longitude: this.state.mapRegion.longitude,
+                                                latitudeDelta: 0.0922,
+                                                longitudeDelta: 0.0421,
+                                            }}
+                                        >
+                                            <MapView.Marker draggable
+                                                            coordinate={this.state.mapRegion}
+                                                            onDragEnd={(e) =>  this._handleMapRegionChange(e.nativeEvent.coordinate)}
+                                            >
+                                                <Image source={images.my_location_map} resizeMode={'contain'} style={{ width: 50, height: 50 }}/>
+                                            </MapView.Marker>
+                                        </MapView>
+                                    ) : (<View />)
+                                }
+                            </View>
+                        </View>
+                        <View style={{ backgroundColor: colors.inboxInputBackground, flexDirection:'row' , flex: 1, width: '100%',height:65, position:'absolute' , bottom:0, padding: 3, marginBottom: 6}}>
+                            <View style={{ width: '90%', paddingHorizontal: 20, paddingBottom: 10, marginLeft: -15 }}>
+                                <View style={{ borderRadius: 30, borderWidth: 1, borderColor: colors.labelFont, height: 40, marginTop: 5, padding: 5, flexDirection: 'row', backgroundColor: colors.inboxInput  }}>
+                                    <Item style={{ alignSelf: 'flex-start', borderBottomWidth: 0, top: -18, marginTop: 0 ,position:'absolute', width:'88%', paddingHorizontal: 5,  }} bordered>
+                                        <Input disabled value={this.state.location} placeholderTextColor={'#e5d7bb'} style={{ width: '100%', fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontSize: 15, top: 10, marginLeft: 30 }}  />
+                                    </Item>
+                                    <Image source={images.location_irbble} style={{ height: 27, width: 27, left: 5 }} resizeMode={'contain'} />
+                                </View>
+                            </View>
+                            <TouchableOpacity style={{ flex: 1, marginTop: 15, marginRight: -10 }} onPress={() => this.startRecord()}>
+                                <Image source={require('../../assets/images/dark_mode/tick.png')} style={{ width: 25, height: 25 }} resizeMode={'contain'} />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+
+                </Modal>
             </Container>
         );
     }

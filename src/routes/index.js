@@ -10,6 +10,9 @@ import ActiveCode from "../components/ActiveCode";
 import Home from "../components/Home";
 import CustomDrawer from "./CustomDrawer";
 import Inbox from "../components/Inbox";
+import NotFine from "../components/NotFine";
+import VideoRecorder from "../components/VideoRecorder";
+import ConfirmStatus from "../components/ConfirmStatus";
 
 const width = Dimensions.get('window').width;
 const CustomDrawerContentComponent = (props) => (<CustomDrawer { ...props }/>);
@@ -28,17 +31,35 @@ const DrawerNavigator = createDrawerNavigator({
 });
 
 const appStack = createStackNavigator({
+    DrawerNavigator: {
+        screen: DrawerNavigator,
+        navigationOptions: {
+            header: null,
+            gesturesEnabled: false
+        }
+    },
+    notFine: {
+        screen: NotFine,
+        navigationOptions: {
+            header: null,
+        }
+    },
     inbox: {
         screen: Inbox,
         navigationOptions: {
             header: null,
         }
     },
-    DrawerNavigator: {
-        screen: DrawerNavigator,
+    VideoRecorder: {
+        screen: VideoRecorder,
         navigationOptions: {
             header: null,
-            gesturesEnabled: false
+        }
+    },
+    confirmStatus: {
+        screen: ConfirmStatus,
+        navigationOptions: {
+            header: null,
         }
     },
 });

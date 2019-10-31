@@ -4,6 +4,10 @@ import {Container, Content} from 'native-base';
 import { DrawerItems } from 'react-navigation-drawer';
 import {connect} from "react-redux";
 import i18n from '../../locale/i18n'
+import lightStyles from '../../assets/styles/light'
+import darkStyles from '../../assets/styles/dark'
+import COLORS from '../consts/colors'
+import themeImages from '../consts/Images'
 
 class CustomDrawer extends Component {
     constructor(props){
@@ -16,14 +20,33 @@ class CustomDrawer extends Component {
     }
 
     render(){
+        let styles  = lightStyles;
+        let images  = themeImages.lightImages;
+        let colors  = COLORS;
+
+        if (this.props.theme == 'dark') {
+            styles = darkStyles;
+            images = themeImages.darkImages;
+            colors = colors.darkColors
+        }else {
+            styles = lightStyles;
+            images = themeImages.lightImages;
+            colors = colors.lightColors
+        }
+
+
         return(
-            <Container style={{ overflow: 'visible' }}>
+            <Container style={{ overflow: 'visible', backgroundColor: colors.darkBackground }}>
                 <Content contentContainerStyle={{ flexGrow: 1 }}>
                     <View>
-                        <TouchableOpacity onPress={() => this.props.navigation.navigate(this.props.user ? 'profile' : 'login')} style={{ height:150, alignItems: 'center', justifyContent: 'center', marginTop: 40, marginLeft: 10 }}>
-                            {/*<Image source={{ uri: user.avatar }} style={{ width: 140, height: 140 }} resizeMode={'cover'} />*/}
-                        </TouchableOpacity>
-                        <Text style={{ color: '#acabae', fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', textAlign: 'center', fontSize: 18, top: -5, marginLeft: 10 }}>User Name</Text>
+                        <View style={{ alignItems: 'center', marginTop: 60 }}>
+                            <ImageBackground source={images.bg_for_pic} style={{ width: 120, height: 120, alignItems: 'center', justifyContent: 'center' }}>
+                                <TouchableOpacity style={{ height: 85, width: 85, borderRadius: 50, overflow: 'hidden', justifyContent: 'center', alignItems: 'center', right: 5, top: -3 }}>
+                                    <Image source={images.person_two} style={{ width: 100, height: 100, }} resizeMode={'cover'} />
+                                </TouchableOpacity>
+                            </ImageBackground>
+                        </View>
+                        <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', textAlign: 'center', fontSize: 18, top: -5, marginLeft: 10 }}>User Name</Text>
                         <View style={{ marginTop: 50 }}>
                             <DrawerItems
                                 {...this.props} labelStyle={{color: '#fff', marginTop: 10, fontSize: 16, marginHorizontal: 5, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontWeight: 'normal'}}  />
