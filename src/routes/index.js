@@ -13,11 +13,21 @@ import Inbox from "../components/Inbox";
 import NotFine from "../components/NotFine";
 import VideoRecorder from "../components/VideoRecorder";
 import ConfirmStatus from "../components/ConfirmStatus";
+import Settings from "../components/Settings";
+import EmergencyList from "../components/EmergencyList";
+import Profile from "../components/Profile";
+import EditProfile from "../components/EditProfile";
+import ShareApp from "../components/ShareApp";
+import Complaint from "../components/Complaint";
 
 const width = Dimensions.get('window').width;
 const CustomDrawerContentComponent = (props) => (<CustomDrawer { ...props }/>);
 const DrawerNavigator = createDrawerNavigator({
     home: Home,
+    profile: Profile,
+    complaint: Complaint,
+    shareApp: ShareApp,
+    settings: Settings,
 }, {
     nitialRouteName: 'home',
     drawerPosition: I18nManager.isRTL ?'right' : 'left',
@@ -31,11 +41,48 @@ const DrawerNavigator = createDrawerNavigator({
 });
 
 const appStack = createStackNavigator({
+
+    complaint: {
+        screen: Complaint,
+        navigationOptions: {
+            header: null,
+        }
+    },
     DrawerNavigator: {
         screen: DrawerNavigator,
         navigationOptions: {
             header: null,
             gesturesEnabled: false
+        }
+    },
+    shareApp: {
+        screen: ShareApp,
+        navigationOptions: {
+            header: null,
+        }
+    },
+    editProfile: {
+        screen: EditProfile,
+        navigationOptions: {
+            header: null,
+        }
+    },
+    profile: {
+        screen: Profile,
+        navigationOptions: {
+            header: null,
+        }
+    },
+    emergencyList: {
+        screen: EmergencyList,
+        navigationOptions: {
+            header: null,
+        }
+    },
+    settings: {
+        screen: Settings,
+        navigationOptions: {
+            header: null,
         }
     },
     notFine: {

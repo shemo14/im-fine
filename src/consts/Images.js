@@ -44,6 +44,12 @@ export default {
         email: require('../../assets/images/dark_mode/email.png'),
         location: require('../../assets/images/light_mode/my_location_yellow.png'),
         small_logo: require('../../assets/images/dark_mode/small_logo.png'),
+        modeImg: require('../../assets/images/light_mode/light_mode.png'),
+        iphone: require('../../assets/images/light_mode/iphone_x.png'),
+        mail: require('../../assets/images/light_mode/mail.png'),
+        loc: require('../../assets/images/light_mode/location.png'),
+        share: require('../../assets/images/light_mode/share.png'),
+        warning: require('../../assets/images/light_mode/warning.png'),
     },
     darkImages: {
         big_logo: require('../../assets/images/dark_mode/big_logo.png'),
@@ -81,5 +87,12 @@ export default {
         email: require('../../assets/images/dark_mode/email.png'),
         location: require('../../assets/images/dark_mode/my_location_yellow.png'),
         small_logo: require('../../assets/images/dark_mode/small_logo.png'),
+        cog: require('../../assets/images/dark_mode/cog.png'),
+        modeImg: require('../../assets/images/dark_mode/dark_mode.png'),
+        iphone: require('../../assets/images/dark_mode/phone.png'),
+        mail: require('../../assets/images/dark_mode/email.png'),
+        loc: require('../../assets/images/dark_mode/location_irbble.png'),
+        share: require('../../assets/images/dark_mode/share.png'),
+        warning: require('../../assets/images/dark_mode/warning.png'),
     }
 }
