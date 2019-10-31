@@ -80,7 +80,7 @@ class ActiveCode extends Component {
 
             if (this.state.userId === null){
                 this.setState({ userId: newProps.auth.data.id });
-                this.props.profile(newProps.auth.data.id);
+                this.props.profile(newProps.auth.data.id, this.props.lang);
             }
 
             this.props.navigation.navigate('DrawerNavigator');
