@@ -29,6 +29,12 @@ class Home extends Component {
         }
     }
 
+
+    static navigationOptions = () => ({
+        drawerLabel:  i18n.t('home')  ,
+        drawerIcon: (<Image source={require('../../assets/images/light_mode/home_fine.png')} style={{width:22 , height:22}} resizeMode={'contain'} /> )
+    })
+
     showTimePicker = (timeType) => {
         this.setState({ isTimePickerVisible: true, timeType });
     };
