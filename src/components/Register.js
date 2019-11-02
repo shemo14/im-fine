@@ -1,9 +1,10 @@
 import React, { Component } from "react";
 import { View, Text, Image, TouchableOpacity, ImageBackground, I18nManager, Dimensions} from "react-native";
-import {Container, Content, Form, Item, Input, Label, Button, Toast, CheckBox} from 'native-base'
+import {Container, Content, Form, Item, Input, Label, Button, Toast, CheckBox, Picker} from 'native-base'
 import lightStyles from '../../assets/styles/light'
 import darkStyles from '../../assets/styles/dark'
 import COLORS from '../consts/colors'
+
 import i18n from '../../locale/i18n'
 // import { connect } from 'react-redux';
 // import { userLogin, profile } from '../actions'
@@ -16,6 +17,7 @@ import * as Location from 'expo-location';
 import themeImages from '../consts/Images'
 import axios from 'axios'
 import Modal from "react-native-modal";
+import CONST from "../consts";
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
@@ -27,16 +29,23 @@ class Register extends Component {
         this.state = {
             phoneStatus: 0,
             passwordStatus: 0,
+            name: '',
             phone: '',
             password: '',
             token: '',
             base64: null,
+            lat: null,
+            lng: null,
+            countryCode: null,
             userId: null,
             isLoaded: false,
             mapRegion: [],
+            countries: [],
+
             location: '',
             checked: false,
-            isModalVisible: false
+            isModalVisible: false,
+            isSubmitted: false
         }
     }
 
@@ -44,17 +53,30 @@ class Register extends Component {
         let isError = false;
         let msg = '';
 
-        if (this.state.phone.length <= 0 || this.state.phone.length !== 10) {
+        if (this.state.name === '') {
             isError = true;
-            msg = i18n.t('phoneValidation');
-        }else if (this.state.password.length <= 0) {
+            msg = i18n.t('nameValidation');
+        }else if (this.state.phone.length <= 0 || this.state.phone.length !== 10) {
             isError = true;
-            msg = i18n.t('passwordRequired');
+            msg = i18n.t('phoneRequired');
+        }else if (this.state.checked ===  false) {
+            isError = true;
+            msg = i18n.t('checkedRequired');
+        }else if (this.state.location.length <= 0) {
+            isError = true;
+            msg = i18n.t('locationRequired');
+        }else if (this.state.base64 === null) {
+            isError = true;
+            msg = i18n.t('base64Required');
+        }else if(this.state.countryCode == null){
+            isError = true;
+            msg = i18n.t('countryValidation');
         }
         if (msg != ''){
             Toast.show({
                 text: msg,
                 type: "danger",
+                style : { fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' , textAlign : 'center'},
                 duration: 3000
             });
         }
@@ -81,28 +103,87 @@ class Register extends Component {
     };
 
     async componentWillMount() {
+
+        axios.get(CONST.url + 'codes').then(response => {
+            this.setState({ countries: response.data.data, loader: false })
+        })
+
         let { status } = await Permissions.askAsync(Permissions.LOCATION);
         if (status !== 'granted') {
             alert('صلاحيات تحديد موقعك الحالي ملغاه');
         }else {
             const { coords: { latitude, longitude } } = await Location.getCurrentPositionAsync({});
             const userLocation = { latitude, longitude };
+            this.setState({
+                lat : latitude ,
+                lng : longitude
+            });
             this.setState({  mapRegion: userLocation });
         }
 
-        // let getCity = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=';
-        // getCity += this.state.mapRegion.latitude + ',' + this.state.mapRegion.longitude;
-        // getCity += '&key=AIzaSyCJTSwkdcdRpIXp2yG7DfSRKFWxKhQdYhQ&language=ar&sensor=true';
-        //
-        // try {
-        //     const { data } = await axios.get(getCity);
-        //     this.setState({ location: data.results[0].formatted_address });
-        // } catch (e) {
-        //     console.log(e);
-        // }
+        let getCity = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=';
+        getCity += this.state.mapRegion.latitude + ',' + this.state.mapRegion.longitude;
+        getCity += '&key=AIzaSyCJTSwkdcdRpIXp2yG7DfSRKFWxKhQdYhQ&language=ar&sensor=true';
+
+        try {
+            const { data } = await axios.get(getCity);
+            this.setState({ location: data.results[0].formatted_address });
+        } catch (e) {
+            console.log(e);
+        }
     }
 
-    onFocus(){
+    onFocus(){}
+
+    onLoginPressed() {
+        const err = this.validate();
+        if (!err){
+            this.setState({ isSubmitted: true });
+            axios.post(CONST.url + 'sign-up', {
+                phone: this.state.phone,
+                name: this.state.name,
+                country_code: this.state.countryCode,
+                email :this.state.email,
+                image : this.state.base64,
+                lang: 'ar' ,
+                lat : this.state.lat,
+                lng : this.state.lng,
+                address : this.state.location,
+            }).then(response => {
+                if(response.data.status == 200){
+                    this.setState({ isSubmitted: false });
+                    this.props.navigation.navigate('activeCode', { data: response.data.data, code: response.data.extra.code });
+                }else{
+                    this.setState({ isSubmitted: false });
+                    Toast.show({
+                        text: response.data.msg,
+                        type: "danger",
+                        duration: 3000
+                    });
+                }
+            })
+        }
+    }
+
+
+    render_submit(colors)
+    {
+
+        if (this.state.isSubmitted){
+            return(
+                <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 20 }}>
+                    <DoubleBounce size={20} color={colors.orange} />
+                </View>
+            )
+        }
+
+        return (
+            <View style={{ bottom: 25, flex: 1, alignSelf: 'center', alignItems: 'center', position: 'absolute' }}>
+                <TouchableOpacity onPress={()=>{this.onLoginPressed()}} style={{ backgroundColor: colors.orange, width: 60, height: 60, transform: [{ rotate: '45deg'}], alignItems: 'center', justifyContent: 'center', alignSelf: 'center' }}>
+                    <Image source={require('../../assets/images/dark_mode/tick.png')} style={{ height: 40, width: 40, transform: [{ rotate: '-45deg'}] }} resizeMode={'contain'} />
+                </TouchableOpacity>
+            </View>
+        );
 
     }
 
@@ -141,32 +222,52 @@ class Register extends Component {
                             <View style={{ borderRadius: 3, borderWidth: 1, borderColor: colors.labelFont, height: 45,marginTop: 10, padding: 5, flexDirection: 'row'  }}>
                                 <Item style={{ alignSelf: 'flex-start', borderBottomWidth: 0, top: -18, marginTop: 0 ,position:'absolute', width:'88%', paddingHorizontal: 5 }} bordered>
                                     <Label style={{ top:5, paddingRight: 10, paddingLeft: 10, backgroundColor: colors.darkBackground, alignSelf: 'flex-start', color: colors.labelFont, fontSize: 14, position: 'absolute' }}>{ i18n.t('username') }</Label>
-                                    <Input placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('username') + '...'} onChangeText={(name) => this.setState({name})} style={{ width: '100%', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontSize: 15, top: 15 }} />
-                                </Item>
+                                    <Input value={this.state.name} placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('username') + '...'} onChangeText={(name) => this.setState({name})} style={{ width: '100%', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontSize: 15, top: 15 }} />
+                                 </Item>
                                 <Image source={images.user} style={{ height: 22, width: 22, right: 15, top: 9, position: 'absolute', flex: 1 }} resizeMode={'contain'} />
                             </View>
-
+                            <View>
+                                <Item style={[styles.itemPicker, { borderColor: colors.labelFont }]} regular >
+                                    <Picker
+                                        mode="dropdown"
+                                        style={[styles.picker, { color: colors.labelFont } ]}
+                                        placeholderStyle={{ color: "#e5d7bb" }}
+                                        placeholderIconColor="#fff"
+                                        selectedValue={this.state.countryCode}
+                                        onValueChange={(value) => this.setState({ countryCode: value })}
+                                    >
+                                        <Picker.Item label={ i18n.t('selectCity') } value={null} />
+                                        {
+                                            this.state.countries.map((country, i) => (
+                                                <Picker.Item key={i} label={country.title} value={country.code} />
+                                            ))
+                                        }
+                                    </Picker>
+                                    <Image source={images.right_wight_arrow_drop} style={styles.pickerImg} resizeMode={'contain'} />
+                                </Item>
+                            </View>
                             <View style={{ borderRadius: 3, borderWidth: 1, borderColor: colors.labelFont, height: 45, marginTop: 20, padding: 5, flexDirection: 'row'  }}>
                                 <Item style={{ alignSelf: 'flex-start', borderBottomWidth: 0, top: -18, marginTop: 0 ,position:'absolute', width:'88%', paddingHorizontal: 5 }} bordered>
                                     <Label style={{ top:5,  paddingRight: 10, paddingLeft: 10, backgroundColor: colors.darkBackground, alignSelf: 'flex-start', color: colors.labelFont, fontSize: 14, position: 'absolute' }}>{ i18n.t('phoneNumber') }</Label>
-                                    <Input placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('phoneNumber') + '...'} onChangeText={(phone) => this.setState({phone})} keyboardType={'number-pad'} style={{ width: '100%', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontSize: 15, top: 15 }}  />
-                                </Item>
+                                    <Input value={this.state.phone}  placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('phoneNumber') + '...'} onChangeText={(phone) => this.setState({phone})} keyboardType={'number-pad'} style={{ width: '100%', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontSize: 15, top: 15 }}  />
+                                 </Item>
                                 <Image source={images.phone} style={{ height: 22, width: 22, right: 15, top: 9, position: 'absolute', flex: 1 }} resizeMode={'contain'} />
                             </View>
 
                             <View style={{ borderRadius: 3, borderWidth: 1, borderColor: colors.labelFont, height: 45, marginTop: 20, padding: 5, flexDirection: 'row'  }}>
                                 <Item style={{ alignSelf: 'flex-start', borderBottomWidth: 0, top: -18, marginTop: 0 ,position:'absolute', width:'88%', paddingHorizontal: 5 }} bordered>
                                     <Label style={{ top:5,  paddingRight: 10, paddingLeft: 10, backgroundColor: colors.darkBackground, alignSelf: 'flex-start', color: colors.labelFont, fontSize: 14, position: 'absolute' }}>{ i18n.t('email') }</Label>
-                                    <Input placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('email') + '...'} onChangeText={(phone) => this.setState({phone})} keyboardType={'number-pad'} style={{ width: '100%', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontSize: 15, top: 15 }}  />
-                                </Item>
+                                    <Input  value={this.state.email} placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('email') + '...'} onChangeText={(email) => this.setState({email})} keyboardType={'number-pad'} style={{ width: '100%', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontSize: 15, top: 15 }}  />
+                                 </Item>
                                 <Image source={images.email} style={{ height: 22, width: 22, right: 15, top: 9, position: 'absolute', flex: 1 }} resizeMode={'contain'} />
                             </View>
 
                             <View style={{ borderRadius: 3, borderWidth: 1, borderColor: colors.labelFont, height: 45, marginTop: 20, padding: 5, flexDirection: 'row'  }}>
                                 <Item style={{ alignSelf: 'flex-start', borderBottomWidth: 0, top: -18, marginTop: 0 ,position:'absolute', width:'88%', paddingHorizontal: 5 }} bordered>
+
                                     <Label style={{ top:5,  paddingRight: 10, paddingLeft: 10, backgroundColor: colors.darkBackground, alignSelf: 'flex-start', color: colors.labelFont, fontSize: 14, position: 'absolute' }}>{ i18n.t('location') }</Label>
                                     <Input value={this.state.location} disabled placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('location') + '...'} onChangeText={(phone) => this.setState({phone})} keyboardType={'number-pad'} style={{ width: '100%', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontSize: 15, top: 15 }}  />
-                                </Item>
+                                 </Item>
                                 <Image source={images.location} style={{ height: 22, width: 22, right: 15, top: 9, position: 'absolute', flex: 1 }} resizeMode={'contain'} />
                             </View>
                         </Form>
@@ -178,11 +279,9 @@ class Register extends Component {
                             </TouchableOpacity>
                         </View>
 
-                        <View style={{ bottom: 25, flex: 1, alignSelf: 'center', alignItems: 'center', position: 'absolute' }}>
-                            <TouchableOpacity style={{ backgroundColor: colors.orange, width: 60, height: 60, transform: [{ rotate: '45deg'}], alignItems: 'center', justifyContent: 'center', alignSelf: 'center' }}>
-                                <Image source={require('../../assets/images/dark_mode/tick.png')} style={{ height: 40, width: 40, transform: [{ rotate: '-45deg'}] }} resizeMode={'contain'} />
-                            </TouchableOpacity>
-                        </View>
+                        {
+                            this.render_submit(colors)
+                        }
                     </View>
                 </Content>
                 <Modal onBackdropPress={()=> this.setState({ isModalVisible : false })} isVisible={this.state.isModalVisible}>

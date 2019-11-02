@@ -65,12 +65,12 @@ class CustomDrawer extends Component {
                         <View style={{ alignItems: 'center', marginTop: 60 , justifyContent:'center' }}>
                             <ImageBackground source={images.bg_for_pic} style={{ width: 120, height: 120, alignItems: 'center', justifyContent: 'center' , alignSelf:'center' , left:5 }}>
                                 <TouchableOpacity style={{ height: 85, width: 85, borderRadius: 50, overflow: 'hidden', justifyContent: 'center', alignItems: 'center', right: 5, top: -3 }}>
-                                    <Image source={images.person_two} style={{ width: 100, height: 100, }} resizeMode={'cover'} />
+                                    <Image source={{ uri: this.props.user.image }} style={{ width: 100, height: 100, }} resizeMode={'cover'} />
                                 </TouchableOpacity>
                             </ImageBackground>
                         </View>
-                        <Text style={{ color: colors.menuColor, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', textAlign: 'center', fontSize: 15}}>اوامر الشبكة</Text>
-                        <Text style={{ color: colors.menuColor, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', textAlign: 'center', fontSize: 15}}>123456789-10</Text>
+                        <Text style={{ color: colors.menuColor, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', textAlign: 'center', fontSize: 15}}>{ this.props.user.name }</Text>
+                        <Text style={{ color: colors.menuColor, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', textAlign: 'center', fontSize: 15}}>{ this.props.user.mobile }</Text>
                         <View style={{marginTop:10}}>
                             <DrawerItems
                                 {...this.props}
@@ -163,4 +163,12 @@ const styles = {
     },
 };
 
-export default CustomDrawer;
+const mapStateToProps = ({ lang, profile }) => {
+    return {
+        lang: lang.lang,
+        user: profile.user
+    };
+};
+
+
+export default connect(mapStateToProps, {  })(CustomDrawer);

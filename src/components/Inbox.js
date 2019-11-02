@@ -52,9 +52,9 @@ class Inbox extends Component {
         };
 
         const data = this.props.navigation.state.params.data;
-        this.socket = SocketIOClient('http://cross.4hoste.com:8891', {jsonp: false});
+        this.socket = SocketIOClient('http://cross.4hoste.com:8892', {jsonp: false});
         this.joinRoom(data);
-        this.socket.on('get_message', () => this.getMessages());
+        this.socket.on('get_message', (data) => this.getMessages(data));
     }
 
     getMessages(){
@@ -80,16 +80,16 @@ class Inbox extends Component {
             this.setState({  mapRegion: userLocation, initMap: false });
         }
 
-        // let getCity = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=';
-        // getCity += this.state.mapRegion.latitude + ',' + this.state.mapRegion.longitude;
-        // getCity += '&key=AIzaSyCJTSwkdcdRpIXp2yG7DfSRKFWxKhQdYhQ&language=ar&sensor=true';
-        //
-        // try {
-        //     const { data } = await axios.get(getCity);
-        //     this.setState({ location: data.results[0].formatted_address });
-        // } catch (e) {
-        //     console.log(e);
-        // }
+        let getCity = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=';
+        getCity += this.state.mapRegion.latitude + ',' + this.state.mapRegion.longitude;
+        getCity += '&key=AIzaSyCJTSwkdcdRpIXp2yG7DfSRKFWxKhQdYhQ&language=ar&sensor=true';
+
+        try {
+            const { data } = await axios.get(getCity);
+            this.setState({ location: data.results[0].formatted_address });
+        } catch (e) {
+            console.log(e);
+        }
         // this.playAudio(1, 'file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540m_shams%252Fim-fine/Audio/recording-d35cb168-49ab-42f0-96ab-dde3202d4fa9.m4a')
     }
 
@@ -181,7 +181,6 @@ class Inbox extends Component {
 
 
     renderMsg(message, i, styles, colors, images){
-        console.log('fuck ids', message.s_id, this.props.user.id);
         if (message.s_id == this.props.user.id){
             if (message.type == 0){
                 return (
@@ -440,15 +439,19 @@ class Inbox extends Component {
             if(msgType == 1 || msgType == 2){
                 formData.append('id',response.data.data.id);
                 axios.post(CONST.url + 'upload', formData).then(res => {
-                    this.socket.emit('rsend_message', { room: response.data.data.room, msg: 'fuck' });
+                    this.emitSendMsg(response.data.data.room, response.data.data.msg);
                     return this.componentWillMount();
                 });
             }
 
             this.setState({ message: '' });
-            this.socket.emit('rsend_message');
+            this.emitSendMsg(response.data.data.room, response.data.data.msg);
             this.componentWillMount();
         })
+    }
+
+    emitSendMsg(room, msg){
+        this.socket.emit('send_message', { room, msg });
     }
 
     onFocus(){
@@ -490,7 +493,7 @@ class Inbox extends Component {
                         </Right>
                         <Body style={[styles.headerText , styles.headerTitle]}></Body>
                         <Left style={styles.flex0}>
-                            <TouchableOpacity onPress={() => this.props.navigation.geBack()} style={{ marginTop: 20 }}>
+                            <TouchableOpacity onPress={() => this.props.navigation.goBack()} style={{ marginTop: 20 }}>
                                 <Image source={images.back} style={{ width: 25, height: 25, margin: 5, marginTop: 15 }} resizeMode={'contain'} />
                             </TouchableOpacity>
                         </Left>

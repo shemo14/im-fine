@@ -65,7 +65,7 @@ class Home extends Component {
 
     search(search){
         this.setState({ loader: true });
-        axios.post(CONST.url + 'search_chat', { username: search, user_id: this.props.user.id }).then(response => {
+        axios.post(CONST.url + 'search_chat', { username: search, user_id: this.props.user ? this.props.user.id : this.props.auth.data.id }).then(response => {
             this.setState({ loader: false, rooms: response.data.data, type: 1 });
         })
     }
@@ -128,7 +128,7 @@ class Home extends Component {
 
     onStandBy(){
         this.setState({ standBySubmit: true });
-        axios.post(CONST.url + 'stop_ready', { user_id: this.props.user.id, time: this.state.startTime, lang: this.props.lang }).then(response => {
+        axios.post(CONST.url + 'stop_ready', { user_id: this.props.user ? this.props.user.id : this.props.auth.data.id , time: this.state.startTime, lang: this.props.lang }).then(response => {
             this.setState({ standBySubmit: false, startTime: '', endTime: '' });
             Toast.show({
                 text: response.data.msg,
@@ -140,7 +140,7 @@ class Home extends Component {
 
     onDaily(){
         this.setState({ DailySubmit: true });
-        axios.post(CONST.url + 'everyday', { user_id: this.props.user.id, time: this.state.tfTime, lang: this.props.lang }).then(response => {
+        axios.post(CONST.url + 'everyday', { user_id: this.props.user ? this.props.user.id : this.props.auth.data.id , time: this.state.tfTime, lang: this.props.lang }).then(response => {
             this.setState({ standBySubmit: false, tfTime: '' });
             Toast.show({
                 text: response.data.msg,
@@ -152,7 +152,7 @@ class Home extends Component {
 
     componentWillMount(){
         this.setState({ loader: true });
-        axios.post(CONST.url + 'chat', { user_id: this.props.user.id }).then(response => {
+        axios.post(CONST.url + 'chat', { user_id: this.props.user ? this.props.user.id : this.props.auth.data.id  }).then(response => {
             this.setState({ rooms: response.data.data, loader: false })
         })
     }
@@ -376,10 +376,11 @@ class Home extends Component {
     }
 }
 
-const mapStateToProps = ({ lang, profile }) => {
+const mapStateToProps = ({ lang, profile, auth }) => {
     return {
         lang: lang.lang,
-        user: profile.user
+        user: profile.user,
+        auth: auth.user
     };
 };
 

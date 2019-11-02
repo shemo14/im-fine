@@ -31,6 +31,7 @@ import COLORS from '../consts/colors'
 import i18n from '../../locale/i18n'
 import {NavigationEvents} from "react-navigation";
 import themeImages from '../consts/Images'
+import {connect} from "react-redux";
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
 
@@ -39,7 +40,14 @@ class Profile extends Component {
     constructor(props){
         super(props);
         this.state = {
+            user : null,
         }
+    }
+
+
+    componentWillMount()
+    {
+        console.log(this.props.user);
     }
 
 
@@ -97,26 +105,28 @@ class Profile extends Component {
                                 <View style={{ alignItems: 'center', marginTop: -50 , justifyContent:'center' }}>
                                     <ImageBackground source={images.bg_for_pic} style={{ width: 120, height: 120, alignItems: 'center', justifyContent: 'center' , alignSelf:'center' , left:5 }}>
                                         <TouchableOpacity style={{ height: 85, width: 85, borderRadius: 50, overflow: 'hidden', justifyContent: 'center', alignItems: 'center', right: 5, top: -3 }}>
-                                            <Image source={images.person_two} style={{ width: 100, height: 100, }} resizeMode={'cover'} />
+                                            <Image source={{uri: this.props.user.image}} style={{ width: 100, height: 100, }} resizeMode={'cover'} />
                                         </TouchableOpacity>
                                     </ImageBackground>
                                 </View>
-                                <Text style={{ color: colors.menuColor, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', textAlign: 'center', fontSize: 15}}>اوامر الشبكة</Text>
+                                <Text style={{ color: colors.menuColor, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', textAlign: 'center', fontSize: 15}}>{this.props.user.name}</Text>
 
 
                                 <View style={{flexDirection:'row' , alignItems:'center' , marginTop:50}}>
                                     <Image source={images.iphone} style={{ width: 25, height: 25 , marginRight:15}} resizeMode={'contain'} />
-                                    <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 15 , color: colors.labelFont }}>012365455</Text>
+                                    <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 15 , color: colors.labelFont }}>{this.props.user.phone}</Text>
                                 </View>
 
                                 <View style={{flexDirection:'row' , alignItems:'center' , marginVertical:10}}>
                                     <Image source={images.mail} style={{ width: 25, height: 25 , marginRight:15 }} resizeMode={'contain'} />
-                                    <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 15 , color: colors.labelFont }}>aait.sa@info.com</Text>
+                                    <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 15 , color: colors.labelFont }}>{this.props.user.email}</Text>
                                 </View>
 
                                 <View style={{flexDirection:'row' , alignItems:'center'}}>
                                     <Image source={images.loc} style={{ width: 25, height: 25 , marginRight:15}} resizeMode={'contain'} />
-                                    <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 15 , color: colors.labelFont }}>الرياض.جدة.الصدوق الأسود</Text>
+                                    <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 15 , color: colors.labelFont }}>
+                                        {this.props.user.address}
+                                     </Text>
                                 </View>
 
 
@@ -136,4 +146,14 @@ class Profile extends Component {
     }
 }
 
-export default Profile;
+const mapStateToProps = ({ theme ,lang , profile}) => {
+    return {
+        theme: theme.theme,
+        lang   : lang.lang,
+        user      : profile.user,
+    };
+};
+
+export default connect(mapStateToProps, {  })(Profile);
+
+

@@ -20,6 +20,8 @@ export default class App extends React.Component {
   }
 
   async componentDidMount() {
+      console.disableYellowBox = true;
+
     AsyncStorage.getItem('theme').then(theme => {
       if (theme == null) {
         AsyncStorage.setItem('theme', 'light');
