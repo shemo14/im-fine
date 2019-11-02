@@ -36,6 +36,11 @@ class Home extends Component {
         }
     }
 
+    static navigationOptions = () => ({
+        drawerLabel:  i18n.t('home')  ,
+        drawerIcon: (<Image source={require('../../assets/images/light_mode/home_fine.png')} style={{width:22 , height:22}} resizeMode={'contain'} /> )
+    })
+
     showTimePicker = (timeType) => {
         this.setState({ isTimePickerVisible: true, timeType });
     };
@@ -57,6 +62,13 @@ class Home extends Component {
 
         this.hideTimePicker();
     };
+
+    search(search){
+        this.setState({ loader: true });
+        axios.post(CONST.url + 'search_chat', { username: search, user_id: this.props.user.id }).then(response => {
+            this.setState({ loader: false, rooms: response.data.data, type: 1 });
+        })
+    }
 
     renderStandBySubmit(colors){
         if (this.state.startTime == '' || this.state.endTime == ''){
@@ -186,7 +198,7 @@ class Home extends Component {
                             this.state.rooms.map((room,i) => (
                                 <TouchableOpacity key={i} onPress={() => this.props.navigation.navigate('inbox', { data: room })} style={{ flexDirection: 'row', borderBottomColor: '#f0e2c0', borderBottomWidth: 1, paddingVertical: 10 }}>
                                     <View style={{ height: 60, width: 60, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
-                                        <Image source={{ uri: room.img }} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
+                                        <Image source={{ uri: room.image }} resizeMode={'cover'} style={{ width: 80, height: 80 }} />
                                     </View>
                                     <View style={{ padding: 10 }}>
                                         <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15, alignSelf: 'flex-start' }}>{ room.username }</Text>
@@ -316,7 +328,7 @@ class Home extends Component {
                         <View style={{ width: '100%', backgroundColor: colors.darkBackground, paddingHorizontal: 20, paddingBottom: 10 }}>
                             <View style={{ borderRadius: 30, borderWidth: 1, borderColor: colors.labelFont, height: 45, marginTop: 5, padding: 5, flexDirection: 'row'  }}>
                                 <Item style={{ alignSelf: 'flex-start', borderBottomWidth: 0, top: -18, marginTop: 0 ,position:'absolute', width:'88%', paddingHorizontal: 5 }} bordered>
-                                    <Input placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('search') + '...'} onChangeText={(search) => this.setState({search})} style={{ width: '100%', fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontSize: 15, top: 15 }}  />
+                                    <Input placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('search') + '...'} onChangeText={(search) => this.search(search)} style={{ width: '100%', fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontSize: 15, top: 15 }}  />
                                 </Item>
                                 <Image source={images.search} style={{ height: 22, width: 22, right: 15, top: 9, position: 'absolute', flex: 1 }} resizeMode={'contain'} />
                             </View>

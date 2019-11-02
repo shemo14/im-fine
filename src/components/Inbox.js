@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, Image, TouchableOpacity, Animated, I18nManager, Dimensions, KeyboardAvoidingView, ScrollView, Slider} from "react-native";
+import { View, Text, Image, TouchableOpacity, Animated, I18nManager, Dimensions, KeyboardAvoidingView, ScrollView, Slider, Keyboard} from "react-native";
 import {Container, Content, Header, Left, Right, Body, Button, Icon, Item, Label, Input} from 'native-base'
 import lightStyles from '../../assets/styles/light'
 import darkStyles from '../../assets/styles/dark'
@@ -14,51 +14,15 @@ import * as Location from 'expo-location';
 import axios from 'axios'
 import Modal from "react-native-modal";
 import * as Permissions from "expo-permissions";
+import { connect } from 'react-redux';
+import {DoubleBounce} from "react-native-loader";
+import CONST from '../consts';
+window.navigator.userAgent = 'react-native';
+import SocketIOClient from 'socket.io-client';
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
 
-const messages = [{
-    id: 1,
-    sender_id: 1,
-    receiver_id: 2,
-    type: 1, // 1 => text, 2 => location, 3 => video, 4 => record
-    message: 'هذا نص لوصف محتوي الرسالة اللي انا باعتها',
-    lat: 31.0413814,
-    long: 31.3478201,
-    file: null,
-    time: 'منذ 3 دقائق'
-},{
-    id: 2,
-    sender_id: 2,
-    receiver_id: 1,
-    type: 2, // 1 => text, 2 => location, 3 => video, 4 => record
-    message: null,
-    lat: 31.0413814,
-    long: 31.3478201,
-    file: null,
-    time: 'منذ 3 دقائق'
-},{
-    id: 3,
-    sender_id: 1,
-    receiver_id: 2,
-    type: 3, // 1 => text, 2 => location, 3 => video, 4 => record
-    message: null,
-    lat: 31.0413814,
-    long: 31.3478201,
-    file: "https://shams.arabsdesign.com/im_fine/jyMuKOMx6c.mp4",
-    time: 'منذ 3 دقائق'
-},{
-    id: 4,
-    sender_id: 2,
-    receiver_id: 1,
-    type: 4, // 1 => text, 2 => location, 3 => video, 4 => record
-    message: null,
-    lat: 31.0413814,
-    long: 31.3478201,
-    file: "file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540m_shams%252Fim-fine/Audio/recording-a7871be6-dd04-4c66-b10f-0ff8c58554b0.m4a",
-    time: 'منذ 3 دقائق'
-}];
 
 class Inbox extends Component {
     constructor(props){
@@ -70,7 +34,7 @@ class Inbox extends Component {
             fadeAnim: new Animated.Value(-55),
             availabel: 0,
             search: '',
-            messages,
+            messages: [],
             lat: null,
             long: null,
             playedVideo: null,
@@ -83,10 +47,29 @@ class Inbox extends Component {
             location: '',
             mapRegion: null,
             initMap: true,
-        }
+            loader: false,
+            bottom: 0
+        };
+
+        const data = this.props.navigation.state.params.data;
+        this.socket = SocketIOClient('http://cross.4hoste.com:8891', {jsonp: false});
+        this.joinRoom(data);
+        this.socket.on('get_message', () => this.getMessages());
+    }
+
+    getMessages(){
+        const data = this.props.navigation.state.params.data;
+        axios.post(CONST.url + 'room', { room: data.room, user_id: this.props.user.id, r_id: data.other }).then(response => {
+            this.setState({ messages: response.data.data, loader: false });
+        });
     }
 
     async componentWillMount() {
+        this.setState({ loader: true });
+        const data = this.props.navigation.state.params.data;
+        axios.post(CONST.url + 'room', { room: data.room, user_id: this.props.user.id, r_id: data.other }).then(response => {
+           this.setState({ messages: response.data.data, loader: false });
+        });
 
         let { status } = await Permissions.askAsync(Permissions.LOCATION);
         if (status !== 'granted') {
@@ -97,17 +80,40 @@ class Inbox extends Component {
             this.setState({  mapRegion: userLocation, initMap: false });
         }
 
-        let getCity = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=';
-        getCity += this.state.mapRegion.latitude + ',' + this.state.mapRegion.longitude;
-        getCity += '&key=AIzaSyCJTSwkdcdRpIXp2yG7DfSRKFWxKhQdYhQ&language=ar&sensor=true';
+        // let getCity = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=';
+        // getCity += this.state.mapRegion.latitude + ',' + this.state.mapRegion.longitude;
+        // getCity += '&key=AIzaSyCJTSwkdcdRpIXp2yG7DfSRKFWxKhQdYhQ&language=ar&sensor=true';
+        //
+        // try {
+        //     const { data } = await axios.get(getCity);
+        //     this.setState({ location: data.results[0].formatted_address });
+        // } catch (e) {
+        //     console.log(e);
+        // }
+        // this.playAudio(1, 'file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540m_shams%252Fim-fine/Audio/recording-d35cb168-49ab-42f0-96ab-dde3202d4fa9.m4a')
+    }
 
-        try {
-            const { data } = await axios.get(getCity);
-            this.setState({ location: data.results[0].formatted_address });
-        } catch (e) {
-            console.log(e);
-        }
-        this.playAudio(1, 'file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540m_shams%252Fim-fine/Audio/recording-d35cb168-49ab-42f0-96ab-dde3202d4fa9.m4a')
+    joinRoom(data){
+        this.socket.emit('subscribe', { room: data.room });
+    }
+
+    componentDidMount() {
+        this.keyboardDidShowListener = Keyboard.addListener(
+            'keyboardDidShow',
+            () => this._keyboardDidShow(),
+        );
+        this.keyboardDidHideListener = Keyboard.addListener(
+            'keyboardDidHide',
+            () => this._keyboardDidHide(),
+        );
+    }
+
+    _keyboardDidShow(){
+        this.setState({ bottom: 70 });
+    }
+
+    _keyboardDidHide(){
+        this.setState({ bottom: 0 });
     }
 
     _handleMapRegionChange  = async (mapRegion) =>  {
@@ -173,29 +179,31 @@ class Inbox extends Component {
         }
     }
 
+
     renderMsg(message, i, styles, colors, images){
-        if (message.sender_id == 1){
-            if (message.type == 1){
+        console.log('fuck ids', message.s_id, this.props.user.id);
+        if (message.s_id == this.props.user.id){
+            if (message.type == 0){
                 return (
-                    <View key={i} style={{ width: (width*80)/100, backgroundColor: colors.sendMsg, borderRadius: 20, alignSelf: 'flex-start', marginHorizontal: 20, marginVertical: 10, padding: 10 }}>
-                        <Text style={{ color: colors.sendFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>{message.message}</Text>
+                    <View key={i} style={{ width: (width*80)/100, backgroundColor: colors.sendMsg, borderRadius: 20, alignSelf: 'flex-start', marginHorizontal: 20, marginVertical: 10, padding: 10, marginBottom: (this.state.messages).length == i+1 ? 65 : 0 }}>
+                        <Text style={{ color: colors.sendFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', alignSelf: 'flex-start' }}>{message.msg}</Text>
                         <View style={{ flexDirection: 'row', alignSelf: 'flex-end', marginTop: 5 }}>
-                            <Text style={{ color: colors.sendFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 12 }}>{message.time}</Text>
+                            <Text style={{ color: colors.sendFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 12 }}>{message.date}</Text>
                             <Image source={images.tick_blue} resizeMode={'contain'} style={{ width: 15, height: 15, marginTop: 2 }} />
                         </View>
                     </View>
                 );
-            }else if (message.type == 2){
+            }else if (message.type == 4){
                 return (
-                    <View key={i} style={{ width: (width*80)/100, backgroundColor: colors.receiverMsg, borderRadius: 20, alignSelf: 'flex-end', marginHorizontal: 20, marginVertical: 10, padding: 10 }}>
-                        <TouchableOpacity style={{ width: '100%', height: 300 }}>
+                    <View key={i} style={{ width: (width*80)/100, height: 200, backgroundColor: colors.sendMsg, borderRadius: 20, alignSelf: 'flex-start', marginHorizontal: 20, marginVertical: 10, marginBottom: (this.state.messages).length == i+1 ? 65 : 0 }}>
+                        <TouchableOpacity style={{ width: '100%', height: 160 }}>
                             {
                                 !this.state.initMap ? (
                                     <MapView
-                                        style={{ flex: 1, width: 300, height: 260 }}
+                                        style={{ flex: 1, width: '100%', height: 160, borderRadius: 20 }}
                                         initialRegion={{
-                                            latitude: message.lat,
-                                            longitude: message.long,
+                                            latitude: Number(message.lat),
+                                            longitude: Number(message.lng),
                                             latitudeDelta: 0.0922,
                                             longitudeDelta: 0.0421,
                                         }}
@@ -203,15 +211,15 @@ class Inbox extends Component {
                                 ) : (<View />)
                             }
                         </TouchableOpacity>
-                        <View style={{ flexDirection: 'row', alignSelf: 'flex-start', marginTop: 5 }}>
-                            <Text style={{ color: colors.receiverFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 12 }}>{message.time}</Text>
+                        <View style={{ flexDirection: 'row', alignSelf: 'flex-end', padding: 10 }}>
+                            <Text style={{ color: colors.sendFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 12 }}>{message.date}</Text>
                             <Image source={images.tick_blue} resizeMode={'contain'} style={{ width: 15, height: 15, marginTop: 2 }} />
                         </View>
                     </View>
                 )
-            }else if (message.type == 3){
+            }else if (message.type == 2){
                 return (
-                    <View key={i} style={{ width: (width*80)/100, height: 200, backgroundColor: colors.sendMsg, borderRadius: 20, alignSelf: 'flex-start', marginHorizontal: 20, marginVertical: 10 }}>
+                    <View key={i} style={{ width: (width*80)/100, height: 200, backgroundColor: colors.sendMsg, borderRadius: 20, alignSelf: 'flex-start', marginHorizontal: 20, marginVertical: 10, marginBottom: (this.state.messages).length == i+1 ? 65 : 0 }}>
                         <View style={{ width: '100%', height: 160 }}>
                             <Video
                                 source={{ uri: message.file }}
@@ -233,21 +241,61 @@ class Inbox extends Component {
                         </View>
                     </View>
                 )
-            }
-        } else{
-            if (message.type == 1){
+            }else if(message.type == 1){
                 return (
-                    <View key={i} style={{ width: (width*80)/100, backgroundColor: colors.receiverMsg, borderRadius: 20, alignSelf: 'flex-end', marginHorizontal: 20, marginVertical: 10, padding: 10 }}>
-                        <Text style={{ color: colors.receiverFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>{message.message}</Text>
-                        <View style={{ flexDirection: 'row', alignSelf: 'flex-start', marginTop: 5 }}>
-                            <Text style={{ color: colors.receiverFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 12 }}>{message.time}</Text>
+                    <View key={i} style={{ width: (width*80)/100, backgroundColor: colors.sendMsg, borderRadius: 20, alignSelf: 'flex-start', marginHorizontal: 20, marginVertical: 10, padding: 10, marginBottom: (this.state.messages).length == i+1 ? 65 : 0 }}>
+                        <View style={{ flexDirection: 'row' }}>
+                            <View style={{ height: 35, width: 35, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
+                                <Image source={images.person_two} resizeMode={'contain'} style={{ width: 50, height: 50 }} />
+                            </View>
+                            <Player
+                                style={{ flex: 1 }}
+                                completeButtonText={'Return Home'}
+                                sender={true}
+                                uri={message.msg}
+                                plyImg={images.play_button_big}
+                                pusImg={images.pause_button}
+                                showDebug={false}
+                                showTimeStamp={false}
+                                showBackButton={true}
+                                playbackSlider={(renderProps) => {
+                                    return (
+                                        <Slider
+                                            style={{ width: '90%' }}
+                                            thumbTintColor={colors.orange}
+                                            maximumTrackTintColor={"#ffffff"}
+                                            minimumTrackTintColor={colors.orange}
+                                            minimimValue={0}
+                                            maximumValue={renderProps.maximumValue}
+                                            onValueChange={renderProps.onSliderValueChange}
+                                            value={renderProps.value}
+                                            disabled={true}
+                                        />
+                                    );
+                                }}
+                            />
+                        </View>
+                        <View style={{ flexDirection: 'row', alignSelf: 'flex-end', marginTop: 5 }}>
+                            <Text style={{ color: colors.sendFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 12 }}>{message.date}</Text>
                             <Image source={images.tick_blue} resizeMode={'contain'} style={{ width: 15, height: 15, marginTop: 2 }} />
                         </View>
                     </View>
                 );
-            }else if(message.type == 2){
+            }
+        } else{
+            if (message.type == 0){
                 return (
-                    <View key={i} style={{ width: (width*80)/100, height: 200, backgroundColor: colors.receiverMsg, borderRadius: 20, alignSelf: 'flex-end', marginHorizontal: 20, marginVertical: 10}}>
+                    <View key={i} style={{ width: (width*80)/100, backgroundColor: colors.receiverMsg, borderRadius: 20, alignSelf: 'flex-end', marginHorizontal: 20, marginVertical: 10, padding: 10, marginBottom: (this.state.messages).length == i+1 ? 65 : 0 }}>
+                        <Text style={{ color: colors.receiverFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>{message.msg}</Text>
+                        <View style={{ flexDirection: 'row', alignSelf: 'flex-start', marginTop: 5 }}>
+                            <Text style={{ color: colors.receiverFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 12 }}>{message.date}</Text>
+                            <Image source={images.tick_blue} resizeMode={'contain'} style={{ width: 15, height: 15, marginTop: 2 }} />
+                        </View>
+                    </View>
+                );
+            }else if(message.type == 4){
+                return (
+                    <View key={i} style={{ width: (width*80)/100, height: 200, backgroundColor: colors.receiverMsg, borderRadius: 20, alignSelf: 'flex-end', marginHorizontal: 20, marginVertical: 10, marginBottom: (this.state.messages).length == i+1 ? 65 : 0}}>
                         <TouchableOpacity style={{ width: '100%', height: 160 }}>
                             {
                                 !this.state.initMap ? (
@@ -269,9 +317,9 @@ class Inbox extends Component {
                         </View>
                     </View>
                 )
-            }else if(message.type == 3){
+            }else if(message.type == 2){
                 return (
-                    <View key={i} style={{ width: (width*80)/100, height: 200, backgroundColor: colors.sendMsg, borderRadius: 20, alignSelf: 'flex-start', marginHorizontal: 20, marginVertical: 10 }}>
+                    <View key={i} style={{ width: (width*80)/100, height: 200, backgroundColor: colors.sendMsg, borderRadius: 20, alignSelf: 'flex-start', marginHorizontal: 20, marginVertical: 10, marginBottom: (this.state.messages).length == i+1 ? 65 : 0 }}>
                         <View style={{ width: '100%', height: 160 }}>
                             <Video
                                 source={{ uri: message.file }}
@@ -288,14 +336,14 @@ class Inbox extends Component {
                             </TouchableOpacity>
                         </View>
                         <View style={{ flexDirection: 'row', alignSelf: 'flex-end', padding: 10 }}>
-                            <Text style={{ color: colors.sendFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 12 }}>{message.time}</Text>
+                            <Text style={{ color: colors.sendFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 12 }}>{message.date}</Text>
                             <Image source={images.tick_blue} resizeMode={'contain'} style={{ width: 15, height: 15, marginTop: 2 }} />
                         </View>
                     </View>
                 )
-            }else if(message.type == 4){
+            }else if(message.type == 1){
                 return (
-                    <View key={i} style={{ width: (width*80)/100, backgroundColor: colors.receiverMsg, borderRadius: 20, alignSelf: 'flex-end', marginHorizontal: 20, marginVertical: 10, padding: 10, marginBottom:  65 }}>
+                    <View key={i} style={{ width: (width*80)/100, backgroundColor: colors.receiverMsg, borderRadius: 20, alignSelf: 'flex-end', marginHorizontal: 20, marginVertical: 10, padding: 10, marginBottom: (this.state.messages).length == i+1 ? 65 : 0 }}>
                         <View style={{ flexDirection: 'row' }}>
                             <Player
                                 style={{ flex: 1 }}
@@ -327,7 +375,7 @@ class Inbox extends Component {
                             </View>
                         </View>
                         <View style={{ flexDirection: 'row', alignSelf: 'flex-start', marginTop: 5 }}>
-                            <Text style={{ color: colors.receiverFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 12 }}>{message.time}</Text>
+                            <Text style={{ color: colors.receiverFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 12 }}>{message.date}</Text>
                             <Image source={images.tick_blue} resizeMode={'contain'} style={{ width: 15, height: 15, marginTop: 2 }} />
                         </View>
                     </View>
@@ -351,6 +399,58 @@ class Inbox extends Component {
         this.setState({ resetRecord: true, startRecord: false, finishRecord: false,  })
     }
 
+    renderLoader(colors){
+        if (this.state.loader){
+            return(
+                <View style={{ alignItems: 'center', justifyContent: 'center', height: (height-100) , alignSelf:'center' , backgroundColor: colors.darkBackground , width:'100%' , position:'absolute' , zIndex:1  }}>
+                    <DoubleBounce size={20} color={COLORS.lightColors.orange} />
+                </View>
+            );
+        }
+    }
+
+    sendMsg(msgType, uri = null){
+        const data = this.props.navigation.state.params.data;
+        this.setState({ isModalVisible: false });
+        let formData = new FormData();
+
+        if (uri){
+            let localUri = uri;
+            filename = localUri.split('/').pop();
+
+            let match = /\.(\w+)$/.exec(filename);
+            console.log(match);
+            let type = msgType == 1 ? 'audio/mp4' : 'video';
+            formData.append('files', { uri: localUri, name: filename, type });
+        }
+
+        axios.post(CONST.url + 'send', {
+            user_id: this.props.user.id,
+            r_id: data.other,
+            message: this.state.message,
+            type: msgType,
+            lat: this.state.mapRegion.latitude,
+            lng: this.state.mapRegion.longitude,
+            // files: msgType == 1 || msgType == 2 ? formData._parts : null,
+            // fileName: file.name,
+            seen:0,
+            status:0,
+            connected:1
+        }).then(response => {
+            if(msgType == 1 || msgType == 2){
+                formData.append('id',response.data.data.id);
+                axios.post(CONST.url + 'upload', formData).then(res => {
+                    this.socket.emit('rsend_message', { room: response.data.data.room, msg: 'fuck' });
+                    return this.componentWillMount();
+                });
+            }
+
+            this.setState({ message: '' });
+            this.socket.emit('rsend_message');
+            this.componentWillMount();
+        })
+    }
+
     onFocus(){
 
     }
@@ -370,6 +470,8 @@ class Inbox extends Component {
             colors = colors.lightColors
         }
 
+        const data = this.props.navigation.state.params.data;
+
         return (
             <Container style={{ backgroundColor: colors.darkBackground }}>
                 <NavigationEvents onWillFocus={() => this.onFocus()} />
@@ -378,10 +480,10 @@ class Inbox extends Component {
                         <Right style={styles.flex0}>
                             <View style={{ flexDirection: 'row', marginTop: 33 }}>
                                 <View style={{ height: 40, width: 40, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
-                                    <Image source={images.person_two} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
+                                    <Image source={{ uri: data.image }} resizeMode={'cover'} style={{ width: 80, height: 80 }} />
                                 </View>
                                 <View style={{ paddingHorizontal: 10 }}>
-                                    <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 }}>اوامر الشركة</Text>
+                                    <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 }}>{ data.username }</Text>
                                     <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>{ i18n.t('online') }</Text>
                                 </View>
                             </View>
@@ -400,6 +502,7 @@ class Inbox extends Component {
                             <View style={{width: 0, height: 0, backgroundColor: 'transparent', borderStyle: 'solid', borderLeftWidth: 50, borderTopWidth: 50, borderLeftColor: 'transparent', borderTopColor: colors.darkBackground, right: 0, position: 'absolute', top: -1 }} />
                             <View style={{ height: 10, width: '100%' }}/>
                             <View style={{ width: 1, height: 70, backgroundColor: '#ddd', transform: [{ rotate: '45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
+                            { this.renderLoader(colors) }
                             <KeyboardAvoidingView behavior={'height'} style={{width:'100%', flexDirection:'column', flex: 1, zIndex: -1, marginTop: -77 }}>
                                 <ScrollView
                                     ref={ref => this.scrollView = ref}
@@ -411,13 +514,13 @@ class Inbox extends Component {
                                     }
                                 </ScrollView>
 
-                                <View style={{ backgroundColor: colors.inboxInputBackground, flexDirection:'row' , flex: 1, width: '100%',height:55, position:'absolute' , bottom:0, padding: 3, marginBottom: 6}}>
+                                <View style={{ backgroundColor: colors.inboxInputBackground, flexDirection:'row' , flex: 1, width: '100%',height:55, position:'absolute' , bottom:this.state.bottom, padding: 3, marginBottom: 6}}>
                                     <View style={{ width: '84%', paddingHorizontal: 20, paddingBottom: 10, marginLeft: -15 }}>
                                         <View style={{ borderRadius: 30, borderWidth: 1, borderColor: colors.labelFont, height: 40, marginTop: 5, padding: 5, flexDirection: 'row', backgroundColor: colors.inboxInput  }}>
                                             <Item style={{ alignSelf: 'flex-start', borderBottomWidth: 0, top: -18, marginTop: 0 ,position:'absolute', width:'88%', paddingHorizontal: 5,  }} bordered>
-                                                <Input placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('search') + '...'} onChangeText={(search) => this.setState({search})} style={{ width: '100%', fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontSize: 15, top: 10 }}  />
+                                                <Input value={this.state.message} placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('message') + '...'} onChangeText={(message) => this.setState({message})} style={{ width: '100%', fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontSize: 15, top: 10 }}  />
                                             </Item>
-                                            <TouchableOpacity style={{ position: 'absolute', flex: 1, right: 10, top: 5 }}>
+                                            <TouchableOpacity onPress={() => this.sendMsg(0)} disabled={this.state.message === '' ? true : false} style={{ position: 'absolute', flex: 1, right: 10, top: 5 }}>
                                                 <Image source={images.send} style={{ height: 27, width: 27 }} resizeMode={'contain'} />
                                             </TouchableOpacity>
                                         </View>
@@ -434,7 +537,7 @@ class Inbox extends Component {
                                     <View style={{ width: '84%', paddingHorizontal: 20, paddingBottom: 10, marginLeft: -15 }}>
                                         <Recorder
                                             style={{flex: 1}}
-                                            onComplete={(i) => this.playAudio(null, i)}
+                                            onComplete={(i) => this.sendMsg(1, i.uri)}
                                             maxDurationMillis={150000}
                                             showDebug={false}
                                             startRecord={this.state.startRecord}
@@ -489,10 +592,10 @@ class Inbox extends Component {
                         <Right style={[ styles.flex0, { alignSelf: 'flex-start', marginLeft: 20 }]}>
                             <View style={{ flexDirection: 'row', marginTop: 15 }}>
                                 <View style={{ height: 40, width: 40, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
-                                    <Image source={images.person_two} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
+                                    <Image source={{ uri: data.image }} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
                                 </View>
                                 <View style={{ paddingHorizontal: 10 }}>
-                                    <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 }}>اوامر الشركة</Text>
+                                    <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 }}>{ data.username }</Text>
                                     <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>{ i18n.t('online') }</Text>
                                 </View>
                             </View>
@@ -537,7 +640,7 @@ class Inbox extends Component {
                                     <Image source={images.location_irbble} style={{ height: 27, width: 27, left: 5 }} resizeMode={'contain'} />
                                 </View>
                             </View>
-                            <TouchableOpacity style={{ flex: 1, marginTop: 15, marginRight: -10 }} onPress={() => this.startRecord()}>
+                            <TouchableOpacity style={{ flex: 1, marginTop: 15, marginRight: -10 }} onPress={() => this.sendMsg(4)}>
                                 <Image source={require('../../assets/images/dark_mode/tick.png')} style={{ width: 25, height: 25 }} resizeMode={'contain'} />
                             </TouchableOpacity>
                         </View>
@@ -549,4 +652,11 @@ class Inbox extends Component {
     }
 }
 
-export default Inbox;
+const mapStateToProps = ({ lang, profile }) => {
+    return {
+        lang: lang.lang,
+        user: profile.user
+    };
+};
+
+export default connect(mapStateToProps, {  })(Inbox);
