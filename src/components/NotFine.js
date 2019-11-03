@@ -13,6 +13,7 @@ import themeImages from '../consts/Images'
 import {Audio} from "expo-av";
 import {Recorder} from 'react-native-audio-player-recorder-no-linking';
 import VideoRecorder from "./VideoRecorder";
+import {connect} from "react-redux";
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
@@ -199,10 +200,10 @@ class NotFine extends Component {
                 </Header>
                 <Content style={{ backgroundColor: colors.darkBackground, marginTop: -25 }} contentContainerStyle={{ flexGrow: 1 }}>
                     <View>
-                        <View style={{ marginTop: 10, backgroundColor: colors.lightBackground, borderTopColor: '#ddd', borderTopWidth: 1}}>
+                        <View style={{ marginTop: 10, backgroundColor: colors.lightBackground, borderTopColor: colors.pageBorder, borderTopWidth: 1}}>
                             <View style={{width: 0, height: 0, backgroundColor: 'transparent', borderStyle: 'solid', borderLeftWidth: 50, borderTopWidth: 50, borderLeftColor: 'transparent', borderTopColor: colors.darkBackground, right: 0, position: 'absolute', top: -1 }} />
                             <View style={{ flex: 1, height: 10, width: '100%' }}/>
-                            <View style={{ width: 1, height: 70, backgroundColor: '#ddd', transform: [{ rotate: '45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
+                            <View style={{ width: 1, height: 70, backgroundColor: colors.pageBorder, transform: [{ rotate: '45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
                             <View style={{ marginTop: -40, height: height-125 }}>
                                 <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', color: colors.labelFont, fontSize: 18, marginHorizontal: 20, marginBottom: 40  }}>{ i18n.t('whyNotFine') }</Text>
                                 <FlatList
@@ -277,4 +278,13 @@ class NotFine extends Component {
     }
 }
 
-export default NotFine;
+const mapStateToProps = ({ lang, profile, auth, theme }) => {
+    return {
+        lang: lang.lang,
+        theme: theme.theme,
+        user: profile.user,
+        auth: auth.user
+    };
+};
+
+export default connect(mapStateToProps, {  })(NotFine);

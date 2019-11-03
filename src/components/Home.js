@@ -207,7 +207,7 @@ class Home extends Component {
                                     <View style={{ marginHorizontal: 20 , position: 'absolute', right: 2, top: 10}}>
                                         <Text style={{ color: colors.orange, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>{ room.date }</Text>
                                         <View style={{ backgroundColor: colors.orange, borderRadius: 20, height: 20, width: 20, alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginTop: 10 }}>
-                                            <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>{ room.count }</Text>
+                                            <Text style={{ color: '#7b6c60', fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>{ room.count }</Text>
                                         </View>
                                     </View>
                                 </TouchableOpacity>
@@ -351,12 +351,12 @@ class Home extends Component {
                                 <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 15, marginTop: 5, color: this.state.type == 3 ? colors.active : colors.unActive }}>تنبيه 24 ساعة</Text>
                             </TouchableOpacity>
                         </View>
-                        <View style={{ marginTop: 10, backgroundColor: colors.lightBackground, borderTopColor: '#ddd', borderTopWidth: 1}}>
+                        <View style={{ marginTop: 10, backgroundColor: colors.lightBackground, borderTopColor: colors.pageBorder, borderTopWidth: 1}}>
                             <View style={{width: 0, height: 0, backgroundColor: 'transparent', borderStyle: 'solid', borderLeftWidth: 50, borderTopWidth: 50, borderLeftColor: 'transparent', borderTopColor: colors.darkBackground, right: 0, position: 'absolute', top: -1 }} />
                             <View style={{ flex: 1, height: 10, width: '100%' }}/>
-                            <View style={{ width: 1, height: 70, backgroundColor: '#ddd', transform: [{ rotate: '45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
+                            <View style={{ width: 1, height: 70, backgroundColor: colors.pageBorder, transform: [{ rotate: '45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
                             { this.renderLoader(colors) }
-                            <View style={{ height: height-200 }}>
+                            <View style={{ height: height-190 }}>
                                 { this.renderContent(styles, images, colors) }
                             </View>
                         </View>
@@ -376,9 +376,10 @@ class Home extends Component {
     }
 }
 
-const mapStateToProps = ({ lang, profile, auth }) => {
+const mapStateToProps = ({ lang, profile, auth, theme }) => {
     return {
         lang: lang.lang,
+        theme: theme.theme,
         user: profile.user,
         auth: auth.user
     };

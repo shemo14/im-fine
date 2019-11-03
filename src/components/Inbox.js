@@ -48,13 +48,15 @@ class Inbox extends Component {
             mapRegion: null,
             initMap: true,
             loader: false,
-            bottom: 0
+            bottom: 0,
+            is_active: false
         };
 
         const data = this.props.navigation.state.params.data;
         this.socket = SocketIOClient('http://cross.4hoste.com:8892', {jsonp: false});
         this.joinRoom(data);
         this.socket.on('get_message', (data) => this.getMessages(data));
+        this.socket.on('offline', (data) => { this.setState({ is_active: data.is_active }) });
     }
 
     getMessages(){
@@ -109,7 +111,7 @@ class Inbox extends Component {
     }
 
     _keyboardDidShow(){
-        this.setState({ bottom: 70 });
+        this.setState({ bottom: 65 });
     }
 
     _keyboardDidHide(){
@@ -245,7 +247,7 @@ class Inbox extends Component {
                     <View key={i} style={{ width: (width*80)/100, backgroundColor: colors.sendMsg, borderRadius: 20, alignSelf: 'flex-start', marginHorizontal: 20, marginVertical: 10, padding: 10, marginBottom: (this.state.messages).length == i+1 ? 65 : 0 }}>
                         <View style={{ flexDirection: 'row' }}>
                             <View style={{ height: 35, width: 35, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
-                                <Image source={images.person_two} resizeMode={'contain'} style={{ width: 50, height: 50 }} />
+                                <Image source={{ uri: message.sender_img }} resizeMode={'contain'} style={{ width: 50, height: 50 }} />
                             </View>
                             <Player
                                 style={{ flex: 1 }}
@@ -301,8 +303,8 @@ class Inbox extends Component {
                                     <MapView
                                         style={{ flex: 1, width: '100%', height: 160, borderRadius: 20 }}
                                         initialRegion={{
-                                            latitude: message.lat,
-                                            longitude: message.long,
+                                            latitude: Number(message.lat),
+                                            longitude: Number(message.lng),
                                             latitudeDelta: 0.0922,
                                             longitudeDelta: 0.0421,
                                         }}
@@ -383,11 +385,6 @@ class Inbox extends Component {
         }
     }
 
-    sendRecord(){
-        this.setAnimate();
-        this.setState({ finishRecord: true, resetRecord: false, startRecord: false })
-    }
-
     startRecord(){
         this.setAnimate();
         this.setState({ startRecord: true, finishRecord: false, resetRecord: false, })
@@ -395,7 +392,7 @@ class Inbox extends Component {
 
     cansleRecord(){
         this.setAnimate();
-        this.setState({ resetRecord: true, startRecord: false, finishRecord: false,  })
+        this.setState({ resetRecord: true, startRecord: false, finishRecord: false  })
     }
 
     renderLoader(colors){
@@ -412,6 +409,7 @@ class Inbox extends Component {
         const data = this.props.navigation.state.params.data;
         this.setState({ isModalVisible: false });
         let formData = new FormData();
+        this.cansleRecord();
 
         if (uri){
             let localUri = uri;
@@ -430,8 +428,6 @@ class Inbox extends Component {
             type: msgType,
             lat: this.state.mapRegion.latitude,
             lng: this.state.mapRegion.longitude,
-            // files: msgType == 1 || msgType == 2 ? formData._parts : null,
-            // fileName: file.name,
             seen:0,
             status:0,
             connected:1
@@ -440,18 +436,26 @@ class Inbox extends Component {
                 formData.append('id',response.data.data.id);
                 axios.post(CONST.url + 'upload', formData).then(res => {
                     this.emitSendMsg(response.data.data.room, response.data.data.msg);
+                    this.scrollView.scrollToEnd({animated: true});
                     return this.componentWillMount();
                 });
             }
 
             this.setState({ message: '' });
             this.emitSendMsg(response.data.data.room, response.data.data.msg);
+            this.scrollView.scrollToEnd({animated: true});
             this.componentWillMount();
         })
     }
 
     emitSendMsg(room, msg){
         this.socket.emit('send_message', { room, msg });
+    }
+
+    leave(){
+        const room = this.props.navigation.state.params.room;
+        this.socket.emit('disconnect', { room });
+        this.props.navigation.goBack();
     }
 
     onFocus(){
@@ -487,13 +491,13 @@ class Inbox extends Component {
                                 </View>
                                 <View style={{ paddingHorizontal: 10 }}>
                                     <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 }}>{ data.username }</Text>
-                                    <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>{ i18n.t('online') }</Text>
+                                    <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>{  this.state.is_active ? i18n.t('online') : i18n.t('offline') }</Text>
                                 </View>
                             </View>
                         </Right>
                         <Body style={[styles.headerText , styles.headerTitle]}></Body>
                         <Left style={styles.flex0}>
-                            <TouchableOpacity onPress={() => this.props.navigation.goBack()} style={{ marginTop: 20 }}>
+                            <TouchableOpacity onPress={() => this.leave()} style={{ marginTop: 20 }}>
                                 <Image source={images.back} style={{ width: 25, height: 25, margin: 5, marginTop: 15 }} resizeMode={'contain'} />
                             </TouchableOpacity>
                         </Left>
@@ -501,10 +505,10 @@ class Inbox extends Component {
                 </Header>
                 <Content style={{ backgroundColor: colors.darkBackground, marginTop: -25 }} contentContainerStyle={{ flexGrow: 1 }}>
                     <View>
-                        <View style={{ marginTop: 10, backgroundColor: colors.lightBackground, borderTopColor: '#ddd', borderTopWidth: 1, height: height-80}}>
+                        <View style={{ marginTop: 10, backgroundColor: colors.lightBackground, borderTopColor: colors.pageBorder, borderTopWidth: 1, height: height-80}}>
                             <View style={{width: 0, height: 0, backgroundColor: 'transparent', borderStyle: 'solid', borderLeftWidth: 50, borderTopWidth: 50, borderLeftColor: 'transparent', borderTopColor: colors.darkBackground, right: 0, position: 'absolute', top: -1 }} />
                             <View style={{ height: 10, width: '100%' }}/>
-                            <View style={{ width: 1, height: 70, backgroundColor: '#ddd', transform: [{ rotate: '45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
+                            <View style={{ width: 1, height: 70, backgroundColor: colors.pageBorder, transform: [{ rotate: '45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
                             { this.renderLoader(colors) }
                             <KeyboardAvoidingView behavior={'height'} style={{width:'100%', flexDirection:'column', flex: 1, zIndex: -1, marginTop: -77 }}>
                                 <ScrollView
@@ -581,10 +585,10 @@ class Inbox extends Component {
                                             }}
                                         />
                                     </View>
-                                    <TouchableOpacity style={{ marginTop: 15, marginLeft: -7 }} onPress={() => this.cansleRecord() }>
+                                    <TouchableOpacity style={{ marginTop: 19, marginLeft: -7 }} onPress={() => this.cansleRecord() }>
                                         <Image source={images.cansle} style={{ width: 20, height: 20 }} resizeMode={'contain'} />
                                     </TouchableOpacity>
-                                    <View style={{ height: 40, width: 1, backgroundColor: '#ddd', marginRight: 9, marginTop: 7 }} />
+                                    <View style={{ height: 35, width: 1, backgroundColor: '#ddd', marginRight: 9, marginTop: 10, marginLeft: 12 }} />
                                 </Animated.View>
                             </KeyboardAvoidingView>
                         </View>
@@ -648,17 +652,17 @@ class Inbox extends Component {
                             </TouchableOpacity>
                         </View>
                     </View>
-
                 </Modal>
             </Container>
         );
     }
 }
 
-const mapStateToProps = ({ lang, profile }) => {
+const mapStateToProps = ({ lang, profile, theme }) => {
     return {
         lang: lang.lang,
-        user: profile.user
+        user: profile.user,
+        theme: theme.theme
     };
 };
 

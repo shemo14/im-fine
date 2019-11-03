@@ -7,6 +7,9 @@ import COLORS from '../consts/colors'
 import i18n from '../../locale/i18n'
 import {NavigationEvents} from "react-navigation";
 import themeImages from '../consts/Images'
+import {connect} from "react-redux";
+
+
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
 
@@ -75,10 +78,10 @@ class ConfirmStatus extends Component {
                 </Header>
                 <Content style={{ backgroundColor: colors.darkBackground, marginTop: -25 }} contentContainerStyle={{ flexGrow: 1 }}>
                     <View>
-                        <View style={{ marginTop: 10, backgroundColor: colors.lightBackground, borderTopColor: '#ddd', borderTopWidth: 1}}>
+                        <View style={{ marginTop: 10, backgroundColor: colors.lightBackground, borderTopColor: colors.pageBorder, borderTopWidth: 1}}>
                             <View style={{width: 0, height: 0, backgroundColor: 'transparent', borderStyle: 'solid', borderLeftWidth: 50, borderTopWidth: 50, borderLeftColor: 'transparent', borderTopColor: colors.darkBackground, right: 0, position: 'absolute', top: -1 }} />
                             <View style={{ flex: 1, height: 10, width: '100%' }}/>
-                            <View style={{ width: 1, height: 70, backgroundColor: '#ddd', transform: [{ rotate: '45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
+                            <View style={{ width: 1, height: 70, backgroundColor: colors.pageBorder, transform: [{ rotate: '45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
                             <View style={{ marginTop: -40, height: height-125 }}>
                                 <View style={{ marginTop: 100, alignItems: 'center', flex: 1, alignSelf: 'center' }}>
                                     <View style={{ height: 120, width: 120, borderRadius: 80, borderWidth: 2, overflow: 'hidden', borderColor: colors.border, justifyContent: 'center', alignItems: 'center' }}>
@@ -87,7 +90,7 @@ class ConfirmStatus extends Component {
                                     <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: colors.labelFont, marginTop: 10 }}>{ i18n.t('confirmSendStatus') }</Text>
 
                                     <Button onPress={() => this.props.navigation.navigate('DrawerNavigator')} style={{ backgroundColor: colors.orange, width: 150, height: 35, marginTop: 40, alignItems: 'center', justifyContent: 'center' }} >
-                                        <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: colors.labelFont, textAlign: 'center'}}>{ i18n.t('backHome') }</Text>
+                                        <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: '#7b6c60', textAlign: 'center'}}>{ i18n.t('backHome') }</Text>
                                     </Button>
                                 </View>
                             </View>
@@ -99,4 +102,11 @@ class ConfirmStatus extends Component {
     }
 }
 
-export default ConfirmStatus;
+const mapStateToProps = ({ lang, theme }) => {
+    return {
+        lang: lang.lang,
+        theme: theme.theme,
+    };
+};
+
+export default connect(mapStateToProps, {  })(ConfirmStatus);

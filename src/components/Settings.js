@@ -7,6 +7,10 @@ import COLORS from '../consts/colors'
 import i18n from '../../locale/i18n'
 import {NavigationEvents} from "react-navigation";
 import themeImages from '../consts/Images'
+import { connect } from 'react-redux';
+import { chooseTheme, chooseLang } from '../actions'
+import * as Battery from 'expo-battery';
+
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
@@ -15,13 +19,23 @@ class Settings extends Component {
     constructor(props){
         super(props);
         this.state = {
-            type: 1,
+            theme: this.props.theme,
             SwitchOnValueHolder:true,
             SwitchOnValueHolder2:false,
             language:''
         }
     }
 
+    componentDidMount(){
+        this._subscribe()
+    }
+
+    _subscribe = () => {
+        this._subscription = Battery.addLowPowerModeListener(({ batteryLevel }) => {
+            alert(batteryLevel);
+            console.log('batteryLevel changed!', batteryLevel);
+        });
+    };
 
     static navigationOptions = () => ({
         drawerLabel:  i18n.t('settings')  ,
@@ -35,9 +49,15 @@ class Settings extends Component {
 
     stopNotification = (value) =>{
         this.setState({  SwitchOnValueHolder:!this.state.SwitchOnValueHolder})
-    }
+    };
+
     stopBattery = (value) =>{
         this.setState({  SwitchOnValueHolder2:!this.state.SwitchOnValueHolder2})
+    };
+
+    setTheme(theme){
+        this.setState({ theme });
+        this.props.chooseTheme(theme);
     }
 
     onFocus(){
@@ -79,28 +99,26 @@ class Settings extends Component {
                 </Header>
                 <Content style={{ backgroundColor: colors.darkBackground, marginTop: -25 }} contentContainerStyle={{ flexGrow: 1 }}>
                     <View>
-                        <View style={{ marginTop: 10, backgroundColor: colors.lightBackground, borderTopColor: '#ddd', borderTopWidth: 1}}>
+                        <View style={{ marginTop: 10, backgroundColor: colors.lightBackground, borderTopColor: colors.pageBorder, borderTopWidth: 1}}>
                             <View style={{width: 0, height: 0, backgroundColor: 'transparent', borderStyle: 'solid', borderLeftWidth: 50, borderTopWidth: 50, borderLeftColor: 'transparent', borderTopColor: colors.darkBackground, right: 0, position: 'absolute', top: -1 }} />
                             <View style={{ flex: 1, height: 10, width: '100%' }}/>
-                            <View style={{ width: 1, height: 70, backgroundColor: '#ddd', transform: [{ rotate: '45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
+                            <View style={{ width: 1, height: 70, backgroundColor: colors.pageBorder, transform: [{ rotate: '45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
                             <View style={{ marginTop: -40, height: height-125 , paddingHorizontal:20 }}>
                                 <View style={{flexDirection:'row' , justifyContent:'space-between' , alignItems:'center'}}>
                                     <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 15 , color: colors.labelFont }}>{ i18n.t('mode') }</Text>
 
                                     <View style={{flexDirection:'row' , justifyContent:'center' , alignItems:'center'}}>
-                                        <TouchableOpacity onPress={() => this.setState({ type: 1 })} style={{flexDirection:'row' , justifyContent:'center' , alignItems:'center' , padding:3 , backgroundColor:this.state.type == 1 ?colors.activeBG : colors.unActiveBG}}>
+                                        <TouchableOpacity onPress={() => this.setTheme('dark')} style={{flexDirection:'row' , justifyContent:'center' , alignItems:'center' , padding:3 , backgroundColor: this.state.theme === 'dark' ?colors.activeBG : colors.unActiveBG}}>
                                             <Image source={require('../../assets/images/dark_mode/dark_mode.png')} style={{ width: 20, height: 20 , marginRight:3}} resizeMode={'contain'} />
                                             <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 13 , color: colors.labelFont }}>{ i18n.t('night') }</Text>
                                         </TouchableOpacity>
-                                        <TouchableOpacity onPress={() => this.setState({ type: 2 })} style={{flexDirection:'row' , justifyContent:'center' , alignItems:'center' , padding:3 , backgroundColor:this.state.type == 2 ?colors.activeBG : colors.unActiveBG}}>
+
+                                        <TouchableOpacity onPress={() => this.setTheme('light')} style={{flexDirection:'row' , justifyContent:'center' , alignItems:'center' , padding:3 , backgroundColor: this.state.theme === 'light' ?colors.activeBG : colors.unActiveBG}}>
                                             <Image source={require('../../assets/images/light_mode/light_mode.png')} style={{ width: 20, height: 20 , marginRight:3}} resizeMode={'contain'} />
                                             <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 13 , color: colors.labelFont }}>{ i18n.t('light') }</Text>
                                         </TouchableOpacity>
                                     </View>
-
-
                                 </View>
-
 
                                 <View style={{backgroundColor:'#ad9bc1' , height:.5 , width:'100%' , marginVertical:20}}/>
 
@@ -184,4 +202,12 @@ class Settings extends Component {
     }
 }
 
-export default Settings;
+const mapStateToProps = ({ lang, profile, theme }) => {
+    return {
+        lang: lang.lang,
+        user: profile.user,
+        theme: theme.theme
+    };
+};
+
+export default connect(mapStateToProps, { chooseTheme })(Settings);

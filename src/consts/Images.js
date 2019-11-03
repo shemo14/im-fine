@@ -51,6 +51,8 @@ export default {
         share: require('../../assets/images/light_mode/share.png'),
         warning: require('../../assets/images/light_mode/warning.png'),
         right_wight_arrow_drop: require('../../assets/images/dark_mode/right_wight_arrow_drop.png'),
+        sign_in: require('../../assets/images/dark_mode/sign-in.png'),
+        star: require('../../assets/images/dark_mode/star.png'),
     },
     darkImages: {
         big_logo: require('../../assets/images/dark_mode/big_logo.png'),
@@ -73,7 +75,7 @@ export default {
         back: require('../../assets/images/dark_mode/back.png'),
         tick_blue: require('../../assets/images/dark_mode/tick_blue.png'),
         play_button_big: require('../../assets/images/dark_mode/play_button_big.png'),
-        location_irbble: require('../../assets/images/dark_mode/location_irbble.png'),
+        location_irbble: require('../../assets/images/dark_mode/my_location.png'),
         microphone: require('../../assets/images/dark_mode/microphone.png'),
         send: require('../../assets/images/dark_mode/send.png'),
         pause_button: require('../../assets/images/light_mode/pause_button.png'),
@@ -96,5 +98,7 @@ export default {
         share: require('../../assets/images/dark_mode/share.png'),
         warning: require('../../assets/images/dark_mode/warning.png'),
         right_wight_arrow_drop: require('../../assets/images/dark_mode/right_wight_arrow_drop.png'),
+        sign_in: require('../../assets/images/dark_mode/sign-in.png'),
+        star: require('../../assets/images/dark_mode/star.png'),
     }
 }

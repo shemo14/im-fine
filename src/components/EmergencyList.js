@@ -9,6 +9,11 @@ import {NavigationEvents} from "react-navigation";
 import themeImages from '../consts/Images'
 import * as Contacts from 'expo-contacts';
 import * as Permissions from 'expo-permissions';
+import {DoubleBounce} from "react-native-loader";
+import {connect} from "react-redux";
+import CONST from '../consts';
+import axios from 'axios'
+
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
@@ -17,7 +22,9 @@ class EmergencyList extends Component {
     constructor(props){
         super(props);
         this.state = {
-            selectedId:0
+            selectedId:0,
+            contacts: [],
+            loader: false
         }
     }
 
@@ -25,16 +32,44 @@ class EmergencyList extends Component {
         this.setState({ selectedId });
     }
 
+    renderLoader(colors){
+        if (this.state.loader){
+            return(
+                <View style={{ alignItems: 'center', justifyContent: 'center', height: (height-100) , alignSelf:'center' , backgroundColor: colors.darkBackground , width:'100%' , position:'absolute' , zIndex:1  }}>
+                    <DoubleBounce size={20} color={COLORS.lightColors.orange} />
+                </View>
+            );
+        }
+    }
+
     async componentWillMount(){
+        this.setState({ loader: true });
         await Permissions.askAsync(Permissions.CONTACTS);
 
         const { data } = await Contacts.getContactsAsync({
             fields: [Contacts.Fields.PhoneNumbers],
         });
+        let phoneNumbers = [];
 
         if (data.length > 0) {
-            const contact = data;
-            console.log(contact);
+            const contacts = data;
+
+            for (let i=0; i < (contacts).length; i++){
+                let number = '';
+                if ((contacts[i].phoneNumbers).length > 0)
+                    number = ((contacts[i].phoneNumbers)[0]).number;
+
+                number = number.replace(/ +/g, "");
+                number = number.replace(/^\+[0-9]{1,3}/,'');
+                number = number.length < 10 ? '0' + number : number;
+
+                if (number >= 10)
+                    phoneNumbers[i] = number
+            }
+
+            axios.post(CONST.url + 'contacts', { id: this.props.user.id, phones: phoneNumbers, lang: this.props.lang }).then(response => {
+                this.setState({ contacts: response.data.data, loader: false })
+            })
         }
     }
 
@@ -57,6 +92,8 @@ class EmergencyList extends Component {
             colors = colors.lightColors
         }
 
+        console.log(this.state.contacts);
+
         return (
             <Container style={{ backgroundColor: colors.darkBackground }}>
                 <NavigationEvents onWillFocus={() => this.onFocus()} />
@@ -77,96 +114,28 @@ class EmergencyList extends Component {
                 </Header>
                 <Content style={{ backgroundColor: colors.darkBackground, marginTop: -25 }} contentContainerStyle={{ flexGrow: 1 }}>
                     <View>
-                        <View style={{ marginTop: 10, backgroundColor: colors.lightBackground, borderTopColor: '#ddd', borderTopWidth: 1}}>
+                        <View style={{ marginTop: 10, backgroundColor: colors.lightBackground, borderTopColor: colors.pageBorder, borderTopWidth: 1}}>
                             <View style={{width: 0, height: 0, backgroundColor: 'transparent', borderStyle: 'solid', borderLeftWidth: 50, borderTopWidth: 50, borderLeftColor: 'transparent', borderTopColor: colors.darkBackground, right: 0, position: 'absolute', top: -1 }} />
                             <View style={{ flex: 1, height: 10, width: '100%' }}/>
-                            <View style={{ width: 1, height: 70, backgroundColor: '#ddd', transform: [{ rotate: '45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
+                            <View style={{ width: 1, height: 70, backgroundColor: colors.pageBorder, transform: [{ rotate: '45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
                             <View style={{ marginTop: -40, height: height-125 , paddingHorizontal:20 }}>
+                                { this.renderLoader(colors) }
 
-                                <TouchableOpacity onPress={ () => this.checkRadio(1)} style={{ flexDirection: 'row', justifyContent:'space-between' , alignItems:'center' ,  borderBottomColor: '#f0e2c0', borderBottomWidth: 1 , paddingVertical:15}}>
-                                    <View style={{ flexDirection: 'row', justifyContent:'center' , alignItems:'center'}}>
-                                        <View style={{ height: 60, width: 60, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
-                                            <Image source={images.person_two} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
-                                        </View>
-                                        <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 , marginLeft:10 }}>اوامر الشركة</Text>
-                                    </View>
-                                    <Radio onPress={ () => this.checkRadio(1)} selected={this.state.selectedId == 1 ? true : false}  color={colors.labelFont} selectedColor={colors.orange} style={{borderColor:colors.orange ,
-                                        paddingRight:Platform.OS === 'ios' ?3:2,
-                                        left:0,}} />
-                                </TouchableOpacity>
-
-                                <TouchableOpacity onPress={ () => this.checkRadio(2)} style={{ flexDirection: 'row', justifyContent:'space-between' , alignItems:'center' ,  borderBottomColor: '#f0e2c0', borderBottomWidth: 1 , paddingVertical:15}}>
-                                    <View style={{ flexDirection: 'row', justifyContent:'center' , alignItems:'center'}}>
-                                        <View style={{ height: 60, width: 60, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
-                                            <Image source={images.person_two} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
-                                        </View>
-                                        <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 , marginLeft:10 }}>اوامر الشركة</Text>
-                                    </View>
-                                    <Radio onPress={ () => this.checkRadio(2)} selected={this.state.selectedId == 2 ? true : false}  color={colors.labelFont} selectedColor={colors.orange} style={{borderColor:colors.orange ,
-                                        paddingRight:Platform.OS === 'ios' ?3:2,
-                                        left:0,}} />
-                                </TouchableOpacity>
-
-                                <TouchableOpacity onPress={ () => this.checkRadio(3)} style={{ flexDirection: 'row', justifyContent:'space-between' , alignItems:'center' ,  borderBottomColor: '#f0e2c0', borderBottomWidth: 1 , paddingVertical:15}}>
-                                    <View style={{ flexDirection: 'row', justifyContent:'center' , alignItems:'center'}}>
-                                        <View style={{ height: 60, width: 60, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
-                                            <Image source={images.person_two} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
-                                        </View>
-                                        <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 , marginLeft:10 }}>اوامر الشركة</Text>
-                                    </View>
-                                    <Radio onPress={ () => this.checkRadio(3)} selected={this.state.selectedId == 3 ? true : false}  color={colors.labelFont} selectedColor={colors.orange} style={{borderColor:colors.orange ,
-                                        paddingRight:Platform.OS === 'ios' ?3:2,
-                                        left:0,}} />
-                                </TouchableOpacity>
-
-                                <TouchableOpacity onPress={ () => this.checkRadio(4)} style={{ flexDirection: 'row', justifyContent:'space-between' , alignItems:'center' ,  borderBottomColor: '#f0e2c0', borderBottomWidth: 1 , paddingVertical:15}}>
-                                    <View style={{ flexDirection: 'row', justifyContent:'center' , alignItems:'center'}}>
-                                        <View style={{ height: 60, width: 60, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
-                                            <Image source={images.person_two} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
-                                        </View>
-                                        <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 , marginLeft:10 }}>اوامر الشركة</Text>
-                                    </View>
-                                    <Radio onPress={ () => this.checkRadio(4)} selected={this.state.selectedId == 4 ? true : false}  color={colors.labelFont} selectedColor={colors.orange} style={{borderColor:colors.orange ,
-                                        paddingRight:Platform.OS === 'ios' ?3:2,
-                                        left:0,}} />
-                                </TouchableOpacity>
-
-                                <TouchableOpacity onPress={ () => this.checkRadio(5)} style={{ flexDirection: 'row', justifyContent:'space-between' , alignItems:'center' ,  borderBottomColor: '#f0e2c0', borderBottomWidth: 1 , paddingVertical:15}}>
-                                    <View style={{ flexDirection: 'row', justifyContent:'center' , alignItems:'center'}}>
-                                        <View style={{ height: 60, width: 60, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
-                                            <Image source={images.person_two} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
-                                        </View>
-                                        <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 , marginLeft:10 }}>اوامر الشركة</Text>
-                                    </View>
-                                    <Radio onPress={ () => this.checkRadio(5)} selected={this.state.selectedId == 5 ? true : false}  color={colors.labelFont} selectedColor={colors.orange} style={{borderColor:colors.orange ,
-                                        paddingRight:Platform.OS === 'ios' ?3:2,
-                                        left:0,}} />
-                                </TouchableOpacity>
-
-                                <TouchableOpacity onPress={ () => this.checkRadio(6)} style={{ flexDirection: 'row', justifyContent:'space-between' , alignItems:'center' ,  borderBottomColor: '#f0e2c0', borderBottomWidth: 1 , paddingVertical:15}}>
-                                    <View style={{ flexDirection: 'row', justifyContent:'center' , alignItems:'center'}}>
-                                        <View style={{ height: 60, width: 60, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
-                                            <Image source={images.person_two} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
-                                        </View>
-                                        <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 , marginLeft:10 }}>اوامر الشركة</Text>
-                                    </View>
-                                    <Radio onPress={ () => this.checkRadio(6)} selected={this.state.selectedId == 6 ? true : false}  color={colors.labelFont} selectedColor={colors.orange} style={{borderColor:colors.orange ,
-                                        paddingRight:Platform.OS === 'ios' ?3:2,
-                                        left:0,}} />
-                                </TouchableOpacity>
-
-                                <TouchableOpacity onPress={ () => this.checkRadio(7)} style={{ flexDirection: 'row', justifyContent:'space-between' , alignItems:'center' ,  borderBottomColor: '#f0e2c0', borderBottomWidth: 1 , paddingVertical:15}}>
-                                    <View style={{ flexDirection: 'row', justifyContent:'center' , alignItems:'center'}}>
-                                        <View style={{ height: 60, width: 60, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
-                                            <Image source={images.person_two} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
-                                        </View>
-                                        <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 , marginLeft:10 }}>اوامر الشركة</Text>
-                                    </View>
-                                    <Radio onPress={ () => this.checkRadio(7)} selected={this.state.selectedId == 7 ? true : false}  color={colors.labelFont} selectedColor={colors.orange} style={{borderColor:colors.orange ,
-                                        paddingRight:Platform.OS === 'ios' ?3:2,
-                                        left:0,}} />
-                                </TouchableOpacity>
-
+                                {
+                                    this.state.contacts.map((contact, i)=>(
+                                        <TouchableOpacity key={i} onPress={ () => this.checkRadio(1)} style={{ flexDirection: 'row', justifyContent:'space-between' , alignItems:'center' ,  borderBottomColor: '#ad9bc1', borderBottomWidth: 1 , paddingVertical:15}}>
+                                            <View style={{ flexDirection: 'row', justifyContent:'center' , alignItems:'center'}}>
+                                                <View style={{ height: 60, width: 60, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
+                                                    <Image source={{ uri: contact.image }} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
+                                                </View>
+                                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 , marginLeft:10 }}>{ contact.name }</Text>
+                                            </View>
+                                            <Radio onPress={ () => this.checkRadio(1)} selected={contact.is_emergency}  color={colors.labelFont} selectedColor={colors.orange} style={{borderColor:colors.orange ,
+                                                paddingRight:Platform.OS === 'ios' ?3:2,
+                                                left:0,}} />
+                                        </TouchableOpacity>
+                                    ))
+                                }
 
                             </View>
                         </View>
@@ -196,4 +165,12 @@ class EmergencyList extends Component {
     }
 }
 
-export default EmergencyList;
+const mapStateToProps = ({ lang, profile, theme }) => {
+    return {
+        lang: lang.lang,
+        user: profile.user,
+        theme: theme.theme
+    };
+};
+
+export default connect(mapStateToProps, {})(EmergencyList);

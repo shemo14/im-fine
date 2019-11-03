@@ -31,7 +31,7 @@ const DrawerNavigator = createDrawerNavigator({
     settings: Settings,
 }, {
     nitialRouteName: 'home',
-    drawerPosition: I18nManager.isRTL ?'right' : 'left',
+    drawerPosition: I18nManager.isRTL ? 'right' : 'left',
     contentComponent: CustomDrawerContentComponent,
     drawerOpenRoute: 'DrawerOpen',
     drawerType: 'back',
@@ -42,13 +42,6 @@ const DrawerNavigator = createDrawerNavigator({
 });
 
 const appStack = createStackNavigator({
-
-    complaint: {
-        screen: Complaint,
-        navigationOptions: {
-            header: null,
-        }
-    },
     DrawerNavigator: {
         screen: DrawerNavigator,
         navigationOptions: {
@@ -74,18 +67,6 @@ const appStack = createStackNavigator({
             header: null,
         }
     },
-    emergencyList: {
-        screen: EmergencyList,
-        navigationOptions: {
-            header: null,
-        }
-    },
-    settings: {
-        screen: Settings,
-        navigationOptions: {
-            header: null,
-        }
-    },
     notFine: {
         screen: NotFine,
         navigationOptions: {
@@ -98,8 +79,26 @@ const appStack = createStackNavigator({
             header: null,
         }
     },
+    emergencyList: {
+        screen: EmergencyList,
+        navigationOptions: {
+            header: null,
+        }
+    },
     VideoRecorder: {
         screen: VideoRecorder,
+        navigationOptions: {
+            header: null,
+        }
+    },
+    settings: {
+        screen: Settings,
+        navigationOptions: {
+            header: null,
+        }
+    },
+    complaint: {
+        screen: Complaint,
         navigationOptions: {
             header: null,
         }

@@ -66,7 +66,7 @@ export const logout = (data) => {
         //     }
         // )
 
-        AsyncStorage.clear();
+        AsyncStorage.multiRemove(['token', 'auth', 'profile'])
     }
 }
 

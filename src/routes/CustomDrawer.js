@@ -8,6 +8,8 @@ import lightStyles from '../../assets/styles/light'
 import darkStyles from '../../assets/styles/dark'
 import COLORS from '../consts/colors'
 import themeImages from '../consts/Images'
+import {logout, tempAuth} from "../actions";
+
 
 class CustomDrawer extends Component {
     constructor(props){
@@ -41,6 +43,12 @@ class CustomDrawer extends Component {
         }
     };
 
+    onLogout(){
+        this.props.logout(this.props.user.id);
+        this.props.tempAuth();
+
+        this.props.navigation.navigate('login')
+    }
 
     render(){
         let styles  = lightStyles;
@@ -95,6 +103,29 @@ class CustomDrawer extends Component {
                                     fontWeight: 'normal',
                                     fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold',}} iconContainerStyle ={{marginHorizontal:20}}
                                 itemStyle  = {{ marginTop:0 , paddingTop:0,}}  />
+                            <View>
+                                <TouchableOpacity style={{ flexDirection: 'row', marginBottom: 5 }}>
+                                    <Image source={images.star} resizeMode={'contain'} style={{ width: 20, height: 20, marginHorizontal:20 }}/>
+                                    <Text style={{ color: colors.menuColor ,
+                                        fontSize:14 ,
+                                        marginLeft: 0 ,
+                                        marginRight: 0 ,
+                                        marginBottom:10 ,
+                                        fontWeight: 'normal',
+                                        fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', }}>{ i18n.t('rate') }</Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity onPress={() => this.onLogout()} style={{ flexDirection: 'row' }}>
+                                    <Image source={images.sign_in} resizeMode={'contain'} style={{ width: 20, height: 20, marginHorizontal:20 }}/>
+                                    <Text style={{ color: colors.menuColor ,
+                                        fontSize:14 ,
+                                        marginLeft: 0 ,
+                                        marginRight: 0 ,
+                                        marginBottom:10 ,
+                                        fontWeight: 'normal',
+                                        fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', }}>{ i18n.t('logout') }</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
                     </View>
                 </Content>
@@ -171,4 +202,4 @@ const mapStateToProps = ({ lang, profile }) => {
 };
 
 
-export default connect(mapStateToProps, {  })(CustomDrawer);
+export default connect(mapStateToProps, {  logout, tempAuth  })(CustomDrawer);
