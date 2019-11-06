@@ -1,8 +1,5 @@
 import React, { Component } from "react";
-import {
-    View, Text, Image, TouchableOpacity, ImageBackground, I18nManager, Dimensions,
-    AsyncStorage
-} from "react-native";
+import { View, Image, TouchableOpacity, I18nManager, Dimensions, AsyncStorage } from "react-native";
 import {Container, Content, Form, Item, Input, Label, Button, Toast, CheckBox, Picker} from 'native-base'
 import lightStyles from '../../assets/styles/light'
 import darkStyles from '../../assets/styles/dark'
@@ -14,8 +11,8 @@ import {NavigationEvents} from "react-navigation";
 import themeImages from '../consts/Images'
 import axios from 'axios';
 import CONST from '../consts'
-import {Notifications} from "expo/build/Expo";
-import * as Permissions from "expo-permissions/build/Permissions";
+import {Notifications} from "expo";
+import * as Permissions from "expo-permissions";
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
@@ -56,8 +53,9 @@ class Login extends Component {
         }
 
         const deviceId = await Notifications.getExpoPushTokenAsync();
-        this.setState({ deviceId, userId: null })
-        AsyncStorage.setItem('deviceID', deviceId);
+        this.setState({ deviceId, userId: null });
+
+        // AsyncStorage.setItem('deviceID', deviceId);
     }
 
     validate = () => {
@@ -104,7 +102,7 @@ class Login extends Component {
         const err = this.validate();
         if (!err){
             this.setState({ isSubmitted: true });
-            axios.post(CONST.url + 'sign-in', { phone: this.state.phone, country_code: this.state.countryCode, lang: 'ar' }).then(response => {
+            axios.post(CONST.url + 'sign-in', { phone: this.state.phone, country_code: this.state.countryCode, lang: this.props.lang, device_id: this.state.deviceId }).then(response => {
                 if(response.data.status == 200){
                     this.setState({ isSubmitted: false });
                     this.props.navigation.navigate('activeCode', { data: response.data.data, code: response.data.extra.code });
@@ -196,9 +194,10 @@ class Login extends Component {
     }
 }
 
-const mapStateToProps = ({ theme }) => {
+const mapStateToProps = ({ theme, lang }) => {
     return {
-        theme: theme.theme
+        theme: theme.theme,
+        lang: lang.lang,
     };
 };
 

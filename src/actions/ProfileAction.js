@@ -54,19 +54,20 @@ export const updateProfile = (data) => {
 }
 
 
-export const logout = (data) => {
+export const logout = (user_id) => {
     return (dispatch) => {
-        // axios({
-        //     url: CONST.url + 'logout',
-        //     method: 'POST',
-        //     headers: {Authorization: data.token },
-        //     }).then(response => {
-        //         AsyncStorage.clear();
-        //         dispatch({type: 'logout'})
-        //     }
-        // )
-
-        AsyncStorage.multiRemove(['token', 'auth', 'profile'])
+        axios({
+            url: CONST.url + 'logout',
+            method: 'POST',
+            data: { user_id }
+            }).then(response => {
+			    AsyncStorage.multiRemove(['token', 'auth', 'profile'])
+                dispatch({type: 'logout'})
+            }
+        ).catch(e => {
+			AsyncStorage.multiRemove(['token', 'auth', 'profile'])
+			dispatch({type: 'logout'})
+        })
     }
 }
 

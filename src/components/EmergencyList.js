@@ -13,10 +13,13 @@ import {DoubleBounce} from "react-native-loader";
 import {connect} from "react-redux";
 import CONST from '../consts';
 import axios from 'axios'
+import Contact from './Contact'
 
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
+
+let selectedContacts = [];
 
 class EmergencyList extends Component {
     constructor(props){
@@ -24,12 +27,34 @@ class EmergencyList extends Component {
         this.state = {
             selectedId:0,
             contacts: [],
-            loader: false
+            loader: false,
+			selectedContacts
         }
     }
 
     checkRadio(selectedId){
-        this.setState({ selectedId });
+
+    }
+
+	pushSelectedChecks(id){
+		selectedContacts.push(id);
+        this.setState({ selectedContacts  })
+    }
+
+	pullSelectedChecks(id){
+		for( let i = 0; i < selectedContacts.length; i++){
+			if ( selectedContacts[i] === id) {
+				selectedContacts.splice(i, 1);
+			}
+		}
+
+		this.setState({ selectedContacts  })
+    }
+
+    addToEmergencyList(){
+		axios.post(CONST.url + 'add-to-emergency', { id: this.props.user.id, users: selectedContacts, lang: this.props.lang }).then(response => {
+			this.componentWillMount()
+		})
     }
 
     renderLoader(colors){
@@ -61,7 +86,7 @@ class EmergencyList extends Component {
 
                 number = number.replace(/ +/g, "");
                 number = number.replace(/^\+[0-9]{1,3}/,'');
-                number = number.length < 10 ? '0' + number : number;
+                number = number.replace(/^0+/, '');
 
                 if (number >= 10)
                     phoneNumbers[i] = number
@@ -69,12 +94,19 @@ class EmergencyList extends Component {
 
             axios.post(CONST.url + 'contacts', { id: this.props.user.id, phones: phoneNumbers, lang: this.props.lang }).then(response => {
                 this.setState({ contacts: response.data.data, loader: false })
+                if ((response.data.data).length > 0){
+                    (response.data.data).map((contact) => {
+						if(contact.is_emergency){
+							this.pushSelectedChecks(contact.id);
+						}
+                    })
+                }
             })
         }
     }
 
     onFocus(){
-
+        this.componentWillMount()
     }
 
     render() {
@@ -92,7 +124,8 @@ class EmergencyList extends Component {
             colors = colors.lightColors
         }
 
-        console.log(this.state.contacts);
+        console.log(this.state.selectedContacts)
+
 
         return (
             <Container style={{ backgroundColor: colors.darkBackground }}>
@@ -118,46 +151,40 @@ class EmergencyList extends Component {
                             <View style={{width: 0, height: 0, backgroundColor: 'transparent', borderStyle: 'solid', borderLeftWidth: 50, borderTopWidth: 50, borderLeftColor: 'transparent', borderTopColor: colors.darkBackground, right: 0, position: 'absolute', top: -1 }} />
                             <View style={{ flex: 1, height: 10, width: '100%' }}/>
                             <View style={{ width: 1, height: 70, backgroundColor: colors.pageBorder, transform: [{ rotate: '45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
-                            <View style={{ marginTop: -40, height: height-125 , paddingHorizontal:20 }}>
+                            <View style={{ marginTop: -40, height: height-125 }}>
                                 { this.renderLoader(colors) }
-
-                                {
-                                    this.state.contacts.map((contact, i)=>(
-                                        <TouchableOpacity key={i} onPress={ () => this.checkRadio(1)} style={{ flexDirection: 'row', justifyContent:'space-between' , alignItems:'center' ,  borderBottomColor: '#ad9bc1', borderBottomWidth: 1 , paddingVertical:15}}>
-                                            <View style={{ flexDirection: 'row', justifyContent:'center' , alignItems:'center'}}>
-                                                <View style={{ height: 60, width: 60, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
-                                                    <Image source={{ uri: contact.image }} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
-                                                </View>
-                                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15 , marginLeft:10 }}>{ contact.name }</Text>
-                                            </View>
-                                            <Radio onPress={ () => this.checkRadio(1)} selected={contact.is_emergency}  color={colors.labelFont} selectedColor={colors.orange} style={{borderColor:colors.orange ,
-                                                paddingRight:Platform.OS === 'ios' ?3:2,
-                                                left:0,}} />
-                                        </TouchableOpacity>
-                                    ))
-                                }
-
+                                <View style={{ marginHorizontal: 20 }}>
+									{
+										this.state.contacts.map((contact, i) => {
+										    return (
+												<Contact  pullSelectedChecks={(id) => this.pullSelectedChecks(id)} pushSelectedChecks={(id) => this.pushSelectedChecks(id)} key={i} data={contact}  />
+											)
+                                        })
+									}
+                                </View>
                             </View>
                         </View>
                     </View>
                 </Content>
 
-                {
-                    this.state.selectedId == 0 ?
-                    (
-                        <View style={{ bottom: 30, flex: 1, alignSelf: 'center', alignItems: 'center', position: 'absolute' }}>
-                            <TouchableOpacity  style={{ backgroundColor: colors.orange, width: 60, height: 60, transform: [{ rotate: '45deg'}], alignItems: 'center', justifyContent: 'center', alignSelf: 'center' }}>
-                                <Image source={require('../../assets/images/dark_mode/add_button.png')} style={{ height: 40, width: 40, transform: [{ rotate: '-45deg'}] }} resizeMode={'contain'} />
-                            </TouchableOpacity>
-                        </View>
-                    ) :
-                    ( <View style={{ bottom: 30, flex: 1, alignSelf: 'center', alignItems: 'center', position: 'absolute' }}>
-                        <TouchableOpacity  onPress={ () => this.checkRadio(0)}  style={{ backgroundColor: colors.orange, width: 60, height: 60, transform: [{ rotate: '45deg'}], alignItems: 'center', justifyContent: 'center', alignSelf: 'center' }}>
-                            <Image source={require('../../assets/images/dark_mode/trash.png')} style={{ height: 40, width: 40, transform: [{ rotate: '-45deg'}] }} resizeMode={'contain'} />
-                        </TouchableOpacity>
-                    </View>
-                    )
-                }
+				<View style={{ bottom: 30, flex: 1, alignSelf: 'center', alignItems: 'center', position: 'absolute' }}>
+					<TouchableOpacity  onPress={() => this.addToEmergencyList()} style={{ backgroundColor: colors.orange, width: 60, height: 60, transform: [{ rotate: '45deg'}], alignItems: 'center', justifyContent: 'center', alignSelf: 'center' }}>
+						<Image source={require('../../assets/images/dark_mode/add_button.png')} style={{ height: 40, width: 40, transform: [{ rotate: '-45deg'}] }} resizeMode={'contain'} />
+					</TouchableOpacity>
+				</View>
+
+                {/*{*/}
+                    {/*(this.state.selectedContacts).length > 0 ?*/}
+                    {/*(*/}
+                        {/**/}
+                    {/*) :*/}
+                    {/*( <View style={{ bottom: 30, flex: 1, alignSelf: 'center', alignItems: 'center', position: 'absolute' }}>*/}
+                        {/*<TouchableOpacity  onPress={ () => this.checkRadio(0)}  style={{ backgroundColor: '#ddd', width: 60, height: 60, transform: [{ rotate: '45deg'}], alignItems: 'center', justifyContent: 'center', alignSelf: 'center' }}>*/}
+                            {/*<Image source={require('../../assets/images/dark_mode/trash.png')} style={{ height: 40, width: 40, transform: [{ rotate: '-45deg'}] }} resizeMode={'contain'} />*/}
+                        {/*</TouchableOpacity>*/}
+                    {/*</View>*/}
+                    {/*)*/}
+                {/*}*/}
 
 
             </Container>

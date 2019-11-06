@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { View, Text, Image, TouchableOpacity, Platform, I18nManager, Dimensions, FlatList, Slider} from "react-native";
-import { Container, Content, Header, Left, Right, Body, Item, Switch, Picker } from 'native-base'
+import { Container, Content, Header, Left, Right, Body, Item, Switch, Picker, Toast } from 'native-base'
 import lightStyles from '../../assets/styles/light'
 import darkStyles from '../../assets/styles/dark'
 import COLORS from '../consts/colors'
@@ -9,8 +9,9 @@ import {NavigationEvents} from "react-navigation";
 import themeImages from '../consts/Images'
 import { connect } from 'react-redux';
 import { chooseTheme, chooseLang } from '../actions'
-import * as Battery from 'expo-battery';
-
+import CONST from '../consts';
+import axios from 'axios';
+import {logout, tempAuth} from "../actions";
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
@@ -20,36 +21,68 @@ class Settings extends Component {
         super(props);
         this.state = {
             theme: this.props.theme,
-            SwitchOnValueHolder:true,
-            SwitchOnValueHolder2:false,
-            language:''
+            SwitchOnValueHolder: true,
+            SwitchOnValueHolder2: false,
+			lang: this.props.lang,
+			batteryLevel: null
         }
     }
 
-    componentDidMount(){
-        this._subscribe()
+	setLang(lang){
+		if (lang != this.state.lang){
+			this.props.chooseLang(lang)
+		}
+	}
+
+	componentWillMount() {
+		axios({
+			url: CONST.url + 'profile',
+			method: 'POST',
+			data: {lang: this.props.lang, id: this.props.user.id}
+		}).then(response => {
+			this.setState({
+				SwitchOnValueHolder:  response.data.data.notification == 1 ? true : false
+			})
+		})
+	}
+
+	onDeleteAccount(){
+		axios({
+			url: CONST.url + 'delete',
+			method: 'POST',
+			data: {id: this.props.user.id}
+		}).then(response => {
+			this.props.logout(this.props.user.id);
+			this.props.tempAuth();
+		})
+
+		this.props.navigation.navigate('login')
     }
 
-    _subscribe = () => {
-        this._subscription = Battery.addLowPowerModeListener(({ batteryLevel }) => {
-            alert(batteryLevel);
-            console.log('batteryLevel changed!', batteryLevel);
-        });
-    };
+
+	stopNotification = (value) =>{
+		this.setState({  SwitchOnValueHolder:!this.state.SwitchOnValueHolder})
+
+        // alert(value)
+
+		axios({
+			method: 'POST',
+			url: CONST.url + 'update',
+			data: { user_id: this.props.user.id, lang: this.props.lang, notification: value ? 1 : 0 }
+		    }).then(response => {
+				Toast.show({
+					text: response.data.msg,
+					type: response.data.status == 200 ? "success" : "danger",
+					duration: 3000
+				});
+			})
+	};
 
     static navigationOptions = () => ({
         drawerLabel:  i18n.t('settings')  ,
         drawerIcon: (<Image source={require('../../assets/images/light_mode/cog.png')} style={{width:29 , height:29}} resizeMode={'contain'} /> )
     })
 
-
-    onChooseLang(lang) {
-        this.setState({ language: lang });
-    };
-
-    stopNotification = (value) =>{
-        this.setState({  SwitchOnValueHolder:!this.state.SwitchOnValueHolder})
-    };
 
     stopBattery = (value) =>{
         this.setState({  SwitchOnValueHolder2:!this.state.SwitchOnValueHolder2})
@@ -129,7 +162,7 @@ class Settings extends Component {
                                         value={this.state.SwitchOnValueHolder}
                                         trackColor={colors.activeSwitch}
                                         thumbColor={colors.darkBackground}
-                                        trackColor={colors.activeBG}
+                                        trackColor={colors.sendMsg}
                                     />
                                 </View>
 
@@ -175,8 +208,8 @@ class Settings extends Component {
                                                 textAlign: I18nManager.isRTL ?'right' : 'left',}}
                                             placeholderStyle={{ color: colors.orange }}
                                             placeholderIconColor="#acabae"
-                                            selectedValue={this.state.language}
-                                            onValueChange={(value) => this.onChooseLang(value)}
+											selectedValue={this.state.lang}
+											onValueChange={(value) => this.setLang(value)}
                                         >
                                             <Picker.Item label={'عربي'} value={"ar"} />
                                             <Picker.Item label={'English'} value={"en"} />
@@ -189,10 +222,9 @@ class Settings extends Component {
 
                                 <View style={{backgroundColor:'#ad9bc1' , height:.5 , width:'100%' , marginVertical:20}}/>
 
-                                <TouchableOpacity style={{justifyContent:'space-between' , alignItems:'center' , alignSelf:'center' , marginTop:15}}>
+                                <TouchableOpacity onPress={() => this.onDeleteAccount()} style={{justifyContent:'space-between' , alignItems:'center' , alignSelf:'center' , marginTop:15}}>
                                     <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 15 , color: colors.orange }}>{ i18n.t('closeAcc') }</Text>
                                 </TouchableOpacity>
-
                             </View>
                         </View>
                     </View>
@@ -210,4 +242,4 @@ const mapStateToProps = ({ lang, profile, theme }) => {
     };
 };
 
-export default connect(mapStateToProps, { chooseTheme })(Settings);
+export default connect(mapStateToProps, { chooseTheme, chooseLang })(Settings);

@@ -20,6 +20,7 @@ import EditProfile from "../components/EditProfile";
 import ShareApp from "../components/ShareApp";
 import Complaint from "../components/Complaint";
 import InitScreen from "../components/InitScreen";
+import AreUFine from "../components/AreUFine";
 
 const width = Dimensions.get('window').width;
 const CustomDrawerContentComponent = (props) => (<CustomDrawer { ...props }/>);
@@ -28,6 +29,7 @@ const DrawerNavigator = createDrawerNavigator({
     profile: Profile,
     complaint: Complaint,
     shareApp: ShareApp,
+	areUFine: AreUFine,
     settings: Settings,
 }, {
     nitialRouteName: 'home',
@@ -67,12 +69,6 @@ const appStack = createStackNavigator({
             header: null,
         }
     },
-    notFine: {
-        screen: NotFine,
-        navigationOptions: {
-            header: null,
-        }
-    },
     inbox: {
         screen: Inbox,
         navigationOptions: {
@@ -91,12 +87,6 @@ const appStack = createStackNavigator({
             header: null,
         }
     },
-    settings: {
-        screen: Settings,
-        navigationOptions: {
-            header: null,
-        }
-    },
     complaint: {
         screen: Complaint,
         navigationOptions: {
@@ -109,6 +99,24 @@ const appStack = createStackNavigator({
             header: null,
         }
     },
+	settings: {
+		screen: Settings,
+		navigationOptions: {
+			header: null,
+		}
+	},
+	notFine: {
+		screen: NotFine,
+		navigationOptions: {
+			header: null,
+		}
+	},
+	areUFine: {
+		screen: AreUFine,
+		navigationOptions: {
+			header: null,
+		}
+	},
 });
 const authStack = createStackNavigator({
     init: {screen: InitScreen, navigationOptions: {header: null}},

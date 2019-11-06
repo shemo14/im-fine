@@ -220,12 +220,12 @@ class Home extends Component {
             return (
                 <View style={{ padding: 25, marginTop: -77, height: height-120 }}>
                     <Image source={images.stop_watch_time} style={{ width: 100, height: 100, alignSelf: 'center' }} resizeMode={'contain'} />
-                    <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', textAlign: 'center', fontSize: 16, marginTop: 10 }}>اختر الوقت</Text>
+                    <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', textAlign: 'center', fontSize: 16, marginTop: 10 }}>{ i18n.t('chooseTime') }</Text>
 
                     <View style={{ marginTop: 50, width: '100%' }}>
                         <TouchableOpacity onPress={() => this.showTimePicker('start')} style={{ borderRadius: 3, borderWidth: 1, borderColor: colors.labelFont, height: 45, marginTop: 20, padding: 5, flexDirection: 'row'  }}>
                             <Item onPress={() => this.showTimePicker('start')} style={{ alignSelf: 'flex-start', borderBottomWidth: 0, top: -18, marginTop: 0 ,position:'absolute', width:'88%', paddingHorizontal: 5 }} bordered>
-                                <Label style={{ top:5, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', width: 75, backgroundColor: colors.lightBackground, alignSelf: 'flex-start', color: colors.labelFont, fontSize: 14, position: 'absolute' }}>{ i18n.t('startTime') }</Label>
+                                <Label style={{ top:5, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', backgroundColor: colors.lightBackground, alignSelf: 'flex-start', color: colors.labelFont, fontSize: 14, position: 'absolute', paddingRight: 5, paddingLeft: 5 }}>{ i18n.t('startTime') }</Label>
                                 <Input value={this.state.startTime.toString()} disabled placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('startTime') + '...'} onChangeText={(phone) => this.setState({phone})} keyboardType={'number-pad'} style={{ width: '100%', fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontSize: 15, top: 15 }}  />
                             </Item>
                             <Image source={images.choose_time} style={{ height: 22, width: 22, right: 15, top: 9, position: 'absolute', flex: 1 }} resizeMode={'contain'} />
@@ -241,7 +241,7 @@ class Home extends Component {
                     <View style={{ marginTop: 20, width: '100%' }}>
                         <TouchableOpacity onPress={() => this.showTimePicker('end')} style={{ borderRadius: 3, borderWidth: 1, borderColor: colors.labelFont, height: 45, marginTop: 20, padding: 5, flexDirection: 'row'  }}>
                             <Item onPress={() => this.showTimePicker('end')} style={{ alignSelf: 'flex-start', borderBottomWidth: 0, top: -18, marginTop: 0 ,position:'absolute', width:'88%', paddingHorizontal: 5 }} bordered>
-                                <Label style={{ top:5, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', width: 75, backgroundColor: colors.lightBackground, alignSelf: 'flex-start', color: colors.labelFont, fontSize: 14, position: 'absolute' }}>{ i18n.t('startTime') }</Label>
+                                <Label style={{ top:5, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', backgroundColor: colors.lightBackground, alignSelf: 'flex-start', color: colors.labelFont, fontSize: 14, position: 'absolute', paddingRight: 5, paddingLeft: 5  }}>{ i18n.t('startTime') }</Label>
                                 <Input value={this.state.endTime.toString()} disabled placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('startTime') + '...'} onChangeText={(phone) => this.setState({phone})} keyboardType={'number-pad'} style={{ width: '100%', fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontSize: 15, top: 15 }}  />
                             </Item>
                             <Image source={images.choose_time} style={{ height: 22, width: 22, right: 15, top: 9, position: 'absolute', flex: 1 }} resizeMode={'contain'} />
@@ -261,12 +261,12 @@ class Home extends Component {
             return (
                 <View style={{ padding: 25, marginTop: -77, height: height-120 }}>
                     <Image source={images.timer_twinty_four} style={{ width: 100, height: 100, alignSelf: 'center' }} resizeMode={'contain'} />
-                    <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', textAlign: 'center', fontSize: 16, marginTop: 10 }}>اختر الوقت</Text>
+                    <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', textAlign: 'center', fontSize: 16, marginTop: 10 }}>{ i18n.t('chooseTime') }</Text>
 
                     <View style={{ marginTop: 50, width: '100%' }}>
                         <TouchableOpacity onPress={() => this.showTimePicker('tfTime')} style={{ borderRadius: 3, borderWidth: 1, borderColor: colors.labelFont, height: 45, marginTop: 20, padding: 5, flexDirection: 'row'  }}>
                             <Item onPress={() => this.showTimePicker('tfTime')} style={{ alignSelf: 'flex-start', borderBottomWidth: 0, top: -18, marginTop: 0 ,position:'absolute', width:'88%', paddingHorizontal: 5 }} bordered>
-                                <Label style={{ top:5, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', width: 75, backgroundColor: colors.lightBackground, alignSelf: 'flex-start', color: colors.labelFont, fontSize: 14, position: 'absolute' }}>{ i18n.t('startTime') }</Label>
+                                <Label style={{ top:5, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', backgroundColor: colors.lightBackground, alignSelf: 'flex-start', color: colors.labelFont, fontSize: 14, position: 'absolute', paddingRight: 5, paddingLeft: 5  }}>{ i18n.t('startTime') }</Label>
                                 <Input value={this.state.tfTime.toString()} disabled placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('startTime') + '...'} onChangeText={(phone) => this.setState({phone})} keyboardType={'number-pad'} style={{ width: '100%', fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontSize: 15, top: 15 }}  />
                             </Item>
                             <Image source={images.choose_time} style={{ height: 22, width: 22, right: 15, top: 9, position: 'absolute', flex: 1 }} resizeMode={'contain'} />
@@ -338,17 +338,17 @@ class Home extends Component {
                         <View style={{ flexDirection: 'row', paddingHorizontal: 5 }}>
                             <TouchableOpacity onPress={() => [ this.setState({ type: 1 }), this.componentWillMount() ]} style={{ flexDirection: 'row', width: '33%' }}>
                                 <Image source={this.state.type == 1 ? images.chat_active : images.chat_non} style={{ width: 25, height: 25, margin: 5 }} resizeMode={'contain'} />
-                                <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 15, marginTop: 5, color: this.state.type == 1 ? colors.active : colors.unActive }}>محدثات</Text>
+                                <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 15, marginTop: 5, color: this.state.type == 1 ? colors.active : colors.unActive }}>{ i18n.t('chat') }</Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity onPress={() => this.setState({ type: 2 })} style={{ flexDirection: 'row', width: '33%', marginLeft: -7 }}>
                                 <Image source={this.state.type == 2 ? images.bell_active : images.bell_non} style={{ width: 25, height: 25, margin: 5 }} resizeMode={'contain'} />
-                                <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 15, marginTop: 5, color: this.state.type == 2 ? colors.active : colors.unActive }}>وضع التأهب</Text>
+                                <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 15, marginTop: 5, color: this.state.type == 2 ? colors.active : colors.unActive }}>{ i18n.t('standBy') }</Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity onPress={() => this.setState({ type: 3 })} style={{ flexDirection: 'row', width: '33%' }}>
                                 <Image source={this.state.type == 3 ? images.stopwatch_active : images.stopwatch_non} style={{ width: 25, height: 25, margin: 5 }} resizeMode={'contain'} />
-                                <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 15, marginTop: 5, color: this.state.type == 3 ? colors.active : colors.unActive }}>تنبيه 24 ساعة</Text>
+                                <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 15, marginTop: 5, color: this.state.type == 3 ? colors.active : colors.unActive }}>{ i18n.t('tfAlert') }</Text>
                             </TouchableOpacity>
                         </View>
                         <View style={{ marginTop: 10, backgroundColor: colors.lightBackground, borderTopColor: colors.pageBorder, borderTopWidth: 1}}>

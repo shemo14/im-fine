@@ -14,6 +14,7 @@ import {Audio} from "expo-av";
 import {Recorder} from 'react-native-audio-player-recorder-no-linking';
 import VideoRecorder from "./VideoRecorder";
 import {connect} from "react-redux";
+import CONST from "../consts";
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
@@ -78,6 +79,7 @@ class NotFine extends Component {
             startRecord: false,
             finishRecord: false,
             resetRecord: false,
+            item: null
         }
     }
 
@@ -115,20 +117,23 @@ class NotFine extends Component {
         this.setState({ resetRecord: true, startRecord: false, finishRecord: false,  })
     }
 
-    setStatus(type, image){
+    setStatus(type, image, item){
         if (type === 8){
             this.setAnimate();
             this.startRecord();
+            this.setState({ item })
         } else if (type === 6){
             this.props.navigation.navigate('VideoRecorder');
-        }else
-            this.props.navigation.navigate('confirmStatus', { image });
+        }else{
+            this.sendMsg(null, item)
+			this.props.navigation.navigate('confirmStatus', { image });
+        }
 
     }
 
     renderItems(item, colors){
         return (
-            <TouchableOpacity onPress={() => this.setStatus(item.type, item.image)} style={{ justifyContent: 'center', alignItems: 'center', flex: 1, margin: 10 }}>
+            <TouchableOpacity onPress={() => this.setStatus(item.type, item.image, item)} style={{ justifyContent: 'center', alignItems: 'center', flex: 1, margin: 10 }}>
                 <View style={{ height: 80, width: 80, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: colors.border, justifyContent: 'center', alignItems: 'center' }}>
                     <Image source={item.image} resizeMode={'contain'} style={{ width: 50, height: 50 }} />
                 </View>
@@ -147,18 +152,73 @@ class NotFine extends Component {
             this.setState({  mapRegion: userLocation });
         }
 
-        let getCity = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=';
-        getCity += this.state.mapRegion.latitude + ',' + this.state.mapRegion.longitude;
-        getCity += '&key=AIzaSyCJTSwkdcdRpIXp2yG7DfSRKFWxKhQdYhQ&language=ar&sensor=true';
-
-        try {
-            const { data } = await axios.get(getCity);
-            this.setState({ location: data.results[0].formatted_address });
-        } catch (e) {
-            console.log(e);
-        }
+        // let getCity = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=';
+        // getCity += this.state.mapRegion.latitude + ',' + this.state.mapRegion.longitude;
+        // getCity += '&key=AIzaSyCJTSwkdcdRpIXp2yG7DfSRKFWxKhQdYhQ&language=ar&sensor=true';
+        //
+        // try {
+        //     const { data } = await axios.get(getCity);
+        //     this.setState({ location: data.results[0].formatted_address });
+        // } catch (e) {
+        //     console.log(e);
+        // }
     }
 
+    componentWillReceiveProps(nextProps) {
+        console.log('fuck props', nextProps);
+	}
+
+
+	sendMsg(uri = null, status){
+		let formData = new FormData();
+		this.cansleRecord();
+
+		let msgType = 0;
+		if (status.type == 6)
+			msgType = 2;
+		else if(status.type == 8)
+			msgType = 1;
+
+		if (uri){
+			let localUri = uri;
+			let filename = localUri.split('/').pop();
+
+			let match = /\.(\w+)$/.exec(filename);
+
+			let type = match ? `audio/${match[1]}` : audio;
+			if (msgType === 2)
+				type = match ? `video/${match[1]}` : video;
+
+			formData.append('files', { uri: localUri, name: filename, type });
+		}
+
+
+		axios.post(CONST.url + 'send', {
+			user_id: this.props.user.id,
+			r_id: null,
+			message: i18n.t('imNotFine') + ' : ' + status.title,
+			type: msgType,
+			lat: this.state.mapRegion.latitude,
+			lng: this.state.mapRegion.longitude,
+			seen:0,
+			status: status.type,
+			connected: 1
+		}).then(response => {
+			if(msgType == 1 || msgType == 2){
+				formData.append('id', JSON.stringify(response.data.data));
+				axios.post(CONST.url + 'upload', formData).then(res => {
+					this.emitSendMsg(response.data.data.room, response.data.data.msg);
+					this.scrollView.scrollToEnd({animated: true});
+					return this.componentWillMount();
+				});
+			}
+
+			this.setState({ message: '' });
+			this.emitSendMsg(response.data.data.room, response.data.data.msg);
+			this.scrollView.scrollToEnd({animated: true});
+			this.componentWillMount();
+		})
+	}
 
     onFocus(){
 
@@ -192,7 +252,7 @@ class NotFine extends Component {
                         </Right>
                         <Body style={[styles.headerText , styles.headerTitle]}></Body>
                         <Left style={styles.flex0}>
-                            <TouchableOpacity onPress={() => this.setAnimate()} style={{ marginTop: 20 }}>
+                            <TouchableOpacity onPress={() => this.props.navigation.goBack()} style={{ marginTop: 20 }}>
                                 <Image source={images.back} style={{ width: 25, height: 25, margin: 5, marginTop: 15 }} resizeMode={'contain'} />
                             </TouchableOpacity>
                         </Left>
@@ -204,7 +264,7 @@ class NotFine extends Component {
                             <View style={{width: 0, height: 0, backgroundColor: 'transparent', borderStyle: 'solid', borderLeftWidth: 50, borderTopWidth: 50, borderLeftColor: 'transparent', borderTopColor: colors.darkBackground, right: 0, position: 'absolute', top: -1 }} />
                             <View style={{ flex: 1, height: 10, width: '100%' }}/>
                             <View style={{ width: 1, height: 70, backgroundColor: colors.pageBorder, transform: [{ rotate: '45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
-                            <View style={{ marginTop: -40, height: height-125 }}>
+                            <View style={{ marginTop: -40, height: height-115 }}>
                                 <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', color: colors.labelFont, fontSize: 18, marginHorizontal: 20, marginBottom: 40  }}>{ i18n.t('whyNotFine') }</Text>
                                 <FlatList
                                     style={{ alignSelf: 'center', width: '100%'}}
@@ -219,11 +279,11 @@ class NotFine extends Component {
                                     <Image source={images.place} style={{ height: 25, width: 25, marginHorizontal: 10 }} resizeMode={'contain'} />
                                     <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: colors.labelFont, marginTop: 5 }}>{ (this.state.location).substring(1, 40) + '...' }</Text>
                                 </View>
-                                <Animated.View style={{ backgroundColor: colors.inboxInputBackground, flexDirection:'row' , flex: 1, width: '100%',height: 55, position:'absolute' , bottom: this.state.fadeAnim, padding: 3, marginBottom: 6}}>
+                                <Animated.View style={{ backgroundColor: colors.inboxInputBackground, flexDirection:'row' , flex: 1, width: '100%',height: 50, position:'absolute' , bottom: this.state.fadeAnim, padding: 3, paddingBottom: 6 }}>
                                     <View style={{ width: '84%', paddingHorizontal: 20, paddingBottom: 10, marginLeft: -15 }}>
                                         <Recorder
                                             style={{flex: 1}}
-                                            onComplete={(i) => this.playAudio(null, i)}
+                                            onComplete={(i) => this.sendMsg(i.uri, this.state.item)}
                                             maxDurationMillis={150000}
                                             showDebug={false}
                                             startRecord={this.state.startRecord}
@@ -264,10 +324,10 @@ class NotFine extends Component {
                                             }}
                                         />
                                     </View>
-                                    <TouchableOpacity style={{ marginTop: 15, marginLeft: -7 }} onPress={() => this.cansleRecord() }>
-                                        <Image source={images.cansle} style={{ width: 20, height: 20 }} resizeMode={'contain'} />
-                                    </TouchableOpacity>
-                                    <View style={{ height: 40, width: 1, backgroundColor: '#ddd', marginRight: 9, marginTop: 7 }} />
+									<TouchableOpacity style={{ marginTop: 19, marginLeft: -7 }} onPress={() => this.cansleRecord() }>
+										<Image source={images.cansle} style={{ width: 20, height: 20 }} resizeMode={'contain'} />
+									</TouchableOpacity>
+									<View style={{ height: 35, width: 1, backgroundColor: '#ddd', marginRight: 9, marginTop: 10, marginLeft: 12 }} />
                                 </Animated.View>
                             </View>
                         </View>

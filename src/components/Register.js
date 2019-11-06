@@ -18,6 +18,7 @@ import themeImages from '../consts/Images'
 import axios from 'axios'
 import Modal from "react-native-modal";
 import CONST from "../consts";
+import {AsyncStorage} from "react-native-web";
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
@@ -42,7 +43,7 @@ class Register extends Component {
             isLoaded: false,
             mapRegion: [],
             countries: [],
-
+            terms: '',
             location: '',
             checked: false,
             isModalVisible: false,
@@ -109,6 +110,10 @@ class Register extends Component {
             this.setState({ countries: response.data.data, loader: false })
         })
 
+		axios.post(CONST.url + 'terms', { lang: this.props.lang }).then(response => {
+			this.setState({ terms: response.data.data.terms, })
+		})
+
         let { status } = await Permissions.askAsync(Permissions.LOCATION);
         if (status !== 'granted') {
             alert('صلاحيات تحديد موقعك الحالي ملغاه');
@@ -140,28 +145,31 @@ class Register extends Component {
         const err = this.validate();
         if (!err){
             this.setState({ isSubmitted: true });
-            axios.post(CONST.url + 'sign-up', {
-                phone: this.state.phone,
-                name: this.state.name,
-                country_code: this.state.countryCode,
-                email :this.state.email,
-                image : this.state.base64,
-                lang: 'ar' ,
-                lat : this.state.lat,
-                lng : this.state.lng,
-                address : this.state.location,
-            }).then(response => {
-                if(response.data.status == 200){
-                    this.setState({ isSubmitted: false });
-                    this.props.navigation.navigate('activeCode', { data: response.data.data, code: response.data.extra.code });
-                }else{
-                    this.setState({ isSubmitted: false });
-                    Toast.show({
-                        text: response.data.msg,
-                        type: "danger",
-                        duration: 3000
-                    });
-                }
+            AsyncStorage.getItem('deviceID').then(device_id => {
+				axios.post(CONST.url + 'sign-up', {
+					phone: this.state.phone,
+					name: this.state.name,
+					country_code: this.state.countryCode,
+					email :this.state.email,
+					image : this.state.base64,
+					lang: this.props.lang ,
+                    device_id,
+					lat : this.state.lat,
+					lng : this.state.lng,
+					address : this.state.location,
+				}).then(response => {
+					if(response.data.status == 200){
+						this.setState({ isSubmitted: false });
+						this.props.navigation.navigate('activeCode', { data: response.data.data, code: response.data.extra.code });
+					}else{
+						this.setState({ isSubmitted: false });
+						Toast.show({
+							text: response.data.msg,
+							type: "danger",
+							duration: 3000
+						});
+					}
+				})
             })
         }
     }
@@ -296,11 +304,7 @@ class Register extends Component {
                             <View style={{ width: 1, height: 90, backgroundColor: '#ddd', transform: [{ rotate: '45deg'}], right: 47, position: 'absolute', top: -13 }} />
                             <Image source={images.small_logo} style={{ width: 120, height: 120, alignSelf: 'center', marginTop: -55 }} resizeMode={'contain'}/>
                             <View style={{ padding: 25 }}>
-                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 16, lineHeight: 22 }}>
-                                    هذا النص هو مثال لنص يمكن أن يستبدل في نفس المساحة، لقد تم توليد هذا النص من مولد النص العربى، حيث يمكنك أن تولد مثل هذا النص أو العديد من النصوص الأخرى إضافة إلى زيادة عدد الحروف التى يولدها التطبيق.
-                                    إذا كنت تحتاج إلى عدد أكبر من الفقرات يتيح لك مولد النص العربى زيادة عدد الفقرات كما تريد، النص لن يبدو مقسما ولا يحوي أخطاء لغوية، مولد النص العربى مفيد لمصممي المواقع على وجه الخصوص، حيث يحتاج العميل فى كثير من الأحيان أن يطلع على صورة حقيقية لتصميم الموقع.
-                                    ومن هنا وجب على المصمم أن يضع نصوصا مؤقتة على التصميم ليظهر للعميل الشكل كاملاً،دور مولد النص العربى أن يوفر على المصمم عناء البحث عن نص بديل لا علاقة له بالموضوع الذى يتحدث عنه التصميم فيظهر بشكل لا يليق.
-                                </Text>
+                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 16, lineHeight: 22 }}> { this.state.terms } </Text>
                             </View>
                         </View>
                         <View style={{ bottom: 30, flex: 1, alignSelf: 'center', alignItems: 'center', position: 'absolute' }}>
@@ -316,9 +320,10 @@ class Register extends Component {
     }
 }
 
-const mapStateToProps = ({ theme }) => {
+const mapStateToProps = ({ theme, lang }) => {
     return {
-        theme: theme.theme
+        theme: theme.theme,
+		lang: lang.lang
     };
 };
 

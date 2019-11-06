@@ -77,8 +77,8 @@ class CustomDrawer extends Component {
                                 </TouchableOpacity>
                             </ImageBackground>
                         </View>
-                        <Text style={{ color: colors.menuColor, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', textAlign: 'center', fontSize: 15}}>{ this.props.user.name }</Text>
-                        <Text style={{ color: colors.menuColor, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', textAlign: 'center', fontSize: 15}}>{ this.props.user.mobile }</Text>
+                        <Text style={{ color: colors.labelFont , fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', textAlign: 'center', fontSize: 15}}>{ this.props.user.name }</Text>
+                        <Text style={{ color: colors.labelFont , fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', textAlign: 'center', fontSize: 15}}>{ this.props.user.mobile }</Text>
                         <View style={{marginTop:10}}>
                             <DrawerItems
                                 {...this.props}
@@ -93,8 +93,8 @@ class CustomDrawer extends Component {
                                     }
                                 }
 
-                                activeBackgroundColor='transparent' inactiveBackgroundColor='transparent' activeLabelStyle={{color:colors.menuColor}}
-                                labelStyle={{color: colors.menuColor ,
+                                activeBackgroundColor={ colors.activeBG } inactiveBackgroundColor='transparent' activeLabelStyle={{color:colors.menuColor}}
+                                labelStyle={{color: colors.labelFont ,
                                     fontSize:14 ,
                                     marginLeft: 0 ,
                                     marginRight: 0 ,
@@ -106,7 +106,7 @@ class CustomDrawer extends Component {
                             <View>
                                 <TouchableOpacity style={{ flexDirection: 'row', marginBottom: 5 }}>
                                     <Image source={images.star} resizeMode={'contain'} style={{ width: 20, height: 20, marginHorizontal:20 }}/>
-                                    <Text style={{ color: colors.menuColor ,
+                                    <Text style={{ color: colors.labelFont  ,
                                         fontSize:14 ,
                                         marginLeft: 0 ,
                                         marginRight: 0 ,
@@ -117,7 +117,7 @@ class CustomDrawer extends Component {
 
                                 <TouchableOpacity onPress={() => this.onLogout()} style={{ flexDirection: 'row' }}>
                                     <Image source={images.sign_in} resizeMode={'contain'} style={{ width: 20, height: 20, marginHorizontal:20 }}/>
-                                    <Text style={{ color: colors.menuColor ,
+                                    <Text style={{ color: colors.labelFont  ,
                                         fontSize:14 ,
                                         marginLeft: 0 ,
                                         marginRight: 0 ,
@@ -194,10 +194,11 @@ const styles = {
     },
 };
 
-const mapStateToProps = ({ lang, profile }) => {
+const mapStateToProps = ({ lang, profile, theme }) => {
     return {
         lang: lang.lang,
-        user: profile.user
+        user: profile.user,
+		theme: theme.theme
     };
 };
 

@@ -82,7 +82,7 @@ class ConfirmStatus extends Component {
                             <View style={{width: 0, height: 0, backgroundColor: 'transparent', borderStyle: 'solid', borderLeftWidth: 50, borderTopWidth: 50, borderLeftColor: 'transparent', borderTopColor: colors.darkBackground, right: 0, position: 'absolute', top: -1 }} />
                             <View style={{ flex: 1, height: 10, width: '100%' }}/>
                             <View style={{ width: 1, height: 70, backgroundColor: colors.pageBorder, transform: [{ rotate: '45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
-                            <View style={{ marginTop: -40, height: height-125 }}>
+                            <View style={{ marginTop: -40, height: height-110 }}>
                                 <View style={{ marginTop: 100, alignItems: 'center', flex: 1, alignSelf: 'center' }}>
                                     <View style={{ height: 120, width: 120, borderRadius: 80, borderWidth: 2, overflow: 'hidden', borderColor: colors.border, justifyContent: 'center', alignItems: 'center' }}>
                                         <Image source={statusImg} resizeMode={'contain'} style={{ width: 80, height: 80 }} />
@@ -90,7 +90,7 @@ class ConfirmStatus extends Component {
                                     <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: colors.labelFont, marginTop: 10 }}>{ i18n.t('confirmSendStatus') }</Text>
 
                                     <Button onPress={() => this.props.navigation.navigate('DrawerNavigator')} style={{ backgroundColor: colors.orange, width: 150, height: 35, marginTop: 40, alignItems: 'center', justifyContent: 'center' }} >
-                                        <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: '#7b6c60', textAlign: 'center'}}>{ i18n.t('backHome') }</Text>
+                                        <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: '#472d35', textAlign: 'center'}}>{ i18n.t('backHome') }</Text>
                                     </Button>
                                 </View>
                             </View>

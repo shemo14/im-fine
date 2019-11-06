@@ -84,56 +84,12 @@ class VideoRecorder extends React.Component {
         const record = await this.camera.recordAsync({ quality: '360' , maxDuration: 30})
 
             .then((data) => {
-
-                if(this.props.navigation.state.params.type === 'edit')
-                {
-                    this.props.navigation.navigate('Edit_ad' , {
-                        recording : data
-                    });
-
-                    this.setState({go: 'Edit_ad'});
-
-
-                }else{
-                    this.props.navigation.navigate('forme3lan' , {
-                        recording : data
-                    })
-                }
+				this.props.navigation.navigate('notFine' , {
+					recording : data
+				});
             }).catch((err) => {
 
             });
-
-        // if(record)
-        // {
-        //
-        //     if(this.props.navigation.state.params.type === 'edit')
-        //     {
-        //         this.props.navigation.navigate('Edit_ad' , {
-        //             recording : record
-        //         });
-        //
-        //         this.setState({go: 'Edit_ad'});
-        //
-        //
-        //     }else{
-        //         this.props.navigation.navigate('forme3lan' , {
-        //             recording : record
-        //         })
-        //     }
-        //
-        // }
-        //
-        // await FileSystem.makeDirectoryAsync(`${FileSystem.documentDirectory}videos/`, {
-        //     intermediates: true
-        // });
-        //
-        // await FileSystem.moveAsync({
-        //     from: record.uri,
-        //     to: `${FileSystem.documentDirectory}videos/demo_${videoId}.mov`
-        // });
-
-        //console.log(`${FileSystem.documentDirectory}videos/demo_${videoId}.mov`);
-        // this.setState(state => ({ ...state, redirect: 'MyVideos' }));
     }
 
     async stopRecording() {
@@ -210,7 +166,7 @@ class VideoRecorder extends React.Component {
                             </Button>
                         </View>
                         <View style={styles.bottonActions}>
-                            <Button transparent onPress={() => { this.props.navigation.navigate(this.state.go)}}>
+                            <Button transparent onPress={() => { this.props.navigation.goBack()}}>
                                 <Icon  type="Ionicons" name='ios-arrow-back' />
                             </Button>
                             <Button
@@ -225,9 +181,9 @@ class VideoRecorder extends React.Component {
                                     <Icon ios="ios-radio-button-on" android="md-radio-button-on" />
                                 )}
                             </Button>
-                            <Button transparent onPress={() => { this.props.navigation.navigate(this.state.go)}}>
-                                <Icon type="Ionicons" name='ios-arrow-back' />
-                            </Button>
+                            {/*<Button transparent onPress={() => { this.props.navigation.navigate(this.state.go)}}>*/}
+                                {/*<Icon type="Ionicons" name='ios-arrow-back' />*/}
+                            {/*</Button>*/}
                         </View>
                     </Camera>
                 </Layout>

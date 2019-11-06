@@ -29,10 +29,10 @@
     },
     "android": {
       "package": "com.app.imfine",
-      "versionCode": 2,
+      "versionCode": 3,
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyDDGCkEv3jHUzSA1FVI26h_OadsG297Pe8"
+          "apiKey": "AIzaSyCmKUEnkSpC2E9aAUqcWDDc43mRQsf5S8c"
         }
       }
     }

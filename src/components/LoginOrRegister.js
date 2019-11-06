@@ -7,6 +7,8 @@ import COLORS from '../consts/colors'
 import i18n from '../../locale/i18n'
 import { connect } from 'react-redux';
 import { chooseTheme, chooseLang } from '../actions'
+import {Notifications} from "expo";
+import * as Permissions from "expo-permissions";
 
 const themeImages = {
     lightImages: {
@@ -22,7 +24,8 @@ class LoginOrRegister extends Component {
         super(props);
         this.state = {
             theme: 'light',
-            lang: this.props.lang
+            lang: this.props.lang,
+            deviceId: ''
         }
     }
 
@@ -32,7 +35,28 @@ class LoginOrRegister extends Component {
         }
     }
 
-    render() {
+    async componentWillMount() {
+		const { status: existingStatus } = await Permissions.getAsync(
+			Permissions.NOTIFICATIONS
+		);
+
+		let finalStatus = existingStatus;
+
+		if (existingStatus !== 'granted') {
+			const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+			finalStatus = status;
+		}
+
+		if (finalStatus !== 'granted') {
+			return;
+		}
+
+		const deviceId = await Notifications.getExpoPushTokenAsync();
+		this.setState({ deviceId, userId: null });
+		AsyncStorage.setItem('deviceID', deviceId);
+	}
+
+	render() {
         let styles  = lightStyles;
         let images  = themeImages.lightImages;
         let colors  = COLORS;
@@ -94,4 +118,5 @@ const mapStateToProps = ({ theme, lang }) => {
     };
 };
 
-export default connect(mapStateToProps, { chooseTheme, chooseLang })(LoginOrRegister);
+export default connect(mapStateToProps, { chooseTheme,
+})(LoginOrRegister);

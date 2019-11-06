@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, Image, TouchableOpacity, Animated, I18nManager, Dimensions, KeyboardAvoidingView, ScrollView, Slider, Keyboard} from "react-native";
+import { View, Text, Image, TouchableOpacity, Animated, I18nManager, Dimensions, KeyboardAvoidingView, ScrollView, Slider, Keyboard, Linking} from "react-native";
 import {Container, Content, Header, Left, Right, Body, Button, Icon, Item, Label, Input} from 'native-base'
 import lightStyles from '../../assets/styles/light'
 import darkStyles from '../../assets/styles/dark'
@@ -197,7 +197,7 @@ class Inbox extends Component {
             }else if (message.type == 4){
                 return (
                     <View key={i} style={{ width: (width*80)/100, height: 200, backgroundColor: colors.sendMsg, borderRadius: 20, alignSelf: 'flex-start', marginHorizontal: 20, marginVertical: 10, marginBottom: (this.state.messages).length == i+1 ? 65 : 0 }}>
-                        <TouchableOpacity style={{ width: '100%', height: 160 }}>
+                        <TouchableOpacity onPress={() => Linking.openURL('https://www.google.com/maps/place/' + message.lat + ',' + message.lng + '')} style={{ width: '100%', height: 160 }}>
                             {
                                 !this.state.initMap ? (
                                     <MapView
@@ -297,7 +297,7 @@ class Inbox extends Component {
             }else if(message.type == 4){
                 return (
                     <View key={i} style={{ width: (width*80)/100, height: 200, backgroundColor: colors.receiverMsg, borderRadius: 20, alignSelf: 'flex-end', marginHorizontal: 20, marginVertical: 10, marginBottom: (this.state.messages).length == i+1 ? 65 : 0}}>
-                        <TouchableOpacity style={{ width: '100%', height: 160 }}>
+                        <TouchableOpacity onPress={() => Linking.openURL('https://www.google.com/maps/place/' + message.lat + ',' + message.lng + '')} style={{ width: '100%', height: 160 }}>
                             {
                                 !this.state.initMap ? (
                                     <MapView
@@ -433,7 +433,7 @@ class Inbox extends Component {
             connected:1
         }).then(response => {
             if(msgType == 1 || msgType == 2){
-                formData.append('id',response.data.data.id);
+                formData.append('id', JSON.stringify([ response.data.data.id ]));
                 axios.post(CONST.url + 'upload', formData).then(res => {
                     this.emitSendMsg(response.data.data.room, response.data.data.msg);
                     this.scrollView.scrollToEnd({animated: true});
