@@ -54,6 +54,8 @@ class LoginOrRegister extends Component {
 		const deviceId = await Notifications.getExpoPushTokenAsync();
 		this.setState({ deviceId, userId: null });
 		AsyncStorage.setItem('deviceID', deviceId);
+
+		console.log(deviceId);
 	}
 
 	render() {
@@ -72,7 +74,7 @@ class LoginOrRegister extends Component {
         }
 
         return (
-            <Container>
+            <Container style={{ backgroundColor: colors.darkBackground }}>
                 <Content contentContainerStyle={{ flexGrow: 1 }}>
                     <ImageBackground source={images.bg_splash} resizeMode={'cover'} style={styles.imageBackgroundStyle}>
                         <Image source={require('../../assets/images/dark_mode/small_logo_login.png')} style={styles.logoStyle} resizeMode={'contain'} />

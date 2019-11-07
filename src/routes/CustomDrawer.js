@@ -9,7 +9,7 @@ import darkStyles from '../../assets/styles/dark'
 import COLORS from '../consts/colors'
 import themeImages from '../consts/Images'
 import {logout, tempAuth} from "../actions";
-
+import CONST from "../consts";
 
 class CustomDrawer extends Component {
     constructor(props){
@@ -21,8 +21,12 @@ class CustomDrawer extends Component {
         }
     }
 
+    componentWillMount() {
+        console.log('fuck user', this.props.user)
+	}
 
-    onShare = async () => {
+
+	onShare = async () => {
         try {
             const result = await Share.share({
                 message:
@@ -65,6 +69,13 @@ class CustomDrawer extends Component {
             colors = colors.lightColors
         }
 
+		let { user } = this.props;
+		if (user === null)
+			user = {
+				imageProfile:  'https://cross.4hoste.com:30011/images/defaultUser.jpg',
+				userName:       i18n.t('guest'),
+                mobile: ''
+			}
 
         return(
             <Container style={{ overflow: 'visible', backgroundColor: colors.darkBackground }}>
@@ -73,12 +84,12 @@ class CustomDrawer extends Component {
                         <View style={{ alignItems: 'center', marginTop: 60 , justifyContent:'center' }}>
                             <ImageBackground source={images.bg_for_pic} style={{ width: 120, height: 120, alignItems: 'center', justifyContent: 'center' , alignSelf:'center' , left:5 }}>
                                 <TouchableOpacity style={{ height: 85, width: 85, borderRadius: 50, overflow: 'hidden', justifyContent: 'center', alignItems: 'center', right: 5, top: -3 }}>
-                                    <Image source={{ uri: this.props.user.image }} style={{ width: 100, height: 100, }} resizeMode={'cover'} />
+                                    <Image source={{ uri: user.image }} style={{ width: 100, height: 100, }} resizeMode={'cover'} />
                                 </TouchableOpacity>
                             </ImageBackground>
                         </View>
-                        <Text style={{ color: colors.labelFont , fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', textAlign: 'center', fontSize: 15}}>{ this.props.user.name }</Text>
-                        <Text style={{ color: colors.labelFont , fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', textAlign: 'center', fontSize: 15}}>{ this.props.user.mobile }</Text>
+                        <Text style={{ color: colors.labelFont , fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', textAlign: 'center', fontSize: 15}}>{ user.name }</Text>
+                        <Text style={{ color: colors.labelFont , fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', textAlign: 'center', fontSize: 15}}>{ user.mobile }</Text>
                         <View style={{marginTop:10}}>
                             <DrawerItems
                                 {...this.props}

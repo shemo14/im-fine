@@ -75,7 +75,7 @@ export default {
         cross                   : require('../../assets/images/dark_mode/cross.png'),
         back                    : require('../../assets/images/dark_mode/back.png'),
         tick_blue               : require('../../assets/images/dark_mode/tick_blue.png'),
-        play_button_big         : require('../../assets/images/dark_mode/play_button_big.png'),
+        play_button_big         : require('../../assets/images/dark_mode/play_button.png'),
         location_irbble         : require('../../assets/images/dark_mode/my_location.png'),
         microphone              : require('../../assets/images/dark_mode/microphone.png'),
         send                    : require('../../assets/images/dark_mode/send.png'),

@@ -275,7 +275,7 @@ const styles = ({
     logoStyle: {
         width: 180,
         height: 150,
-        marginTop: (height*30)/100
+        marginTop: (height*20)/100
     },
     inputMarginTop:{
         marginTop:35
@@ -388,7 +388,7 @@ const styles = ({
         alignItems: 'center',
         justifyContent: 'center',
         alignSelf: 'center' ,
-        backgroundColor: COLORS.yellow
+        backgroundColor: COLORS.orange
     },
     createAcc:{
         borderRadius: 5,
@@ -406,7 +406,7 @@ const styles = ({
         marginTop: 30
     },
     btnTxt:{
-        color: COLORS.darkgray,
+        color: '#472d35',
         fontSize:16,
         fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans',
     },

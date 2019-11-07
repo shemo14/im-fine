@@ -50,13 +50,10 @@ class Profile extends Component {
         console.log(this.props.user);
     }
 
-
     static navigationOptions = () => ({
         drawerLabel:  i18n.t('profile')  ,
         drawerIcon: (<Image source={require('../../assets/images/light_mode/User.png')} style={{width:20 , height:20}} resizeMode={'contain'} /> )
-    })
-
-
+    });
 
     onFocus(){
 
@@ -90,18 +87,18 @@ class Profile extends Component {
                         <Body style={[styles.headerText , styles.headerTitle]}></Body>
                         <Left style={styles.flex0}>
                             <TouchableOpacity onPress={() => this.props.navigation.navigate('home')} style={{ marginTop: 20 }}>
-                                <Image source={images.back} style={{ width: 25, height: 25, margin: 5, marginTop: 15 }} resizeMode={'contain'} />
+                                <Image source={images.back} style={{ width: 25, height: 25, margin: 5, marginTop: 15, transform: I18nManager.isRTL ? [{rotateY : '0deg'}] : [{rotateY : '-180deg'}] }} resizeMode={'contain'} />
                             </TouchableOpacity>
                         </Left>
                     </View>
                 </Header>
                 <Content style={{ backgroundColor: colors.darkBackground, marginTop: -25 }} contentContainerStyle={{ flexGrow: 1 }}>
                     <View>
-                        <View style={{ marginTop: 10, backgroundColor: colors.lightBackground, borderTopColor: '#ddd', borderTopWidth: 1}}>
+                        <View style={{ marginTop: 10, backgroundColor: colors.lightBackground, borderTopColor: colors.pageBorder, borderTopWidth: 1}}>
                             <View style={{width: 0, height: 0, backgroundColor: 'transparent', borderStyle: 'solid', borderLeftWidth: 50, borderTopWidth: 50, borderLeftColor: 'transparent', borderTopColor: colors.darkBackground, right: 0, position: 'absolute', top: -1 }} />
                             <View style={{ flex: 1, height: 10, width: '100%' }}/>
-                            <View style={{ width: 1, height: 70, backgroundColor: '#ddd', transform: [{ rotate: '45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
-                            <View style={{ marginTop: -40, height: height-125 , paddingHorizontal:20 }}>
+                            <View style={{ width: 1, height: 70, backgroundColor: colors.pageBorder, transform: I18nManager.isRTL ? [{ rotate: '45deg'}] : [{ rotate: '-45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
+                            <View style={{ marginTop: -40, height: height-115 , paddingHorizontal:20 }}>
                                 <View style={{ alignItems: 'center', marginTop: -50 , justifyContent:'center' }}>
                                     <ImageBackground source={images.bg_for_pic} style={{ width: 120, height: 120, alignItems: 'center', justifyContent: 'center' , alignSelf:'center' , left:5 }}>
                                         <TouchableOpacity style={{ height: 85, width: 85, borderRadius: 50, overflow: 'hidden', justifyContent: 'center', alignItems: 'center', right: 5, top: -3 }}>

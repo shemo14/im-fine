@@ -10,6 +10,7 @@ import DateTimePicker from "react-native-modal-datetime-picker";
 import themeImages from '../consts/Images'
 import { connect } from 'react-redux';
 import {DoubleBounce} from "react-native-loader";
+import {Notifications} from "expo";
 import axios from 'axios';
 import CONST from '../consts';
 
@@ -128,7 +129,7 @@ class Home extends Component {
 
     onStandBy(){
         this.setState({ standBySubmit: true });
-        axios.post(CONST.url + 'stop_ready', { user_id: this.props.user ? this.props.user.id : this.props.auth.data.id , time: this.state.startTime, lang: this.props.lang }).then(response => {
+        axios.post(CONST.url + 'set_ready_time', { user_id: this.props.user ? this.props.user.id : this.props.auth.data.id , ready_time: this.state.startTime, lang: this.props.lang }).then(response => {
             this.setState({ standBySubmit: false, startTime: '', endTime: '' });
             Toast.show({
                 text: response.data.msg,
@@ -152,10 +153,31 @@ class Home extends Component {
 
     componentWillMount(){
         this.setState({ loader: true });
-        axios.post(CONST.url + 'chat', { user_id: this.props.user ? this.props.user.id : this.props.auth.data.id  }).then(response => {
+        axios.post(CONST.url + 'chat', { user_id: this.props.user ? this.props.user.id : this.props.auth.data.id, lang: this.props.lang  }).then(response => {
             this.setState({ rooms: response.data.data, loader: false })
         })
     }
+
+	componentDidMount(){
+		Notifications.addListener(this.handleNotification);
+	}
+
+	handleNotification = (notification) => {
+			console.log(notification);
+
+		if (notification && notification.origin !== 'received') {
+			const { data } = notification;
+			const orderId = data.id;
+
+			if (data.type && data.type === 'areUFine') {
+				const userId = data.user_id;
+				this.props.navigation.navigate('areUFine');
+			}else if(data.type && data.type === 'offer'){
+				console.log('this is order id', orderId);
+				this.props.navigation.navigate('finishOrder', { orderId });
+			}
+		}
+	};
 
     renderLoader(colors){
         if (this.state.loader){
@@ -286,7 +308,7 @@ class Home extends Component {
     }
 
     onFocus(){
-
+        this.componentWillMount()
     }
 
     render() {
@@ -354,7 +376,7 @@ class Home extends Component {
                         <View style={{ marginTop: 10, backgroundColor: colors.lightBackground, borderTopColor: colors.pageBorder, borderTopWidth: 1}}>
                             <View style={{width: 0, height: 0, backgroundColor: 'transparent', borderStyle: 'solid', borderLeftWidth: 50, borderTopWidth: 50, borderLeftColor: 'transparent', borderTopColor: colors.darkBackground, right: 0, position: 'absolute', top: -1 }} />
                             <View style={{ flex: 1, height: 10, width: '100%' }}/>
-                            <View style={{ width: 1, height: 70, backgroundColor: colors.pageBorder, transform: [{ rotate: '45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
+                            <View style={{ width: 1, height: 70, backgroundColor: colors.pageBorder, transform: I18nManager.isRTL ? [{ rotate: '45deg'}] : [{ rotate: '-45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
                             { this.renderLoader(colors) }
                             <View style={{ height: height-190 }}>
                                 { this.renderContent(styles, images, colors) }

@@ -212,6 +212,9 @@ class Inbox extends Component {
                                 ) : (<View />)
                             }
                         </TouchableOpacity>
+                        <View style={{ padding: 10, }}>
+							<Text style={{ color: colors.sendFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', alignSelf: 'flex-start' }}>{message.msg}</Text>
+                        </View>
                         <View style={{ flexDirection: 'row', alignSelf: 'flex-end', padding: 10 }}>
                             <Text style={{ color: colors.sendFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 12 }}>{message.date}</Text>
                             <Image source={images.tick_blue} resizeMode={'contain'} style={{ width: 15, height: 15, marginTop: 2 }} />
@@ -263,9 +266,8 @@ class Inbox extends Component {
                                     return (
                                         <Slider
                                             style={{ width: '90%' }}
-                                            thumbTintColor={colors.orange}
+                                            thumbTintColor={'#ffffff'}
                                             maximumTrackTintColor={"#ffffff"}
-                                            minimumTrackTintColor={colors.orange}
                                             minimimValue={0}
                                             maximumValue={renderProps.maximumValue}
                                             onValueChange={renderProps.onSliderValueChange}
@@ -409,7 +411,9 @@ class Inbox extends Component {
         const data = this.props.navigation.state.params.data;
         this.setState({ isModalVisible: false });
         let formData = new FormData();
-        this.cansleRecord();
+
+        if (msgType == 1)
+            this.cansleRecord();
 
         if (uri){
             let localUri = uri;
@@ -498,7 +502,7 @@ class Inbox extends Component {
                         <Body style={[styles.headerText , styles.headerTitle]}></Body>
                         <Left style={styles.flex0}>
                             <TouchableOpacity onPress={() => this.leave()} style={{ marginTop: 20 }}>
-                                <Image source={images.back} style={{ width: 25, height: 25, margin: 5, marginTop: 15 }} resizeMode={'contain'} />
+                                <Image source={images.back} style={{ width: 25, height: 25, margin: 5, marginTop: 15, transform: I18nManager.isRTL ? [{rotateY : '0deg'}] : [{rotateY : '-180deg'}] }} resizeMode={'contain'} />
                             </TouchableOpacity>
                         </Left>
                     </View>
@@ -508,7 +512,7 @@ class Inbox extends Component {
                         <View style={{ marginTop: 10, backgroundColor: colors.lightBackground, borderTopColor: colors.pageBorder, borderTopWidth: 1, height: height-80}}>
                             <View style={{width: 0, height: 0, backgroundColor: 'transparent', borderStyle: 'solid', borderLeftWidth: 50, borderTopWidth: 50, borderLeftColor: 'transparent', borderTopColor: colors.darkBackground, right: 0, position: 'absolute', top: -1 }} />
                             <View style={{ height: 10, width: '100%' }}/>
-                            <View style={{ width: 1, height: 70, backgroundColor: colors.pageBorder, transform: [{ rotate: '45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
+                            <View style={{ width: 1, height: 70, backgroundColor: colors.pageBorder, transform: I18nManager.isRTL ? [{ rotate: '45deg'}] : [{ rotate: '-45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
                             { this.renderLoader(colors) }
                             <KeyboardAvoidingView behavior={'height'} style={{width:'100%', flexDirection:'column', flex: 1, zIndex: -1, marginTop: -77 }}>
                                 <ScrollView
@@ -614,7 +618,7 @@ class Inbox extends Component {
                         <View style={{ marginTop: 10, height, backgroundColor: colors.lightBackground, borderTopColor: '#ddd', borderTopWidth: 1}}>
                             <View style={{width: 0, height: 0, backgroundColor: 'transparent', borderStyle: 'solid', borderLeftWidth: 50, borderTopWidth: 50, borderLeftColor: 'transparent', borderTopColor: colors.darkBackground, right: 0, position: 'absolute', zIndex:1, top: -1 }} />
                             <View style={{ height: 10, width: '100%' }}/>
-                            <View style={{ width: 1, height: 70, backgroundColor: '#ddd', transform: [{ rotate: '45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
+                            <View style={{ width: 1, height: 70, backgroundColor: '#ddd', transform: I18nManager.isRTL ? [{ rotate: '45deg'}] : [{ rotate: '-45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
                             <View style={{ width: '100%', height: height-80, marginTop: -80 }}>
                                 {
                                     !this.state.initMap ? (

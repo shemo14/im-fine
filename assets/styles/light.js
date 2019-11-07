@@ -261,8 +261,8 @@ const styles = ({
         fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold'
     },
     imageBackgroundStyle: {
-        width: null,
-        height: null,
+        width,
+        height,
         flex: 1,
         alignItems: 'center',
         backgroundColor:'#0A8EBB'
@@ -406,7 +406,7 @@ const styles = ({
         marginTop: 30
     },
     btnTxt:{
-        color: COLORS.darkgray,
+        color: '#472d35',
         fontSize:16,
         fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans',
     },

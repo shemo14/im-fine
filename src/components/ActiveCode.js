@@ -115,7 +115,7 @@ class ActiveCode extends Component {
         }
 
         return (
-            <Container>
+            <Container style={{ backgroundColor: colors.darkBackground }}>
                 <NavigationEvents onWillFocus={() => this.onFocus()} />
                 <Content contentContainerStyle={{ flexGrow: 1 }}>
                     <View style={styles.contentBackground}>

@@ -213,7 +213,7 @@ class Register extends Component {
         }
 
         return (
-            <Container>
+            <Container style={{ backgroundColor: colors.darkBackground }}>
                 <NavigationEvents onWillFocus={() => this.onFocus()} />
                 <Content contentContainerStyle={{ flexGrow: 1 }}>
                     <View style={styles.contentBackground}>
@@ -301,7 +301,7 @@ class Register extends Component {
 
                         <View style={{ marginTop: 80, height: height-80, backgroundColor: colors.lightBackground, borderTopColor: '#ddd', borderTopWidth: 1}}>
                             <View style={{width: 0, height: 0, backgroundColor: 'transparent', borderStyle: 'solid', borderLeftWidth: 80, borderTopWidth: 80, borderLeftColor: 'transparent', borderTopColor: colors.darkBackground, right: 0, position: 'absolute', top: -1 }} />
-                            <View style={{ width: 1, height: 90, backgroundColor: '#ddd', transform: [{ rotate: '45deg'}], right: 47, position: 'absolute', top: -13 }} />
+                            <View style={{ width: 1, height: 90, backgroundColor: '#ddd', transform: I18nManager.isRTL ? [{ rotate: '45deg'}] : [{ rotate: '-45deg'}], right: 47, position: 'absolute', top: -13 }} />
                             <Image source={images.small_logo} style={{ width: 120, height: 120, alignSelf: 'center', marginTop: -55 }} resizeMode={'contain'}/>
                             <View style={{ padding: 25 }}>
                                 <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 16, lineHeight: 22 }}> { this.state.terms } </Text>

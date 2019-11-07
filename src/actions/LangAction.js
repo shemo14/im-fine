@@ -5,7 +5,7 @@ import {Updates} from "expo";
 
 export const chooseLang = lang => {
 
-    if (lang === 'en') {
+    if (lang === 'en' || lang === 'es') {
         I18nManager.forceRTL(false);
     } else {
         I18nManager.forceRTL(true);

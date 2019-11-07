@@ -19,47 +19,6 @@ import CONST from "../consts";
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
 
-const status = [
-    {
-        title: i18n.t('sick'),
-        image: themeImages.lightImages.patient,
-        type: 1
-    },{
-        title: i18n.t('lost'),
-        image: themeImages.lightImages.lost,
-        type: 2
-    },{
-        title: i18n.t('in_danger'),
-        image: themeImages.lightImages.caution,
-        type: 3
-    },{
-        title: i18n.t('call_me'),
-        image: themeImages.lightImages.support,
-        type: 4
-    },{
-        title: i18n.t('message_me'),
-        image: themeImages.lightImages.message_me,
-        type: 5
-    },{
-        title: i18n.t('record_video'),
-        image: themeImages.lightImages.vedio_call,
-        type: 6
-    },{
-        title: i18n.t('kidnapped'),
-        image: themeImages.lightImages.kidnapping,
-        type: 7
-    },{
-        title: i18n.t('record_voice'),
-        image: themeImages.lightImages.recourdStatus,
-        type: 8
-    },{
-        title: i18n.t('accident'),
-        image: themeImages.lightImages.accident,
-        type: 9
-    },
-
-];
-
 class NotFine extends Component {
     constructor(props){
         super(props);
@@ -79,7 +38,47 @@ class NotFine extends Component {
             startRecord: false,
             finishRecord: false,
             resetRecord: false,
-            item: null
+            item: null,
+            setCallBack: null,
+            status: [
+				{
+					title: i18n.t('sick'),
+					image: themeImages.lightImages.patient,
+					type: 1
+				},{
+					title: i18n.t('lost'),
+					image: themeImages.lightImages.lost,
+					type: 2
+				},{
+					title: i18n.t('in_danger'),
+					image: themeImages.lightImages.caution,
+					type: 3
+				},{
+					title: i18n.t('call_me'),
+					image: themeImages.lightImages.support,
+					type: 4
+				},{
+					title: i18n.t('message_me'),
+					image: themeImages.lightImages.message_me,
+					type: 5
+				},{
+					title: i18n.t('record_video'),
+					image: themeImages.lightImages.vedio_call,
+					type: 6
+				},{
+					title: i18n.t('kidnapped'),
+					image: themeImages.lightImages.kidnapping,
+					type: 7
+				},{
+					title: i18n.t('record_voice'),
+					image: themeImages.lightImages.recourdStatus,
+					type: 8
+				},{
+					title: i18n.t('accident'),
+					image: themeImages.lightImages.accident,
+					type: 9
+				},
+			]
         }
     }
 
@@ -123,9 +122,10 @@ class NotFine extends Component {
             this.startRecord();
             this.setState({ item })
         } else if (type === 6){
+			this.setState({ item });
             this.props.navigation.navigate('VideoRecorder');
         }else{
-            this.sendMsg(null, item)
+            this.sendMsg(null, item);
 			this.props.navigation.navigate('confirmStatus', { image });
         }
 
@@ -152,32 +152,40 @@ class NotFine extends Component {
             this.setState({  mapRegion: userLocation });
         }
 
-        // let getCity = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=';
-        // getCity += this.state.mapRegion.latitude + ',' + this.state.mapRegion.longitude;
-        // getCity += '&key=AIzaSyCJTSwkdcdRpIXp2yG7DfSRKFWxKhQdYhQ&language=ar&sensor=true';
-        //
-        // try {
-        //     const { data } = await axios.get(getCity);
-        //     this.setState({ location: data.results[0].formatted_address });
-        // } catch (e) {
-        //     console.log(e);
-        // }
+
+        let getCity = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=';
+        getCity += this.state.mapRegion.latitude + ',' + this.state.mapRegion.longitude;
+        getCity += '&key=AIzaSyCJTSwkdcdRpIXp2yG7DfSRKFWxKhQdYhQ&language=' + this.props.lang + '&sensor=true';
+
+        try {
+            const { data } = await axios.get(getCity);
+            this.setState({ location: data.results[0].formatted_address });
+        } catch (e) {
+            console.log(e);
+        }
     }
 
     componentWillReceiveProps(nextProps) {
-        console.log('fuck props', nextProps);
+        if (nextProps.navigation.state.params.recording){
+            const uri = nextProps.navigation.state.params.recording.uri;
+            this.sendMsg(uri, this.state.item);
+
+            console.log('fuck props', nextProps);
+        }
+
 	}
 
 
 	sendMsg(uri = null, status){
 		let formData = new FormData();
-		this.cansleRecord();
 
-		let msgType = 0;
+		let msgType = 4;
 		if (status.type == 6)
 			msgType = 2;
-		else if(status.type == 8)
+		else if(status.type == 8){
+			this.cansleRecord();
 			msgType = 1;
+        }
 
 		if (uri){
 			let localUri = uri;
@@ -210,6 +218,10 @@ class NotFine extends Component {
 					this.emitSendMsg(response.data.data.room, response.data.data.msg);
 					this.scrollView.scrollToEnd({animated: true});
 					return this.componentWillMount();
+				});
+
+				axios.post(CONST.url + 'stop_ready', { user_id: this.props.user.id, lang: this.props.lang }).then(response => {
+					this.setState({ setCallBack: 200 });
 				});
 			}
 
@@ -253,7 +265,7 @@ class NotFine extends Component {
                         <Body style={[styles.headerText , styles.headerTitle]}></Body>
                         <Left style={styles.flex0}>
                             <TouchableOpacity onPress={() => this.props.navigation.goBack()} style={{ marginTop: 20 }}>
-                                <Image source={images.back} style={{ width: 25, height: 25, margin: 5, marginTop: 15 }} resizeMode={'contain'} />
+                                <Image source={images.back} style={{ width: 25, height: 25, margin: 5, marginTop: 15, transform: I18nManager.isRTL ? [{rotateY : '0deg'}] : [{rotateY : '-180deg'}] }} resizeMode={'contain'} />
                             </TouchableOpacity>
                         </Left>
                     </View>
@@ -263,12 +275,12 @@ class NotFine extends Component {
                         <View style={{ marginTop: 10, backgroundColor: colors.lightBackground, borderTopColor: colors.pageBorder, borderTopWidth: 1}}>
                             <View style={{width: 0, height: 0, backgroundColor: 'transparent', borderStyle: 'solid', borderLeftWidth: 50, borderTopWidth: 50, borderLeftColor: 'transparent', borderTopColor: colors.darkBackground, right: 0, position: 'absolute', top: -1 }} />
                             <View style={{ flex: 1, height: 10, width: '100%' }}/>
-                            <View style={{ width: 1, height: 70, backgroundColor: colors.pageBorder, transform: [{ rotate: '45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
+                            <View style={{ width: 1, height: 70, backgroundColor: colors.pageBorder, transform: I18nManager.isRTL ? [{ rotate: '45deg'}] : [{ rotate: '-45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
                             <View style={{ marginTop: -40, height: height-115 }}>
                                 <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', color: colors.labelFont, fontSize: 18, marginHorizontal: 20, marginBottom: 40  }}>{ i18n.t('whyNotFine') }</Text>
                                 <FlatList
                                     style={{ alignSelf: 'center', width: '100%'}}
-                                    data={status}
+                                    data={this.state.status}
                                     renderItem={({ item }) => this.renderItems(item, colors)}
                                     numColumns={3}
                                     keyExtractor={this._keyExtractor}
