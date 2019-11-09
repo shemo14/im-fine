@@ -19,6 +19,7 @@ import axios from 'axios'
 import Modal from "react-native-modal";
 import CONST from "../consts";
 import {AsyncStorage} from "react-native-web";
+import {Notifications} from "expo";
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
@@ -39,6 +40,7 @@ class Register extends Component {
             lat: null,
             lng: null,
             countryCode: null,
+            deviceId: null,
             userId: null,
             isLoaded: false,
             mapRegion: [],
@@ -106,6 +108,10 @@ class Register extends Component {
 
     async componentWillMount() {
 
+        const deviceId = await Notifications.getExpoPushTokenAsync();
+        this.setState({ deviceId });
+
+
         axios.get(CONST.url + 'codes').then(response => {
             this.setState({ countries: response.data.data, loader: false })
         })
@@ -141,36 +147,42 @@ class Register extends Component {
 
     onFocus(){}
 
+
+
+
+
     onLoginPressed() {
         const err = this.validate();
         if (!err){
             this.setState({ isSubmitted: true });
-            AsyncStorage.getItem('deviceID').then(device_id => {
-				axios.post(CONST.url + 'sign-up', {
-					phone: this.state.phone,
-					name: this.state.name,
-					country_code: this.state.countryCode,
-					email :this.state.email,
-					image : this.state.base64,
-					lang: this.props.lang ,
-                    device_id,
-					lat : this.state.lat,
-					lng : this.state.lng,
-					address : this.state.location,
-				}).then(response => {
-					if(response.data.status == 200){
-						this.setState({ isSubmitted: false });
-						this.props.navigation.navigate('activeCode', { data: response.data.data, code: response.data.extra.code });
-					}else{
-						this.setState({ isSubmitted: false });
-						Toast.show({
-							text: response.data.msg,
-							type: "danger",
-							duration: 3000
-						});
-					}
-				})
-            })
+
+            axios.post(CONST.url + 'sign-up', {
+                phone: this.state.phone,
+                name: this.state.name,
+                country_code: this.state.countryCode,
+                email :this.state.email,
+                image : this.state.base64,
+                lang: this.props.lang ,
+                device_id :  this.state.deviceId,
+                lat : this.state.lat,
+                lng : this.state.lng,
+                address : this.state.location,
+            }).then(response => {
+                if(response.data.status == 200){
+                    this.setState({ isSubmitted: false });
+                    this.props.navigation.navigate('activeCode', { data: response.data.data, code: response.data.extra.code });
+                }else{
+                    this.setState({ isSubmitted: false });
+                    Toast.show({
+                        text: response.data.msg,
+                        type: "danger",
+                        duration: 3000
+                    });
+                }
+            }).catch(error => {
+                console.log(error.message)
+            });
+
         }
     }
 

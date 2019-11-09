@@ -129,8 +129,9 @@ class Home extends Component {
 
     onStandBy(){
         this.setState({ standBySubmit: true });
-        axios.post(CONST.url + 'set_ready_time', { user_id: this.props.user ? this.props.user.id : this.props.auth.data.id , ready_time: this.state.startTime, lang: this.props.lang }).then(response => {
+        axios.post(CONST.url + 'set_ready_time', { user_id: this.props.user ? this.props.user.id : this.props.auth.data.id , time: this.state.startTime, lang: this.props.lang }).then(response => {
             this.setState({ standBySubmit: false, startTime: '', endTime: '' });
+            console.log(response.data)
             Toast.show({
                 text: response.data.msg,
                 type: "success",
@@ -138,6 +139,7 @@ class Home extends Component {
             });
         })
     }
+
 
     onDaily(){
         this.setState({ DailySubmit: true });

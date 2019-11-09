@@ -1,6 +1,21 @@
 import React, { Component } from "react";
 import { View, Text, Image, TouchableOpacity, Platform, I18nManager, Dimensions, FlatList, Slider} from "react-native";
-import { Container, Content, Header, Left, Right, Body, Icon, Item, Label, Input, Switch, Picker, Radio } from 'native-base'
+import {
+    Container,
+    Content,
+    Header,
+    Left,
+    Right,
+    Body,
+    Icon,
+    Item,
+    Label,
+    Input,
+    Switch,
+    Picker,
+    Radio,
+    Toast
+} from 'native-base'
 import lightStyles from '../../assets/styles/light'
 import darkStyles from '../../assets/styles/dark'
 import COLORS from '../consts/colors'
@@ -53,9 +68,18 @@ class EmergencyList extends Component {
 
     addToEmergencyList(){
 		axios.post(CONST.url + 'add-to-emergency', { id: this.props.user.id, users: selectedContacts, lang: this.props.lang }).then(response => {
-			this.componentWillMount()
+		   if(response.data.status === 200)
+           {
+               Toast.show({
+                   text: response.data.msg,
+                   type: "success",
+                   duration: 3000
+               });
+           }
 		})
     }
+
+
 
     renderLoader(colors){
         if (this.state.loader){
@@ -76,32 +100,65 @@ class EmergencyList extends Component {
         });
         let phoneNumbers = [];
 
+
         if (data.length > 0) {
             const contacts = data;
 
-            for (let i=0; i < (contacts).length; i++){
-                let number = '';
-                if ((contacts[i].phoneNumbers).length > 0)
-                    number = ((contacts[i].phoneNumbers)[0]).number;
+            if(contacts.length > 0)
+            {
+                for (let i=0; i < (contacts).length; i++){
 
-                number = number.replace(/ +/g, "");
-                number = number.replace(/^\+[0-9]{1,3}/,'');
-                number = number.replace(/^0+/, '');
+                    let number = '';
+                    if (contacts[i].phoneNumbers)
+                        if( contacts[i].phoneNumbers  !== undefined)
+                        {
+                            number = contacts[i].phoneNumbers[0].number;
 
-                if (number >= 10)
-                    phoneNumbers[i] = number
+                            number = number.replace(/ +/g, "");
+                            number = number.replace(/^\+[0-9]{1,3}/,'');
+                            number = number.replace(/^0+/, '');
+
+                            if (number >= 10)
+                                phoneNumbers[i] = number
+                        }
+
+                }
+
+                axios.post(CONST.url + 'contacts', { id: this.props.user.id, phones: phoneNumbers, lang: this.props.lang }).then(response => {
+                    this.setState({ contacts: response.data.data, loader: false })
+                    if ((response.data.data).length > 0){
+                        (response.data.data).map((contact) => {
+                            if(contact.is_emergency){
+                                this.pushSelectedChecks(contact.id);
+                            }
+                        })
+                    }else{
+                        this.setState({ loader: false });
+                        Toast.show({
+                            text: 'No Contacts',
+                            type: "danger",
+                            duration: 3000
+                        });
+                    }
+                }).error(error => {
+                    console.log(error.message)
+                });
+
+            }else{
+                Toast.show({
+                    text: 'No Contacts',
+                    type: "danger",
+                    duration: 3000
+                });
             }
 
-            axios.post(CONST.url + 'contacts', { id: this.props.user.id, phones: phoneNumbers, lang: this.props.lang }).then(response => {
-                this.setState({ contacts: response.data.data, loader: false })
-                if ((response.data.data).length > 0){
-                    (response.data.data).map((contact) => {
-						if(contact.is_emergency){
-							this.pushSelectedChecks(contact.id);
-						}
-                    })
-                }
-            })
+        }else{
+            this.setState({ loader: false });
+            Toast.show({
+                text: 'No Contacts',
+                type: "danger",
+                duration: 3000
+            });
         }
     }
 

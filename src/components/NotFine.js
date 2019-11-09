@@ -257,10 +257,10 @@ class NotFine extends Component {
                 <Header style={[styles.header , styles.plateformMarginTop]} noShadow>
                     <View style={[styles.headerView  , styles.animatedHeader ,{ backgroundColor: colors.darkBackground }]}>
                         <Right style={styles.flex0}>
-                            <TouchableOpacity onPress={() => this.props.navigation.openDrawer()} style={{ flexDirection: 'row', marginTop: 20 }}>
-                                <Image source={images.drawer} style={{ width: 25, height: 25, marginTop: 35, marginHorizontal: 8 }} resizeMode={'contain'} />
-                                <Image source={images.logo_tittle} style={{ width: 90, height: 90 }} resizeMode={'contain'} />
-                            </TouchableOpacity>
+                            {/*<TouchableOpacity onPress={() => this.props.navigation.openDrawer()} style={{ flexDirection: 'row', marginTop: 20 }}>*/}
+                                {/*<Image source={images.drawer} style={{ width: 25, height: 25, marginTop: 35, marginHorizontal: 8 }} resizeMode={'contain'} />*/}
+                                {/*<Image source={images.logo_tittle} style={{ width: 90, height: 90 }} resizeMode={'contain'} />*/}
+                            {/*</TouchableOpacity>*/}
                         </Right>
                         <Body style={[styles.headerText , styles.headerTitle]}></Body>
                         <Left style={styles.flex0}>
