@@ -84,8 +84,7 @@ class LoginOrRegister extends Component {
                                     <Picker
                                         mode="dropdown"
                                         style={[styles.picker, { color: colors.labelFont } ]}
-                                        placeholderStyle={{ color: "#e5d7bb" }}
-                                        placeholderIconColor="#fff"
+										textStyle={{ color: colors.labelFont }}
                                         selectedValue={this.state.lang}
                                         onValueChange={(value) => this.setLang(value)}
                                     >
@@ -120,5 +119,4 @@ const mapStateToProps = ({ theme, lang }) => {
     };
 };
 
-export default connect(mapStateToProps, { chooseTheme,
-})(LoginOrRegister);
+export default connect(mapStateToProps, { chooseTheme, chooseLang })(LoginOrRegister);

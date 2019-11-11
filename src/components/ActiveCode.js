@@ -83,7 +83,7 @@ class ActiveCode extends Component {
                 this.props.profile(newProps.auth.data.id, this.props.lang);
             }
 
-            this.props.navigation.navigate('DrawerNavigator');
+            this.props.navigation.navigate('drawerNavigator');
         }
 
         if (newProps.auth !== null) {

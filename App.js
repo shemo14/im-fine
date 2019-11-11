@@ -30,7 +30,7 @@ export default class App extends React.Component {
 		if (Platform.OS === 'android') {
 			Notifications.createChannelAndroidAsync('battery-notify', {
 				name: 'Chat messages',
-				sound: true,
+				sound: 'alarm',
 			});
 		}
 

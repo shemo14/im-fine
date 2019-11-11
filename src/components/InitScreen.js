@@ -20,7 +20,7 @@ class InitScreen extends Component {
         if (this.props.auth == null || this.props.user == null)
             this.props.navigation.navigate('loginOrRegister');
         else
-            this.props.navigation.navigate('DrawerNavigator');
+            this.props.navigation.navigate('drawerNavigator');
 
         AsyncStorage.getItem('init').then(init => {
             if (init != 'true'){

@@ -125,11 +125,22 @@ class NotFine extends Component {
 			this.setState({ item });
             this.props.navigation.navigate('VideoRecorder');
         }else{
+			this.playAudio();
             this.sendMsg(null, item);
 			this.props.navigation.navigate('confirmStatus', { image });
         }
-
     }
+
+	async playAudio(){
+		const soundObject = new Audio.Sound();
+		try {
+			await soundObject.loadAsync(require('../../assets/sounds/notFine.mp3'));
+			await soundObject.playAsync();
+
+		} catch (error) {
+			console.log('fuck error', error)
+		}
+	}
 
     renderItems(item, colors){
         return (
@@ -219,11 +230,11 @@ class NotFine extends Component {
 					this.scrollView.scrollToEnd({animated: true});
 					return this.componentWillMount();
 				});
-
-				axios.post(CONST.url + 'stop_ready', { user_id: this.props.user.id, lang: this.props.lang }).then(response => {
-					this.setState({ setCallBack: 200 });
-				});
 			}
+
+			axios.post(CONST.url + 'stop_ready', { user_id: this.props.user.id, lang: this.props.lang }).then(response => {
+				this.setState({ setCallBack: 200 });
+			});
 
 			this.setState({ message: '' });
 			this.emitSendMsg(response.data.data.room, response.data.data.msg);
@@ -257,10 +268,10 @@ class NotFine extends Component {
                 <Header style={[styles.header , styles.plateformMarginTop]} noShadow>
                     <View style={[styles.headerView  , styles.animatedHeader ,{ backgroundColor: colors.darkBackground }]}>
                         <Right style={styles.flex0}>
-                            <TouchableOpacity onPress={() => this.props.navigation.openDrawer()} style={{ flexDirection: 'row', marginTop: 20 }}>
-                                <Image source={images.drawer} style={{ width: 25, height: 25, marginTop: 35, marginHorizontal: 8 }} resizeMode={'contain'} />
-                                <Image source={images.logo_tittle} style={{ width: 90, height: 90 }} resizeMode={'contain'} />
-                            </TouchableOpacity>
+                            {/*<TouchableOpacity onPress={() => this.props.navigation.openDrawer()} style={{ flexDirection: 'row', marginTop: 20 }}>*/}
+                                {/*<Image source={images.drawer} style={{ width: 25, height: 25, marginTop: 35, marginHorizontal: 8 }} resizeMode={'contain'} />*/}
+                                {/*<Image source={images.logo_tittle} style={{ width: 90, height: 90 }} resizeMode={'contain'} />*/}
+                            {/*</TouchableOpacity>*/}
                         </Right>
                         <Body style={[styles.headerText , styles.headerTitle]}></Body>
                         <Left style={styles.flex0}>
@@ -277,7 +288,7 @@ class NotFine extends Component {
                             <View style={{ flex: 1, height: 10, width: '100%' }}/>
                             <View style={{ width: 1, height: 70, backgroundColor: colors.pageBorder, transform: I18nManager.isRTL ? [{ rotate: '45deg'}] : [{ rotate: '-45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
                             <View style={{ marginTop: -40, height: height-115 }}>
-                                <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', color: colors.labelFont, fontSize: 18, marginHorizontal: 20, marginBottom: 40  }}>{ i18n.t('whyNotFine') }</Text>
+                                <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', color: colors.labelFont, fontSize: 18, marginHorizontal: 20, marginBottom: 40, textAlign: I18nManager.isRTL ? 'right' : 'left', alignSelf: 'flex-start'  }}>{ i18n.t('whyNotFine') }</Text>
                                 <FlatList
                                     style={{ alignSelf: 'center', width: '100%'}}
                                     data={this.state.status}

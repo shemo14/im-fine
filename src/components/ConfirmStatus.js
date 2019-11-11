@@ -89,7 +89,7 @@ class ConfirmStatus extends Component {
                                     </View>
                                     <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: colors.labelFont, marginTop: 10 }}>{ i18n.t('confirmSendStatus') }</Text>
 
-                                    <Button onPress={() => this.props.navigation.navigate('DrawerNavigator')} style={{ backgroundColor: colors.orange, width: 150, height: 35, marginTop: 40, alignItems: 'center', justifyContent: 'center' }} >
+                                    <Button onPress={() => this.props.navigation.navigate('drawerNavigator')} style={{ backgroundColor: colors.orange, width: 150, height: 35, marginTop: 40, alignItems: 'center', justifyContent: 'center' }} >
                                         <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: '#472d35', textAlign: 'center'}}>{ i18n.t('backHome') }</Text>
                                     </Button>
                                 </View>

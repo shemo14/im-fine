@@ -107,7 +107,7 @@ const styles = ({
         flexGrow: 1
     },
     plateformMarginTop:{
-        marginTop:Platform.OS === 'ios' ? 10 : 40,
+        marginTop:Platform.OS === 'ios' ? 20 : 40,
     },
     keyboardAvoid: {
         width:'100%',
@@ -115,7 +115,7 @@ const styles = ({
         flex: 1
     },
     contentBackground: {
-        backgroundColor: '#000',
+        // backgroundColor: '#000',
         flex: 1,
     },
     headerCheck: {
@@ -458,7 +458,8 @@ const styles = ({
     },
     header : {
         zIndex: 9999999,
-        height: 50,
+        height: 60,
+		marginVertical: 5,
         backgroundColor: 'transparent',
         borderBottomWidth:0,
         paddingLeft: 0,

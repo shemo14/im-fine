@@ -54,6 +54,7 @@ export default {
         sign_in                 : require('../../assets/images/dark_mode/sign-in.png'),
         star                    : require('../../assets/images/dark_mode/star.png'),
 		you_ok                  : require('../../assets/images/light_mode/you_ok.png'),
+		bg_splash               : require('../../assets/images/light_mode/bg_splash.png'),
     },
     darkImages: {
         big_logo                : require('../../assets/images/dark_mode/big_logo.png'),
@@ -102,5 +103,6 @@ export default {
         sign_in                 : require('../../assets/images/dark_mode/sign-in.png'),
         star                    : require('../../assets/images/dark_mode/star.png'),
 		you_ok                  : require('../../assets/images/dark_mode/you_ok.png'),
+		bg_splash               : require('../../assets/images/dark_mode/bg_splash.png'),
     }
 }

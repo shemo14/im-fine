@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Image, TouchableOpacity, I18nManager, Dimensions, AsyncStorage } from "react-native";
+import {View, Image, TouchableOpacity, I18nManager, Dimensions, AsyncStorage, ImageBackground} from "react-native";
 import {Container, Content, Form, Item, Input, Label, Button, Toast, CheckBox, Picker} from 'native-base'
 import lightStyles from '../../assets/styles/light'
 import darkStyles from '../../assets/styles/dark'
@@ -151,43 +151,44 @@ class Login extends Component {
             <Container style={{ backgroundColor: colors.darkBackground }}>
                 <NavigationEvents onWillFocus={() => this.onFocus()} />
                 <Content contentContainerStyle={{ flexGrow: 1 }}>
-                    { this.renderLoader(colors) }
-                    <View style={styles.contentBackground}>
-                        <View style={{ alignItems: 'center', marginTop: 100 }}>
-                            <Image resizeMode={'contain'} source={images.big_logo} style={{ width: 120, height: 120, alignSelf: 'center' }} />
-                        </View>
-                        <Form style={{ width: '100%', paddingHorizontal: 40, marginTop: 70 }}>
-                            <View>
-                                <Item style={[styles.itemPicker, { borderColor: colors.labelFont }]} regular >
-                                    <Picker
-                                        mode="dropdown"
-                                        style={[styles.picker, { color: colors.labelFont } ]}
-                                        placeholderStyle={{ color: "#e5d7bb" }}
-                                        placeholderIconColor="#fff"
-                                        selectedValue={this.state.countryCode}
-                                        onValueChange={(value) => this.setState({ countryCode: value })}
-                                    >
-                                        <Picker.Item label={ i18n.t('selectCity') } value={null} />
-                                        {
-                                            this.state.countries.map((country, i) => (
-                                                <Picker.Item key={i} label={country.title} value={country.code} />
-                                            ))
-                                        }
-                                    </Picker>
-                                    <Image source={images.right_wight_arrow_drop} style={styles.pickerImg} resizeMode={'contain'} />
-                                </Item>
+					<ImageBackground source={images.bg_splash} resizeMode={'cover'} style={styles.imageBackgroundStyle}>
+                        { this.renderLoader(colors) }
+                        <View style={styles.contentBackground}>
+                            <View style={{ alignItems: 'center', marginTop: 100 }}>
+                                <Image resizeMode={'contain'} source={images.big_logo} style={{ width: 120, height: 120, alignSelf: 'center' }} />
                             </View>
-                            <View style={{ borderRadius: 3, borderWidth: 1, borderColor: colors.labelFont, height: 45, marginTop: 20, padding: 5, flexDirection: 'row'  }}>
-                                <Item style={{ alignSelf: 'flex-start', borderBottomWidth: 0, top: -18, marginTop: 0 ,position:'absolute', width:'88%', paddingHorizontal: 5 }} bordered>
-                                    <Label style={{ top:5,  paddingRight: 10, paddingLeft: 10, backgroundColor: colors.darkBackground, alignSelf: 'flex-start', color: colors.labelFont, fontSize: 14, position: 'absolute' }}>{ i18n.t('phoneNumber') }</Label>
-                                    <Input placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('phoneNumber') + '...'} onChangeText={(phone) => this.setState({phone})} keyboardType={'number-pad'} style={{ width: '100%', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontSize: 15, top: 15 }}  />
-                                </Item>
-                                <Image source={images.phone} style={{ height: 22, width: 22, right: 15, top: 9, position: 'absolute', flex: 1 }} resizeMode={'contain'} />
-                            </View>
-                        </Form>
+                            <Form style={{ width: '100%', paddingHorizontal: 40, marginTop: 70 }}>
+                                <View>
+                                    <Item style={[styles.itemPicker, { borderColor: colors.labelFont }]} regular >
+                                        <Picker
+                                            mode="dropdown"
+                                            style={[styles.picker, { color: colors.labelFont, width: (width*70)/100 } ]}
+											textStyle={{ color: colors.labelFont }}
+                                            selectedValue={this.state.countryCode}
+                                            onValueChange={(value) => this.setState({ countryCode: value })}
+                                        >
+                                            <Picker.Item label={ i18n.t('selectCity') } value={null} />
+                                            {
+                                                this.state.countries.map((country, i) => (
+                                                    <Picker.Item key={i} label={country.title} value={country.code} />
+                                                ))
+                                            }
+                                        </Picker>
+                                        <Image source={images.right_wight_arrow_drop} style={styles.pickerImg} resizeMode={'contain'} />
+                                    </Item>
+                                </View>
+                                <View style={{ borderRadius: 3, borderWidth: 1, borderColor: colors.labelFont, height: 45, marginTop: 20, padding: 5, flexDirection: 'row'  }}>
+                                    <Item style={{ alignSelf: 'flex-start', borderBottomWidth: 0, top: -18, marginTop: 0 ,position:'absolute', width:'88%', paddingHorizontal: 5 }} bordered>
+                                        <Label style={{ top:5,  paddingRight: 10, paddingLeft: 10, backgroundColor: colors.darkBackground, alignSelf: 'flex-start', color: colors.labelFont, fontSize: 14, position: 'absolute' }}>{ i18n.t('phoneNumber') }</Label>
+                                        <Input placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('phoneNumber') + '...'} onChangeText={(phone) => this.setState({phone})} keyboardType={'number-pad'} style={{ width: '100%', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontSize: 15, top: 15 }}  />
+                                    </Item>
+                                    <Image source={images.phone} style={{ height: 22, width: 22, right: 15, top: 9, position: 'absolute', flex: 1 }} resizeMode={'contain'} />
+                                </View>
+                            </Form>
 
-                        { this.renderSubmit(colors) }
-                    </View>
+                            { this.renderSubmit(colors) }
+                        </View>
+                    </ImageBackground>
                 </Content>
             </Container>
         );

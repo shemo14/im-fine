@@ -44,7 +44,7 @@ const DrawerNavigator = createDrawerNavigator({
 });
 
 const appStack = createStackNavigator({
-    DrawerNavigator: {
+    drawerNavigator: {
         screen: DrawerNavigator,
         navigationOptions: {
             header: null,

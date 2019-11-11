@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, Image, TouchableOpacity, Animated, I18nManager, Dimensions} from "react-native";
+import { View, Text, Image, TouchableOpacity, Animated, I18nManager, Dimensions, Platform} from "react-native";
 import {Container, Content, Header, Left, Right, Body, Item, Label, Input, Toast} from 'native-base'
 import lightStyles from '../../assets/styles/light'
 import darkStyles from '../../assets/styles/dark'
@@ -13,6 +13,7 @@ import {DoubleBounce} from "react-native-loader";
 import {Notifications} from "expo";
 import axios from 'axios';
 import CONST from '../consts';
+import * as Audio from "expo-av/build/Audio";
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
@@ -129,8 +130,9 @@ class Home extends Component {
 
     onStandBy(){
         this.setState({ standBySubmit: true });
-        axios.post(CONST.url + 'set_ready_time', { user_id: this.props.user ? this.props.user.id : this.props.auth.data.id , ready_time: this.state.startTime, lang: this.props.lang }).then(response => {
+        axios.post(CONST.url + 'set_ready_time', { user_id: this.props.user ? this.props.user.id : this.props.auth.data.id , time: this.state.startTime, lang: this.props.lang }).then(response => {
             this.setState({ standBySubmit: false, startTime: '', endTime: '' });
+            console.log(response.data)
             Toast.show({
                 text: response.data.msg,
                 type: "success",
@@ -138,6 +140,7 @@ class Home extends Component {
             });
         })
     }
+
 
     onDaily(){
         this.setState({ DailySubmit: true });
@@ -158,12 +161,24 @@ class Home extends Component {
         })
     }
 
+	async playAudio(){
+		const soundObject = new Audio.Sound();
+		try {
+			await soundObject.loadAsync(require('../../assets/sounds/alarm.wav'), { shouldPlay: true });
+			await soundObject.playAsync();
+
+		} catch (error) {
+			console.log('fuck error', error)
+		}
+	}
+
 	componentDidMount(){
 		Notifications.addListener(this.handleNotification);
 	}
 
 	handleNotification = (notification) => {
-			console.log(notification);
+			console.log('test notification', notification);
+			this.playAudio();
 
 		if (notification && notification.origin !== 'received') {
 			const { data } = notification;
@@ -229,7 +244,7 @@ class Home extends Component {
                                     <View style={{ marginHorizontal: 20 , position: 'absolute', right: 2, top: 10}}>
                                         <Text style={{ color: colors.orange, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>{ room.date }</Text>
                                         <View style={{ backgroundColor: colors.orange, borderRadius: 20, height: 20, width: 20, alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginTop: 10 }}>
-                                            <Text style={{ color: '#7b6c60', fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>{ room.count }</Text>
+                                            <Text style={{ color: '#7b6c60', fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', marginTop: Platform.OS == 'ios' ? 5 : 0 }}>{ room.count }</Text>
                                         </View>
                                     </View>
                                 </TouchableOpacity>
@@ -245,11 +260,13 @@ class Home extends Component {
                     <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', textAlign: 'center', fontSize: 16, marginTop: 10 }}>{ i18n.t('chooseTime') }</Text>
 
                     <View style={{ marginTop: 50, width: '100%' }}>
-                        <TouchableOpacity onPress={() => this.showTimePicker('start')} style={{ borderRadius: 3, borderWidth: 1, borderColor: colors.labelFont, height: 45, marginTop: 20, padding: 5, flexDirection: 'row'  }}>
-                            <Item onPress={() => this.showTimePicker('start')} style={{ alignSelf: 'flex-start', borderBottomWidth: 0, top: -18, marginTop: 0 ,position:'absolute', width:'88%', paddingHorizontal: 5 }} bordered>
+                        <TouchableOpacity onPress={() => this.showTimePicker('start')} style={{ borderRadius: 3, borderWidth: 1, borderColor: colors.labelFont, height: 45, marginTop: 20, padding: 5, flexDirection: 'row',}}>
+                            <TouchableOpacity onPress={() => this.showTimePicker('start')} style={{ alignSelf: 'flex-start', borderBottomWidth: 0, top: -18, marginTop: 0 ,position:'absolute', width:'88%', paddingHorizontal: 5, zIndex: 1 }} bordered>
                                 <Label style={{ top:5, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', backgroundColor: colors.lightBackground, alignSelf: 'flex-start', color: colors.labelFont, fontSize: 14, position: 'absolute', paddingRight: 5, paddingLeft: 5 }}>{ i18n.t('startTime') }</Label>
-                                <Input value={this.state.startTime.toString()} disabled placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('startTime') + '...'} onChangeText={(phone) => this.setState({phone})} keyboardType={'number-pad'} style={{ width: '100%', fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontSize: 15, top: 15 }}  />
-                            </Item>
+                                <View>
+                                    <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontSize: 15, top: 34, }}>{ this.state.startTime.toString() }</Text>
+                                </View>
+                            </TouchableOpacity>
                             <Image source={images.choose_time} style={{ height: 22, width: 22, right: 15, top: 9, position: 'absolute', flex: 1 }} resizeMode={'contain'} />
                         </TouchableOpacity>
                         <DateTimePicker
@@ -262,10 +279,12 @@ class Home extends Component {
 
                     <View style={{ marginTop: 20, width: '100%' }}>
                         <TouchableOpacity onPress={() => this.showTimePicker('end')} style={{ borderRadius: 3, borderWidth: 1, borderColor: colors.labelFont, height: 45, marginTop: 20, padding: 5, flexDirection: 'row'  }}>
-                            <Item onPress={() => this.showTimePicker('end')} style={{ alignSelf: 'flex-start', borderBottomWidth: 0, top: -18, marginTop: 0 ,position:'absolute', width:'88%', paddingHorizontal: 5 }} bordered>
+                            <TouchableOpacity onPress={() => this.showTimePicker('end')} style={{ alignSelf: 'flex-start', borderBottomWidth: 0, top: -18, marginTop: 0 ,position:'absolute', width:'88%', paddingHorizontal: 5 }} bordered>
                                 <Label style={{ top:5, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', backgroundColor: colors.lightBackground, alignSelf: 'flex-start', color: colors.labelFont, fontSize: 14, position: 'absolute', paddingRight: 5, paddingLeft: 5  }}>{ i18n.t('startTime') }</Label>
-                                <Input value={this.state.endTime.toString()} disabled placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('startTime') + '...'} onChangeText={(phone) => this.setState({phone})} keyboardType={'number-pad'} style={{ width: '100%', fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontSize: 15, top: 15 }}  />
-                            </Item>
+								<View>
+									<Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontSize: 15, top: 34, }}>{this.state.endTime.toString()}</Text>
+								</View>
+                            </TouchableOpacity>
                             <Image source={images.choose_time} style={{ height: 22, width: 22, right: 15, top: 9, position: 'absolute', flex: 1 }} resizeMode={'contain'} />
                         </TouchableOpacity>
                         <DateTimePicker
@@ -287,10 +306,12 @@ class Home extends Component {
 
                     <View style={{ marginTop: 50, width: '100%' }}>
                         <TouchableOpacity onPress={() => this.showTimePicker('tfTime')} style={{ borderRadius: 3, borderWidth: 1, borderColor: colors.labelFont, height: 45, marginTop: 20, padding: 5, flexDirection: 'row'  }}>
-                            <Item onPress={() => this.showTimePicker('tfTime')} style={{ alignSelf: 'flex-start', borderBottomWidth: 0, top: -18, marginTop: 0 ,position:'absolute', width:'88%', paddingHorizontal: 5 }} bordered>
+                            <TouchableOpacity onPress={() => this.showTimePicker('tfTime')} style={{ alignSelf: 'flex-start', borderBottomWidth: 0, top: -18, marginTop: 0 ,position:'absolute', width:'88%', paddingHorizontal: 5 }} bordered>
                                 <Label style={{ top:5, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', backgroundColor: colors.lightBackground, alignSelf: 'flex-start', color: colors.labelFont, fontSize: 14, position: 'absolute', paddingRight: 5, paddingLeft: 5  }}>{ i18n.t('startTime') }</Label>
-                                <Input value={this.state.tfTime.toString()} disabled placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('startTime') + '...'} onChangeText={(phone) => this.setState({phone})} keyboardType={'number-pad'} style={{ width: '100%', fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontSize: 15, top: 15 }}  />
-                            </Item>
+								<View>
+									<Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontSize: 15, top: 34, }}>{this.state.tfTime.toString()}</Text>
+								</View>
+                            </TouchableOpacity>
                             <Image source={images.choose_time} style={{ height: 22, width: 22, right: 15, top: 9, position: 'absolute', flex: 1 }} resizeMode={'contain'} />
                         </TouchableOpacity>
                         <DateTimePicker
@@ -360,17 +381,17 @@ class Home extends Component {
                         <View style={{ flexDirection: 'row', paddingHorizontal: 5 }}>
                             <TouchableOpacity onPress={() => [ this.setState({ type: 1 }), this.componentWillMount() ]} style={{ flexDirection: 'row', width: '33%' }}>
                                 <Image source={this.state.type == 1 ? images.chat_active : images.chat_non} style={{ width: 25, height: 25, margin: 5 }} resizeMode={'contain'} />
-                                <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 15, marginTop: 5, color: this.state.type == 1 ? colors.active : colors.unActive }}>{ i18n.t('chat') }</Text>
+                                <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 15, marginTop:  Platform.OS == 'ios' ? 10 : 5, color: this.state.type == 1 ? colors.active : colors.unActive }}>{ i18n.t('chat') }</Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity onPress={() => this.setState({ type: 2 })} style={{ flexDirection: 'row', width: '33%', marginLeft: -7 }}>
                                 <Image source={this.state.type == 2 ? images.bell_active : images.bell_non} style={{ width: 25, height: 25, margin: 5 }} resizeMode={'contain'} />
-                                <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 15, marginTop: 5, color: this.state.type == 2 ? colors.active : colors.unActive }}>{ i18n.t('standBy') }</Text>
+                                <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 15, marginTop: Platform.OS == 'ios' ? 10 : 5, color: this.state.type == 2 ? colors.active : colors.unActive }}>{ i18n.t('standBy') }</Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity onPress={() => this.setState({ type: 3 })} style={{ flexDirection: 'row', width: '33%' }}>
                                 <Image source={this.state.type == 3 ? images.stopwatch_active : images.stopwatch_non} style={{ width: 25, height: 25, margin: 5 }} resizeMode={'contain'} />
-                                <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 15, marginTop: 5, color: this.state.type == 3 ? colors.active : colors.unActive }}>{ i18n.t('tfAlert') }</Text>
+                                <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 15, marginTop: Platform.OS == 'ios' ? 10 : 5, color: this.state.type == 3 ? colors.active : colors.unActive }}>{ i18n.t('tfAlert') }</Text>
                             </TouchableOpacity>
                         </View>
                         <View style={{ marginTop: 10, backgroundColor: colors.lightBackground, borderTopColor: colors.pageBorder, borderTopWidth: 1}}>

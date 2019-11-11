@@ -45,8 +45,7 @@ class Profile extends Component {
     }
 
 
-    componentWillMount()
-    {
+    componentWillMount(){
         console.log(this.props.user);
     }
 

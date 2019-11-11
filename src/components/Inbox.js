@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, Image, TouchableOpacity, Animated, I18nManager, Dimensions, KeyboardAvoidingView, ScrollView, Slider, Keyboard, Linking} from "react-native";
+import { View, Text, Image, TouchableOpacity, Animated, I18nManager, Dimensions, KeyboardAvoidingView, ScrollView, Slider, Keyboard, Linking, Platform} from "react-native";
 import {Container, Content, Header, Left, Right, Body, Button, Icon, Item, Label, Input} from 'native-base'
 import lightStyles from '../../assets/styles/light'
 import darkStyles from '../../assets/styles/dark'
@@ -17,6 +17,7 @@ import * as Permissions from "expo-permissions";
 import { connect } from 'react-redux';
 import {DoubleBounce} from "react-native-loader";
 import CONST from '../consts';
+
 window.navigator.userAgent = 'react-native';
 import SocketIOClient from 'socket.io-client';
 
@@ -148,7 +149,6 @@ class Inbox extends Component {
         const soundObject = new Audio.Sound();
         try {
             await soundObject.loadAsync({ uri: info.url });
-            console.log('test audio', soundObject);
             await soundObject.playAsync();
 
             const status = await soundObject.getStatusAsync();
@@ -190,7 +190,7 @@ class Inbox extends Component {
                         <Text style={{ color: colors.sendFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', alignSelf: 'flex-start' }}>{message.msg}</Text>
                         <View style={{ flexDirection: 'row', alignSelf: 'flex-end', marginTop: 5 }}>
                             <Text style={{ color: colors.sendFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 12 }}>{message.date}</Text>
-                            <Image source={images.tick_blue} resizeMode={'contain'} style={{ width: 15, height: 15, marginTop: 2 }} />
+                            <Image source={images.tick_blue} resizeMode={'contain'} style={{ width: 15, height: 15, marginTop: 2, marginHorizontal: 4  }} />
                         </View>
                     </View>
                 );
@@ -212,12 +212,14 @@ class Inbox extends Component {
                                 ) : (<View />)
                             }
                         </TouchableOpacity>
-                        <View style={{ padding: 10, }}>
-							<Text style={{ color: colors.sendFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', alignSelf: 'flex-start' }}>{message.msg}</Text>
-                        </View>
-                        <View style={{ flexDirection: 'row', alignSelf: 'flex-end', padding: 10 }}>
-                            <Text style={{ color: colors.sendFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 12 }}>{message.date}</Text>
-                            <Image source={images.tick_blue} resizeMode={'contain'} style={{ width: 15, height: 15, marginTop: 2 }} />
+                        <View style={{ flexDirection: 'row' }}>
+                            <View style={{ padding: 10, flex: 2 }}>
+                                <Text style={{ color: colors.sendFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', alignSelf: 'flex-start' }}>{message.msg}</Text>
+                            </View>
+                            <View style={{ flexDirection: 'row', alignSelf: 'flex-end', padding: 10, flex: 1 }}>
+                                <Text style={{ color: colors.sendFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 12 }}>{message.date}</Text>
+                                <Image source={images.tick_blue} resizeMode={'contain'} style={{ width: 15, height: 15, marginTop: 2, marginHorizontal: 4 }} />
+                            </View>
                         </View>
                     </View>
                 )
@@ -240,8 +242,8 @@ class Inbox extends Component {
                             </TouchableOpacity>
                         </View>
                         <View style={{ flexDirection: 'row', alignSelf: 'flex-end', padding: 10 }}>
-                            <Text style={{ color: colors.sendFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 12 }}>{message.time}</Text>
-                            <Image source={images.tick_blue} resizeMode={'contain'} style={{ width: 15, height: 15, marginTop: 2 }} />
+                            <Text style={{ color: colors.sendFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 12 }}>{message.date}</Text>
+                            <Image source={images.tick_blue} resizeMode={'contain'} style={{ width: 15, height: 15, marginTop: 2, marginHorizontal: 4  }} />
                         </View>
                     </View>
                 )
@@ -256,7 +258,7 @@ class Inbox extends Component {
                                 style={{ flex: 1 }}
                                 completeButtonText={'Return Home'}
                                 sender={true}
-                                uri={message.msg}
+                                uri={'http://ahmed-taha.arabsdesign.com/ImFine/uploads/images/users/11-11-1915734816581348396041.mp4'}
                                 plyImg={images.play_button_big}
                                 pusImg={images.pause_button}
                                 showDebug={false}
@@ -265,7 +267,7 @@ class Inbox extends Component {
                                 playbackSlider={(renderProps) => {
                                     return (
                                         <Slider
-                                            style={{ width: '90%' }}
+                                            style={{ width: '88%' }}
                                             thumbTintColor={'#ffffff'}
                                             maximumTrackTintColor={"#ffffff"}
                                             minimimValue={0}
@@ -280,7 +282,7 @@ class Inbox extends Component {
                         </View>
                         <View style={{ flexDirection: 'row', alignSelf: 'flex-end', marginTop: 5 }}>
                             <Text style={{ color: colors.sendFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 12 }}>{message.date}</Text>
-                            <Image source={images.tick_blue} resizeMode={'contain'} style={{ width: 15, height: 15, marginTop: 2 }} />
+                            <Image source={images.tick_blue} resizeMode={'contain'} style={{ width: 15, height: 15, marginTop: 2, marginHorizontal: 4  }} />
                         </View>
                     </View>
                 );
@@ -292,7 +294,7 @@ class Inbox extends Component {
                         <Text style={{ color: colors.receiverFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>{message.msg}</Text>
                         <View style={{ flexDirection: 'row', alignSelf: 'flex-start', marginTop: 5 }}>
                             <Text style={{ color: colors.receiverFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 12 }}>{message.date}</Text>
-                            <Image source={images.tick_blue} resizeMode={'contain'} style={{ width: 15, height: 15, marginTop: 2 }} />
+                            <Image source={images.tick_blue} resizeMode={'contain'} style={{ width: 15, height: 15, marginTop: 2, marginHorizontal: 4  }} />
                         </View>
                     </View>
                 );
@@ -314,9 +316,14 @@ class Inbox extends Component {
                                 ) : (<View />)
                             }
                         </TouchableOpacity>
-                        <View style={{ flexDirection: 'row', alignSelf: 'flex-start', padding: 10 }}>
-                            <Text style={{ color: colors.receiverFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 12 }}>{message.time}</Text>
-                            <Image source={images.tick_blue} resizeMode={'contain'} style={{ width: 15, height: 15, marginTop: 2 }} />
+						<View style={{ flexDirection: 'row' }}>
+							<View style={{ flexDirection: 'row', alignSelf: 'flex-start', padding: 10, flex: 1 }}>
+								<Text style={{ color: colors.receiverFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 12 }}>{message.date}</Text>
+								<Image source={images.tick_blue} resizeMode={'contain'} style={{ width: 15, height: 15, marginTop: 2, marginHorizontal: 4  }} />
+							</View>
+                            <View style={{ padding: 10, flex: 2 }}>
+								<Text style={{ color: colors.receiverFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', alignSelf: 'flex-end' }}>{message.msg}</Text>
+							</View>
                         </View>
                     </View>
                 )
@@ -340,7 +347,7 @@ class Inbox extends Component {
                         </View>
                         <View style={{ flexDirection: 'row', alignSelf: 'flex-end', padding: 10 }}>
                             <Text style={{ color: colors.sendFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 12 }}>{message.date}</Text>
-                            <Image source={images.tick_blue} resizeMode={'contain'} style={{ width: 15, height: 15, marginTop: 2 }} />
+                            <Image source={images.tick_blue} resizeMode={'contain'} style={{ width: 15, height: 15, marginTop: 2, marginHorizontal: 4  }} />
                         </View>
                     </View>
                 )
@@ -379,7 +386,7 @@ class Inbox extends Component {
                         </View>
                         <View style={{ flexDirection: 'row', alignSelf: 'flex-start', marginTop: 5 }}>
                             <Text style={{ color: colors.receiverFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 12 }}>{message.date}</Text>
-                            <Image source={images.tick_blue} resizeMode={'contain'} style={{ width: 15, height: 15, marginTop: 2 }} />
+                            <Image source={images.tick_blue} resizeMode={'contain'} style={{ width: 15, height: 15, marginTop: 2, marginHorizontal: 4  }} />
                         </View>
                     </View>
                 );
@@ -415,13 +422,15 @@ class Inbox extends Component {
         if (msgType == 1)
             this.cansleRecord();
 
+        console.log('fuck uri', uri);
+
         if (uri){
             let localUri = uri;
             filename = localUri.split('/').pop();
 
             let match = /\.(\w+)$/.exec(filename);
             console.log(match);
-            let type = msgType == 1 ? 'audio/mp4' : 'video';
+            let type = msgType == 1 ? `audio/${match[1]}` : 'video';
             formData.append('files', { uri: localUri, name: filename, type });
         }
 
@@ -436,6 +445,8 @@ class Inbox extends Component {
             status:0,
             connected:1
         }).then(response => {
+            console.log('dam msgType...', msgType);
+
             if(msgType == 1 || msgType == 2){
                 formData.append('id', JSON.stringify([ response.data.data.id ]));
                 axios.post(CONST.url + 'upload', formData).then(res => {
@@ -486,9 +497,9 @@ class Inbox extends Component {
         return (
             <Container style={{ backgroundColor: colors.darkBackground }}>
                 <NavigationEvents onWillFocus={() => this.onFocus()} />
-                <Header style={[styles.header , styles.plateformMarginTop]} noShadow>
+                <Header style={[styles.header , styles.plateformMarginTop, { height: 65 }]} noShadow>
                     <View style={[styles.headerView  , styles.animatedHeader ,{ backgroundColor: colors.darkBackground }]}>
-                        <Right style={styles.flex0}>
+                        <Right style={[styles.flex0, { height: 64, marginTop: 10 }]}>
                             <View style={{ flexDirection: 'row', marginTop: 33 }}>
                                 <View style={{ height: 40, width: 40, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
                                     <Image source={{ uri: data.image }} resizeMode={'cover'} style={{ width: 80, height: 80 }} />
@@ -525,7 +536,7 @@ class Inbox extends Component {
                                     }
                                 </ScrollView>
 
-                                <View style={{ backgroundColor: colors.inboxInputBackground, flexDirection:'row' , flex: 1, width: '100%',height:55, position:'absolute' , bottom:this.state.bottom, padding: 3, marginBottom: 6}}>
+                                <View style={{ backgroundColor: colors.inboxInputBackground, flexDirection:'row' , flex: 1, width: '100%',height:55, position:'absolute' , bottom: Platform.OS != 'ios' ? this.state.bottom : 0, padding: 3, marginBottom: 6}}>
                                     <View style={{ width: '84%', paddingHorizontal: 20, paddingBottom: 10, marginLeft: -15 }}>
                                         <View style={{ borderRadius: 30, borderWidth: 1, borderColor: colors.labelFont, height: 40, marginTop: 5, padding: 5, flexDirection: 'row', backgroundColor: colors.inboxInput  }}>
                                             <Item style={{ alignSelf: 'flex-start', borderBottomWidth: 0, top: -18, marginTop: 0 ,position:'absolute', width:'88%', paddingHorizontal: 5,  }} bordered>
@@ -557,13 +568,13 @@ class Inbox extends Component {
                                             showBackButton={true}
                                             audioMode={{
                                                 allowsRecordingIOS: true,
+												extension: '.m4a',
                                                 interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
                                                 playsInSilentModeIOS: true,
                                                 playsInSilentLockedModeIOS: true,
                                                 staysActiveInBackground: true,
                                                 shouldDuckAndroid: true,
-                                                interruptionModeAndroid:
-                                                Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
+                                                interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
                                                 playThroughEarpieceAndroid: false
                                             }}
                                             recordingCompleteButton={(renderProps) => {

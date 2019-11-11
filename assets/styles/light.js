@@ -107,11 +107,11 @@ const styles = ({
         flexGrow: 1
     },
     contentBackground: {
-        backgroundColor: '#fff5dd',
+        // backgroundColor: '#fff5dd',
         flex: 1,
     },
     plateformMarginTop:{
-        marginTop:Platform.OS === 'ios' ? 10 : 40,
+        marginTop:Platform.OS === 'ios' ? 20 : 40,
     },
     keyboardAvoid: {
         width:'100%',
@@ -458,7 +458,8 @@ const styles = ({
     },
     header : {
         zIndex: 9999999,
-        height: 55,
+        height: 60,
+        marginVertical: 5,
         backgroundColor: 'transparent',
         borderBottomWidth:0,
         paddingLeft: 0,
