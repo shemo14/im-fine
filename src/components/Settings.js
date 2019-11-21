@@ -8,10 +8,9 @@ import i18n from '../../locale/i18n'
 import {NavigationEvents} from "react-navigation";
 import themeImages from '../consts/Images'
 import { connect } from 'react-redux';
-import { chooseTheme, chooseLang } from '../actions'
+import { chooseTheme, chooseLang, batteryStatus } from '../actions'
 import CONST from '../consts';
 import axios from 'axios';
-import {logout, tempAuth} from "../actions";
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
@@ -22,7 +21,7 @@ class Settings extends Component {
         this.state = {
             theme: this.props.theme,
             SwitchOnValueHolder: true,
-            SwitchOnValueHolder2: false,
+            SwitchOnValueHolder2: this.props.battery,
 			lang: this.props.lang,
 			batteryLevel: null
         }
@@ -61,9 +60,7 @@ class Settings extends Component {
 
 
 	stopNotification = (value) =>{
-		this.setState({  SwitchOnValueHolder:!this.state.SwitchOnValueHolder})
-
-        // alert(value)
+		this.setState({  SwitchOnValueHolder:!this.state.SwitchOnValueHolder});
 
 		axios({
 			method: 'POST',
@@ -83,9 +80,9 @@ class Settings extends Component {
         drawerIcon: (<Image source={require('../../assets/images/light_mode/cog.png')} style={{width:29 , height:29}} resizeMode={'contain'} /> )
     })
 
-
     stopBattery = (value) =>{
-        this.setState({  SwitchOnValueHolder2:!this.state.SwitchOnValueHolder2})
+        this.setState({  SwitchOnValueHolder2:!this.state.SwitchOnValueHolder2});
+		this.props.batteryStatus(value);
     };
 
     setTheme(theme){
@@ -234,12 +231,13 @@ class Settings extends Component {
     }
 }
 
-const mapStateToProps = ({ lang, profile, theme }) => {
+const mapStateToProps = ({ lang, profile, theme, battery }) => {
     return {
         lang: lang.lang,
         user: profile.user,
+		battery: battery.batteryNotify,
         theme: theme.theme
     };
 };
 
-export default connect(mapStateToProps, { chooseTheme, chooseLang })(Settings);
+export default connect(mapStateToProps, { chooseTheme, chooseLang, batteryStatus })(Settings);

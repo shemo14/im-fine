@@ -14,6 +14,7 @@ import {Notifications} from "expo";
 import axios from 'axios';
 import CONST from '../consts';
 import * as Audio from "expo-av/build/Audio";
+import * as Battery from "expo-battery";
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
@@ -64,6 +65,31 @@ class Home extends Component {
 
         this.hideTimePicker();
     };
+
+
+	async _subscribe(){
+		let batteryLevel = await Battery.getBatteryLevelAsync();
+
+		if (!this.props.battery){
+			this._interval = setInterval(() => {
+				if ((batteryLevel*100) <= 15){
+					this.sendNotificationImmediately()
+				}
+			}, 60000);
+		}
+
+	};
+
+	sendNotificationImmediately = async () => {
+		let notificationId = await Notifications.presentLocalNotificationAsync({
+			title: i18n.t('batteryLow'),
+			body: i18n.t('batteryLowBody'),
+			android: {
+				channelId: 'battery-notify'
+			}
+		});
+		console.log(notificationId); // can be saved in AsyncStorage or send to server
+	};
 
     search(search){
         this.setState({ loader: true });
@@ -172,8 +198,9 @@ class Home extends Component {
 		}
 	}
 
-	componentDidMount(){
+	async componentDidMount(){
 		Notifications.addListener(this.handleNotification);
+		this._subscribe()
 	}
 
 	handleNotification = (notification) => {
@@ -226,6 +253,37 @@ class Home extends Component {
         }
     }
 
+    renderMsg(room, images, colors){
+        if (room.type == 0){
+            return (
+                <View>
+					<Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>{ room.msg }</Text>
+                </View>
+            )
+        } else if(room.type == 1){
+            return (
+				<View style={{ flexDirection: 'row' }}>
+                    <Image source={images.video_player} style={{ width: 20, height: 20, marginHorizontal: 5 }} resizeMode={'contain'}/>
+					<Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>{ i18n.t('video') }</Text>
+				</View>
+            )
+        } else if(room.type == 2){
+            return (
+				<View style={{ flexDirection: 'row' }}>
+                    <Image source={images.music_player} style={{ width: 20, height: 20, marginHorizontal: 5 }} resizeMode={'contain'}/>
+					<Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>{ i18n.t('audio') }</Text>
+				</View>
+            )
+        } else if(room.type == 4){
+            return (
+				<View style={{ flexDirection: 'row' }}>
+                    <Image source={images.pin} style={{ width: 20, height: 20, marginHorizontal: 5 }} resizeMode={'contain'}/>
+					<Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>{ i18n.t('location') }</Text>
+				</View>
+            )
+        }
+    }
+
     renderContent(styles, images, colors){
         if (this.state.type == 1){
             return (
@@ -239,7 +297,7 @@ class Home extends Component {
                                     </View>
                                     <View style={{ padding: 10 }}>
                                         <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', fontSize: 15, alignSelf: 'flex-start' }}>{ room.username }</Text>
-                                        <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>{ room.msg }</Text>
+                                        { this.renderMsg(room, images, colors) }
                                     </View>
                                     <View style={{ marginHorizontal: 20 , position: 'absolute', right: 2, top: 10}}>
                                         <Text style={{ color: colors.orange, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>{ room.date }</Text>
@@ -330,6 +388,7 @@ class Home extends Component {
 
     onFocus(){
         this.componentWillMount()
+        this.componentDidMount()
     }
 
     render() {
@@ -419,10 +478,11 @@ class Home extends Component {
     }
 }
 
-const mapStateToProps = ({ lang, profile, auth, theme }) => {
+const mapStateToProps = ({ lang, profile, auth, theme, battery }) => {
     return {
         lang: lang.lang,
         theme: theme.theme,
+		battery: battery.batteryNotify,
         user: profile.user,
         auth: auth.user
     };

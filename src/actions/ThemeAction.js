@@ -9,6 +9,19 @@ export const chooseTheme = theme => {
     }
 };
 
+export const batteryStatus = status => {
+	batteryNotify(status);
+
+	return {
+		type: 'batteryNotify',
+		payload: status
+	}
+};
+
 const setTheme = async theme => {
     await AsyncStorage.setItem('theme', theme);
+};
+
+const batteryNotify = async status => {
+    await AsyncStorage.setItem('batteryNotify', status);
 };

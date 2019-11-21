@@ -55,6 +55,10 @@ export default {
         star                    : require('../../assets/images/dark_mode/star.png'),
 		you_ok                  : require('../../assets/images/light_mode/you_ok.png'),
 		bg_splash               : require('../../assets/images/light_mode/bg_splash.png'),
+		tick                    : require('../../assets/images/dark_mode/tick.png'),
+		pin                     : require('../../assets/images/dark_mode/pin.png'),
+		music_player            : require('../../assets/images/dark_mode/music_player.png'),
+		video_player            : require('../../assets/images/dark_mode/video_player.png'),
     },
     darkImages: {
         big_logo                : require('../../assets/images/dark_mode/big_logo.png'),
@@ -104,5 +108,9 @@ export default {
         star                    : require('../../assets/images/dark_mode/star.png'),
 		you_ok                  : require('../../assets/images/dark_mode/you_ok.png'),
 		bg_splash               : require('../../assets/images/dark_mode/bg_splash.png'),
+		tick                    : require('../../assets/images/dark_mode/tick_yellow.png'),
+		pin                     : require('../../assets/images/dark_mode/pin.png'),
+		music_player            : require('../../assets/images/dark_mode/music_player.png'),
+		video_player            : require('../../assets/images/dark_mode/video_player.png'),
     }
 }

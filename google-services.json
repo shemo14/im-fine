@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "527043067563",
+    "firebase_url": "https://im-fine-7220a.firebaseio.com",
+    "project_id": "im-fine-7220a",
+    "storage_bucket": "im-fine-7220a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:527043067563:android:8cf971b3d7b6594805c1ee",
+        "android_client_info": {
+          "package_name": "com.app.imfine"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "527043067563-ud5dqf1pqtptosnaaglts5hq89fevt2d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAqxtB-OtCHby29S7SxjNB5mXlxq_DsFoI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "527043067563-ud5dqf1pqtptosnaaglts5hq89fevt2d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

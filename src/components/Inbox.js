@@ -68,7 +68,7 @@ class Inbox extends Component {
     }
 
     async componentWillMount() {
-        this.setState({ loader: true });
+    //    this.setState({ loader: true });
         const data = this.props.navigation.state.params.data;
         axios.post(CONST.url + 'room', { room: data.room, user_id: this.props.user.id, r_id: data.other }).then(response => {
            this.setState({ messages: response.data.data, loader: false });
@@ -228,7 +228,7 @@ class Inbox extends Component {
                     <View key={i} style={{ width: (width*80)/100, height: 200, backgroundColor: colors.sendMsg, borderRadius: 20, alignSelf: 'flex-start', marginHorizontal: 20, marginVertical: 10, marginBottom: (this.state.messages).length == i+1 ? 65 : 0 }}>
                         <View style={{ width: '100%', height: 160 }}>
                             <Video
-                                source={{ uri: message.file }}
+                                source={{ uri: message.msg }}
                                 rate={1.0}
                                 volume={1.0}
                                 isMuted={false}
@@ -258,7 +258,7 @@ class Inbox extends Component {
                                 style={{ flex: 1 }}
                                 completeButtonText={'Return Home'}
                                 sender={true}
-                                uri={'http://ahmed-taha.arabsdesign.com/ImFine/uploads/images/users/11-11-1915734816581348396041.mp4'}
+                                uri={message.msg}
                                 plyImg={images.play_button_big}
                                 pusImg={images.pause_button}
                                 showDebug={false}
@@ -332,7 +332,7 @@ class Inbox extends Component {
                     <View key={i} style={{ width: (width*80)/100, height: 200, backgroundColor: colors.sendMsg, borderRadius: 20, alignSelf: 'flex-start', marginHorizontal: 20, marginVertical: 10, marginBottom: (this.state.messages).length == i+1 ? 65 : 0 }}>
                         <View style={{ width: '100%', height: 160 }}>
                             <Video
-                                source={{ uri: message.file }}
+                                source={{ uri: message.msg }}
                                 rate={1.0}
                                 volume={1.0}
                                 isMuted={false}
@@ -358,7 +358,7 @@ class Inbox extends Component {
                             <Player
                                 style={{ flex: 1 }}
                                 completeButtonText={'Return Home'}
-                                uri={message.file}
+                                uri={message.msg}
                                 plyImg={images.play_button_big}
                                 pusImg={images.pause_button}
                                 showDebug={false}
@@ -380,12 +380,12 @@ class Inbox extends Component {
                                     );
                                 }}
                             />
-                            <View style={{ height: 35, width: 35, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center' }}>
-                                <Image source={images.person_two} resizeMode={'contain'} style={{ width: 50, height: 50 }} />
+                            <View style={{ height: 35, width: 35, borderRadius: 50, borderWidth: 2, overflow: 'hidden', borderColor: '#9f8f75', justifyContent: 'center', alignItems: 'center', marginHorizontal: 5 }}>
+                                <Image source={{ uri: message.receiver_img }} resizeMode={'contain'} style={{ width: 50, height: 50 }} />
                             </View>
                         </View>
                         <View style={{ flexDirection: 'row', alignSelf: 'flex-start', marginTop: 5 }}>
-                            <Text style={{ color: colors.receiverFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 12 }}>{message.date}</Text>
+                            <Text style={{ color: colors.receiverFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 12 }}>{message.date}  {message.id}</Text>
                             <Image source={images.tick_blue} resizeMode={'contain'} style={{ width: 15, height: 15, marginTop: 2, marginHorizontal: 4  }} />
                         </View>
                     </View>
@@ -518,9 +518,9 @@ class Inbox extends Component {
                         </Left>
                     </View>
                 </Header>
-                <Content style={{ backgroundColor: colors.darkBackground, marginTop: -25 }} contentContainerStyle={{ flexGrow: 1 }}>
+                <Content style={{ backgroundColor: colors.darkBackground, marginTop: -30 }} contentContainerStyle={{ flexGrow: 1 }}>
                     <View>
-                        <View style={{ marginTop: 10, backgroundColor: colors.lightBackground, borderTopColor: colors.pageBorder, borderTopWidth: 1, height: height-80}}>
+                        <View style={{ backgroundColor: colors.lightBackground, borderTopColor: colors.pageBorder, borderTopWidth: 1, height: height-80}}>
                             <View style={{width: 0, height: 0, backgroundColor: 'transparent', borderStyle: 'solid', borderLeftWidth: 50, borderTopWidth: 50, borderLeftColor: 'transparent', borderTopColor: colors.darkBackground, right: 0, position: 'absolute', top: -1 }} />
                             <View style={{ height: 10, width: '100%' }}/>
                             <View style={{ width: 1, height: 70, backgroundColor: colors.pageBorder, transform: I18nManager.isRTL ? [{ rotate: '45deg'}] : [{ rotate: '-45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
@@ -663,7 +663,7 @@ class Inbox extends Component {
                                 </View>
                             </View>
                             <TouchableOpacity style={{ flex: 1, marginTop: 15, marginRight: -10 }} onPress={() => this.sendMsg(4)}>
-                                <Image source={require('../../assets/images/dark_mode/tick.png')} style={{ width: 25, height: 25 }} resizeMode={'contain'} />
+                                <Image source={images.tick} style={{ width: 25, height: 25 }} resizeMode={'contain'} />
                             </TouchableOpacity>
                         </View>
                     </View>

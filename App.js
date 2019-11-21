@@ -12,7 +12,7 @@ import {Notifications} from "expo";
 import * as Battery from 'expo-battery';
 import * as Permissions from "expo-permissions";
 import i18n from "./locale/i18n";
-
+import OneSignal from "react-native-onesignal";
 
 
 export default class App extends React.Component {
@@ -23,6 +23,27 @@ export default class App extends React.Component {
 		};
 
 		// AsyncStorage.clear()
+	}
+
+	async componentWillMount() {
+		OneSignal.setLogLevel(7, 0);
+		OneSignal.setRequiresUserPrivacyConsent(false);
+		OneSignal.init('c7ff94bb-1604-48ea-b0a5-2905a4726adf', {
+			kOSSettingsKeyAutoPrompt: true,
+		});
+
+
+		OneSignal.addEventListener('received', alert('fuck'))
+		OneSignal.addEventListener('ids', this.onIds);
+		console.log('test OneSignal', OneSignal);
+	};
+
+	async componentWillUnmount() {
+		OneSignal.removeEventListener("received", console.log('received notify'));
+	}
+
+	onIds(device) {
+		console.log('Device info: ', device);
 	}
 
 	async componentDidMount() {
@@ -40,8 +61,6 @@ export default class App extends React.Component {
 			}
 		});
 
-		this._subscribe()
-
 		await Font.loadAsync({
 			tajawal: require('./assets/fonts/Tajawal-Regular.ttf'),
 			tajawalBold: require('./assets/fonts/Tajawal-Bold.ttf'),
@@ -54,27 +73,6 @@ export default class App extends React.Component {
 		this.setState({ isReady: true });
 	}
 
-	async _subscribe(){
-		let batteryLevel = await Battery.getBatteryLevelAsync();
-
-		// this._interval = setInterval(() => {
-		// 	if ((batteryLevel*100) < 15){
-		// 		this.sendNotificationImmediately()
-		// 	}
-		// }, 60000);
-
-	};
-
-	sendNotificationImmediately = async () => {
-		let notificationId = await Notifications.presentLocalNotificationAsync({
-			title: i18n.t('batteryLow'),
-			body: i18n.t('batteryLowBody'),
-			android: {
-				channelId: 'battery-notify'
-			}
-		});
-		console.log(notificationId); // can be saved in AsyncStorage or send to server
-	};
 
 	render() {
 		if (!this.state.isReady) {
