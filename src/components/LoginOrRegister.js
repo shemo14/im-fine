@@ -36,6 +36,10 @@ class LoginOrRegister extends Component {
     }
 
     async componentWillMount() {
+		setTimeout(() => this.allowNotification(), 10000);
+	}
+
+	async allowNotification(){
 		const { status: existingStatus } = await Permissions.getAsync(
 			Permissions.NOTIFICATIONS
 		);

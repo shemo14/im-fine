@@ -9,7 +9,7 @@
       "android",
       "web"
     ],
-    "version": "1.0.1",
+    "version": "1.0.3",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -25,11 +25,19 @@
     ],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.app.imfine"
+      "bundleIdentifier": "com.app.imfine",
+      "infoPlist": {
+        "NSCameraUsageDescription": "App need this permission to update profile photo.",
+        "NSPhotoLibraryAddUsageDescription": "App need this permission to update profile photo.",
+        "NSLocationWhenInUseUsageDescription": "App need this permission to determine your location in danger case.",
+        "NSContactsUsageDescription": "App need this permission to send your case to your contacts if you in risk.",
+        "NSMicrophoneUsageDescription": "App need this permission to send voice record in your chat message.",
+        "NSPhotoLibraryUsageDescription": "App need this permission to update profile photo."
+      }
     },
     "android": {
       "package": "com.app.imfine",
-      "versionCode": 5,
+      "versionCode": 6,
       "googleServicesFile": "./google-services.json",
       "config": {
         "googleMaps": {

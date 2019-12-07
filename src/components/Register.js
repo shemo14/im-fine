@@ -1,6 +1,20 @@
 import React, { Component } from "react";
 import { View, Text, Image, TouchableOpacity, ImageBackground, I18nManager, Dimensions} from "react-native";
-import {Container, Content, Form, Item, Input, Label, Button, Toast, CheckBox, Picker} from 'native-base'
+import {
+	Container,
+	Content,
+	Form,
+	Item,
+	Input,
+	Label,
+	Button,
+	Toast,
+	CheckBox,
+	Picker,
+	Right,
+	Body,
+	Left, Header
+} from 'native-base'
 import lightStyles from '../../assets/styles/light'
 import darkStyles from '../../assets/styles/dark'
 import COLORS from '../consts/colors'
@@ -108,17 +122,16 @@ class Register extends Component {
 
     async componentWillMount() {
 
-        const deviceId = await Notifications.getExpoPushTokenAsync();
-        this.setState({ deviceId });
-
-
-        axios.get(CONST.url + 'codes').then(response => {
-            this.setState({ countries: response.data.data, loader: false })
-        })
+		axios.get(CONST.url + 'codes').then(response => {
+			this.setState({ countries: response.data.data, loader: false })
+		});
 
 		axios.post(CONST.url + 'terms', { lang: this.props.lang }).then(response => {
 			this.setState({ terms: response.data.data.terms, })
-		})
+		});
+
+        const deviceId = await Notifications.getExpoPushTokenAsync();
+        this.setState({ deviceId });
 
         let { status } = await Permissions.askAsync(Permissions.LOCATION);
         if (status !== 'granted') {
@@ -145,10 +158,7 @@ class Register extends Component {
         }
     }
 
-    onFocus(){}
-
-
-
+ //   onFocus(){}
 
 
     onLoginPressed() {
@@ -182,14 +192,11 @@ class Register extends Component {
             }).catch(error => {
                 console.log(error.message)
             });
-
         }
     }
 
 
-    render_submit(colors)
-    {
-
+    render_submit(colors){
         if (this.state.isSubmitted){
             return(
                 <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 20 }}>
@@ -227,9 +234,24 @@ class Register extends Component {
         return (
             <Container style={{ backgroundColor: colors.darkBackground }}>
                 <NavigationEvents onWillFocus={() => this.onFocus()} />
+				<Header style={[styles.header , styles.plateformMarginTop, { height: 30 }]} noShadow>
+					<View style={[styles.headerView  , styles.animatedHeader ,{ backgroundColor: colors.darkBackground }]}>
+						<Right style={styles.flex0}>
+							<TouchableOpacity onPress={() => this.props.navigation.openDrawer()} style={{ flexDirection: 'row', marginTop: 20 }}>
+								<Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 15 , color: colors.labelFont }} />
+							</TouchableOpacity>
+						</Right>
+						<Body style={[styles.headerText , styles.headerTitle]} />
+						<Left style={styles.flex0}>
+							<TouchableOpacity onPress={() => this.props.navigation.goBack()} style={{ marginTop: 20 }}>
+								<Image source={images.back} style={{ width: 25, height: 25, margin: 5, marginTop: 15, transform: I18nManager.isRTL ? [{rotateY : '0deg'}] : [{rotateY : '-180deg'}] }} resizeMode={'contain'} />
+							</TouchableOpacity>
+						</Left>
+					</View>
+				</Header>
                 <Content contentContainerStyle={{ flexGrow: 1 }}>
                     <View style={styles.contentBackground}>
-                        <View style={{ alignItems: 'center', marginTop: 60 }}>
+                        <View style={{ alignItems: 'center', marginTop: 10 }}>
                             <ImageBackground source={images.bg_for_pic} style={{ width: 100, height: 100, alignItems: 'center', justifyContent: 'center' }}>
                                 <TouchableOpacity onPress={this._pickImage} style={{ alignSelf: 'center' }}>
                                     {image == null ?
@@ -239,7 +261,7 @@ class Register extends Component {
                                 </TouchableOpacity>
                             </ImageBackground>
                         </View>
-                        <Form style={{ width: '100%', paddingHorizontal: 40, marginTop: 20 }}>
+                        <Form style={{ width: '100%', paddingHorizontal: 40, marginTop: 10 }}>
                             <View style={{ borderRadius: 3, borderWidth: 1, borderColor: colors.labelFont, height: 45,marginTop: 10, padding: 5, flexDirection: 'row'  }}>
                                 <Item style={{ alignSelf: 'flex-start', borderBottomWidth: 0, top: -18, marginTop: 0 ,position:'absolute', width:'88%', paddingHorizontal: 5 }} bordered>
                                     <Label style={{ top:5, paddingRight: 10, paddingLeft: 10, backgroundColor: colors.darkBackground, alignSelf: 'flex-start', color: colors.labelFont, fontSize: 14, position: 'absolute' }}>{ i18n.t('username') }</Label>
@@ -316,7 +338,7 @@ class Register extends Component {
                             <View style={{ width: 1, height: 90, backgroundColor: '#ddd', transform: I18nManager.isRTL ? [{ rotate: '45deg'}] : [{ rotate: '-45deg'}], right: 47, position: 'absolute', top: -13 }} />
                             <Image source={images.small_logo} style={{ width: 120, height: 120, alignSelf: 'center', marginTop: -55 }} resizeMode={'contain'}/>
                             <View style={{ padding: 25 }}>
-                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 16, lineHeight: 22 }}> { this.state.terms } </Text>
+                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 16, lineHeight: 22, textAlign: 'center' }}> { this.state.terms } </Text>
                             </View>
                         </View>
                         <View style={{ bottom: 30, flex: 1, alignSelf: 'center', alignItems: 'center', position: 'absolute' }}>

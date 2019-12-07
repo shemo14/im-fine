@@ -32,7 +32,7 @@ class Inbox extends Component {
             type: 1,
             isTimePickerVisible: false,
             timeType: 'start',
-            fadeAnim: new Animated.Value(-55),
+            fadeAnim: new Animated.Value(-100),
             availabel: 0,
             search: '',
             messages: [],
@@ -173,7 +173,7 @@ class Inbox extends Component {
             Animated.timing(
                 this.state.fadeAnim,
                 {
-                    toValue: -55,
+                    toValue: -100,
                     duration: 800,
                 },
             ).start();
@@ -497,7 +497,7 @@ class Inbox extends Component {
         return (
             <Container style={{ backgroundColor: colors.darkBackground }}>
                 <NavigationEvents onWillFocus={() => this.onFocus()} />
-                <Header style={[styles.header , styles.plateformMarginTop, { height: 65 }]} noShadow>
+                <Header style={[styles.header , styles.plateformMarginTop, { height:  Platform.OS == 'ios' ? 75 : 65 }]} noShadow>
                     <View style={[styles.headerView  , styles.animatedHeader ,{ backgroundColor: colors.darkBackground }]}>
                         <Right style={[styles.flex0, { height: 64, marginTop: 10 }]}>
                             <View style={{ flexDirection: 'row', marginTop: 33 }}>
@@ -518,14 +518,15 @@ class Inbox extends Component {
                         </Left>
                     </View>
                 </Header>
+
                 <Content style={{ backgroundColor: colors.darkBackground, marginTop: -30 }} contentContainerStyle={{ flexGrow: 1 }}>
                     <View>
-                        <View style={{ backgroundColor: colors.lightBackground, borderTopColor: colors.pageBorder, borderTopWidth: 1, height: height-80}}>
+                        <View style={{ backgroundColor: colors.lightBackground, borderTopColor: colors.pageBorder, borderTopWidth: 1, height: Platform.OS == 'ios' ? height-70 : height-80}}>
                             <View style={{width: 0, height: 0, backgroundColor: 'transparent', borderStyle: 'solid', borderLeftWidth: 50, borderTopWidth: 50, borderLeftColor: 'transparent', borderTopColor: colors.darkBackground, right: 0, position: 'absolute', top: -1 }} />
                             <View style={{ height: 10, width: '100%' }}/>
                             <View style={{ width: 1, height: 70, backgroundColor: colors.pageBorder, transform: I18nManager.isRTL ? [{ rotate: '45deg'}] : [{ rotate: '-45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
                             { this.renderLoader(colors) }
-                            <KeyboardAvoidingView behavior={'height'} style={{width:'100%', flexDirection:'column', flex: 1, zIndex: -1, marginTop: -77 }}>
+                            <KeyboardAvoidingView behavior={ Platform.OS == 'ios' ? 'padding' : 'height'} style={{width:'100%', flexDirection:'column', flex: 1, zIndex: -1, marginTop: -77 }}>
                                 <ScrollView
                                     ref={ref => this.scrollView = ref}
                                     onContentSizeChange={(contentWidth, contentHeight)=>{
@@ -536,7 +537,7 @@ class Inbox extends Component {
                                     }
                                 </ScrollView>
 
-                                <View style={{ backgroundColor: colors.inboxInputBackground, flexDirection:'row' , flex: 1, width: '100%',height:55, position:'absolute' , bottom: Platform.OS != 'ios' ? this.state.bottom : 0, padding: 3, marginBottom: 6}}>
+                                <View style={{ backgroundColor: colors.inboxInputBackground, flexDirection:'row' , flex: 1, width: '100%',height:55, position:'absolute' , bottom: Platform.OS != 'ios' ? this.state.bottom : 0, padding: 3 }}>
                                     <View style={{ width: '84%', paddingHorizontal: 20, paddingBottom: 10, marginLeft: -15 }}>
                                         <View style={{ borderRadius: 30, borderWidth: 1, borderColor: colors.labelFont, height: 40, marginTop: 5, padding: 5, flexDirection: 'row', backgroundColor: colors.inboxInput  }}>
                                             <Item style={{ alignSelf: 'flex-start', borderBottomWidth: 0, top: -18, marginTop: 0 ,position:'absolute', width:'88%', paddingHorizontal: 5,  }} bordered>
@@ -555,7 +556,7 @@ class Inbox extends Component {
                                         <Image source={images.microphone} style={{ width: 25, height: 25 }} resizeMode={'contain'} />
                                     </TouchableOpacity>
                                 </View>
-                                <Animated.View style={{ backgroundColor: colors.inboxInputBackground, flexDirection:'row' , flex: 1, width: '100%',height: 55, position:'absolute' , bottom: this.state.fadeAnim, padding: 3, marginBottom: 6}}>
+                                <Animated.View style={{ backgroundColor: colors.inboxInputBackground, flexDirection:'row' , flex: 1, width: '100%',height: 55, position:'absolute' , bottom: this.state.fadeAnim, padding: 3 }}>
                                     <View style={{ width: '84%', paddingHorizontal: 20, paddingBottom: 10, marginLeft: -15 }}>
                                         <Recorder
                                             style={{flex: 1}}

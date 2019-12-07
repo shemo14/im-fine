@@ -73,7 +73,7 @@ class Home extends Component {
 		if (!this.props.battery){
 			this._interval = setInterval(() => {
 				if ((batteryLevel*100) <= 15){
-					this.sendNotificationImmediately()
+					// this.sendNotificationImmediately()
 				}
 			}, 60000);
 		}

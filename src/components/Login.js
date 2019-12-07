@@ -1,6 +1,29 @@
 import React, { Component } from "react";
-import {View, Image, TouchableOpacity, I18nManager, Dimensions, AsyncStorage, ImageBackground} from "react-native";
-import {Container, Content, Form, Item, Input, Label, Button, Toast, CheckBox, Picker} from 'native-base'
+import {
+	View,
+	Image,
+	TouchableOpacity,
+	I18nManager,
+	Dimensions,
+	AsyncStorage,
+	ImageBackground,
+	Text
+} from "react-native";
+import {
+	Container,
+	Content,
+	Form,
+	Item,
+	Input,
+	Label,
+	Button,
+	Toast,
+	CheckBox,
+	Picker,
+	Right,
+	Body,
+	Left, Header
+} from 'native-base'
 import lightStyles from '../../assets/styles/light'
 import darkStyles from '../../assets/styles/dark'
 import COLORS from '../consts/colors'
@@ -90,7 +113,7 @@ class Login extends Component {
         }
 
         return (
-            <View style={{ bottom: 25, flex: 1, alignSelf: 'center', alignItems: 'center', position: 'absolute' }}>
+            <View style={{ marginTop: 150, flex: 1, alignSelf: 'center', alignItems: 'center', }}>
                 <TouchableOpacity onPress={() => this.onLoginPressed()} style={{ backgroundColor: colors.orange, width: 60, height: 60, transform: [{ rotate: '45deg'}], alignItems: 'center', justifyContent: 'center', alignSelf: 'center' }}>
                     <Image source={require('../../assets/images/dark_mode/tick.png')} style={{ height: 40, width: 40, transform: [{ rotate: '-45deg'}] }} resizeMode={'contain'} />
                 </TouchableOpacity>
@@ -150,14 +173,29 @@ class Login extends Component {
         return (
             <Container style={{ backgroundColor: colors.darkBackground }}>
                 <NavigationEvents onWillFocus={() => this.onFocus()} />
+				<Header style={[styles.header , styles.plateformMarginTop, { height: 30 }]} noShadow>
+					<View style={[styles.headerView  , styles.animatedHeader ,{ backgroundColor: colors.darkBackground }]}>
+						<Right style={styles.flex0}>
+							<TouchableOpacity onPress={() => this.props.navigation.openDrawer()} style={{ flexDirection: 'row', marginTop: 20 }}>
+								<Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 15 , color: colors.labelFont }} />
+							</TouchableOpacity>
+						</Right>
+						<Body style={[styles.headerText , styles.headerTitle]} />
+						<Left style={styles.flex0}>
+							<TouchableOpacity onPress={() => this.props.navigation.goBack()} style={{ marginTop: 20 }}>
+								<Image source={images.back} style={{ width: 25, height: 25, margin: 5, marginTop: 15, transform: I18nManager.isRTL ? [{rotateY : '0deg'}] : [{rotateY : '-180deg'}] }} resizeMode={'contain'} />
+							</TouchableOpacity>
+						</Left>
+					</View>
+				</Header>
                 <Content contentContainerStyle={{ flexGrow: 1 }}>
 					<ImageBackground source={images.bg_splash} resizeMode={'cover'} style={styles.imageBackgroundStyle}>
                         { this.renderLoader(colors) }
                         <View style={styles.contentBackground}>
-                            <View style={{ alignItems: 'center', marginTop: 100 }}>
+                            <View style={{ alignItems: 'center', marginTop: 40 }}>
                                 <Image resizeMode={'contain'} source={images.big_logo} style={{ width: 120, height: 120, alignSelf: 'center' }} />
                             </View>
-                            <Form style={{ width: '100%', paddingHorizontal: 40, marginTop: 70 }}>
+                            <Form style={{ width: '100%', paddingHorizontal: 40, marginTop: 40 }}>
                                 <View>
                                     <Item style={[styles.itemPicker, { borderColor: colors.labelFont }]} regular >
                                         <Picker

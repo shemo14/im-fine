@@ -262,7 +262,7 @@ const styles = ({
     },
     imageBackgroundStyle: {
         width,
-        height,
+        height: '100%',
         flex: 1,
         alignItems: 'center',
         backgroundColor:'#0A8EBB'
