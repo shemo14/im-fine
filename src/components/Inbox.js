@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import { View, Text, Image, TouchableOpacity, Animated, I18nManager, Dimensions, KeyboardAvoidingView, ScrollView, Slider, Keyboard, Linking, Platform} from "react-native";
-import {Container, Content, Header, Left, Right, Body, Button, Icon, Item, Label, Input} from 'native-base'
+import { View, Text, Image, TouchableOpacity, Animated, I18nManager, Dimensions, KeyboardAvoidingView, ScrollView, Slider, Keyboard, Linking, NativeModules, Platform, StatusBarIOS} from "react-native";
+import {Container, Content, Header, Left, Right, Body, Item, Input} from 'native-base'
 import lightStyles from '../../assets/styles/light'
 import darkStyles from '../../assets/styles/dark'
 import COLORS from '../consts/colors'
@@ -17,12 +17,15 @@ import * as Permissions from "expo-permissions";
 import { connect } from 'react-redux';
 import {DoubleBounce} from "react-native-loader";
 import CONST from '../consts';
+import firebase from 'react-native-firebase';
 
 window.navigator.userAgent = 'react-native';
 import SocketIOClient from 'socket.io-client';
 
-const height = Dimensions.get('window').height;
-const width = Dimensions.get('window').width;
+const height                = Dimensions.get('window').height;
+const width                 = Dimensions.get('window').width;
+const IS_IPHONE_X 	        = (height === 812 || height === 896) && Platform.OS === 'ios';
+const {StatusBarManager}    = NativeModules;
 
 
 class Inbox extends Component {
@@ -50,7 +53,8 @@ class Inbox extends Component {
             initMap: true,
             loader: false,
             bottom: 0,
-            is_active: false
+            is_active: false,
+			statusBarHeight: 0
         };
 
         const data = this.props.navigation.state.params.data;
@@ -67,10 +71,14 @@ class Inbox extends Component {
         });
     }
 
+	componentWillUnmount() {
+		this.statusBarListener.remove();
+	}
+
     async componentWillMount() {
     //    this.setState({ loader: true });
         const data = this.props.navigation.state.params.data;
-        axios.post(CONST.url + 'room', { room: data.room, user_id: this.props.user.id, r_id: data.other }).then(response => {
+        axios.post(CONST.url + 'room', { room: data.room, user_id: this.props.user.id, r_id: data.other, lang: this.props.lang }).then(response => {
            this.setState({ messages: response.data.data, loader: false });
         });
 
@@ -96,12 +104,32 @@ class Inbox extends Component {
         // this.playAudio(1, 'file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540m_shams%252Fim-fine/Audio/recording-d35cb168-49ab-42f0-96ab-dde3202d4fa9.m4a')
     }
 
+	linkingToGoogleMap(lat, lng){
+		const scheme = Platform.select({ ios: 'maps:0,0?q=', android: 'geo:0,0?q=' });
+		const latLng = `${lat},${lng}`;
+		const label = 'Custom Label';
+		const url = Platform.select({
+			ios : `${scheme}${label}@${latLng}`,
+			android: `${scheme}${latLng}(${label})`,
+		});
+
+		Linking.openURL(url);
+    }
+
     joinRoom(data){
         this.socket.emit('subscribe', { room: data.room });
     }
 
     componentDidMount() {
-        this.keyboardDidShowListener = Keyboard.addListener(
+		StatusBarManager.getHeight((statusBarFrameData) => {
+			this.setState({statusBarHeight: statusBarFrameData.height});
+		});
+		this.statusBarListener = StatusBarIOS.addListener('statusBarFrameWillChange', (statusBarData) => {
+			this.setState({statusBarHeight: statusBarData.frame.height});
+		});
+
+
+		this.keyboardDidShowListener = Keyboard.addListener(
             'keyboardDidShow',
             () => this._keyboardDidShow(),
         );
@@ -197,7 +225,8 @@ class Inbox extends Component {
             }else if (message.type == 4){
                 return (
                     <View key={i} style={{ width: (width*80)/100, height: 200, backgroundColor: colors.sendMsg, borderRadius: 20, alignSelf: 'flex-start', marginHorizontal: 20, marginVertical: 10, marginBottom: (this.state.messages).length == i+1 ? 65 : 0 }}>
-                        <TouchableOpacity onPress={() => Linking.openURL('https://www.google.com/maps/place/' + message.lat + ',' + message.lng + '')} style={{ width: '100%', height: 160 }}>
+                        <TouchableOpacity onPress={() => this.linkingToGoogleMap(message.lat, message.lng)} style={{ width: '100%', height: 160 }}>
+                            <View  style={{ width: '100%', height: 160, backgroundColor: 'transparent' , zIndex: 1, position: 'absolute' }} />
                             {
                                 !this.state.initMap ? (
                                     <MapView
@@ -298,10 +327,11 @@ class Inbox extends Component {
                         </View>
                     </View>
                 );
-            }else if(message.type == 4){
+            }else if(message.type == 4){ //
                 return (
                     <View key={i} style={{ width: (width*80)/100, height: 200, backgroundColor: colors.receiverMsg, borderRadius: 20, alignSelf: 'flex-end', marginHorizontal: 20, marginVertical: 10, marginBottom: (this.state.messages).length == i+1 ? 65 : 0}}>
-                        <TouchableOpacity onPress={() => Linking.openURL('https://www.google.com/maps/place/' + message.lat + ',' + message.lng + '')} style={{ width: '100%', height: 160 }}>
+                        <TouchableOpacity onPress={() => this.linkingToGoogleMap(message.lat, message.lng)} style={{ width: '100%', height: 160 }}>
+							<View  style={{ width: '100%', height: 160, zIndex: 1, position: 'absolute' }} />
                             {
                                 !this.state.initMap ? (
                                     <MapView
@@ -443,6 +473,7 @@ class Inbox extends Component {
             lng: this.state.mapRegion.longitude,
             seen:0,
             status:0,
+            lang: this.props.lang,
             connected:1
         }).then(response => {
             console.log('dam msgType...', msgType);
@@ -473,11 +504,20 @@ class Inbox extends Component {
         this.props.navigation.goBack();
     }
 
+    behavior(){
+        if (IS_IPHONE_X) return 'position';
+        else if(Platform.OS == 'ios') return 'padding';
+        else return 'height';
+    }
+
     onFocus(){
 
     }
 
     render() {
+
+        console.log('behavior __', this.behavior(), this.state.bottom);
+
         let styles  = lightStyles;
         let images  = themeImages.lightImages;
         let colors  = COLORS;
@@ -497,7 +537,7 @@ class Inbox extends Component {
         return (
             <Container style={{ backgroundColor: colors.darkBackground }}>
                 <NavigationEvents onWillFocus={() => this.onFocus()} />
-                <Header style={[styles.header , styles.plateformMarginTop, { height:  Platform.OS == 'ios' ? 75 : 65 }]} noShadow>
+                <Header style={[styles.header , styles.plateformMarginTop, { height: IS_IPHONE_X ? 90 : 75 }]} noShadow>
                     <View style={[styles.headerView  , styles.animatedHeader ,{ backgroundColor: colors.darkBackground }]}>
                         <Right style={[styles.flex0, { height: 64, marginTop: 10 }]}>
                             <View style={{ flexDirection: 'row', marginTop: 33 }}>
@@ -519,14 +559,14 @@ class Inbox extends Component {
                     </View>
                 </Header>
 
-                <Content style={{ backgroundColor: colors.darkBackground, marginTop: -30 }} contentContainerStyle={{ flexGrow: 1 }}>
+                <Content bounces={false} scrollEnabled={false} style={{ backgroundColor: colors.darkBackground, marginTop: IS_IPHONE_X ? -10 : -30 }} contentContainerStyle={{ flexGrow: 1 }}>
                     <View>
-                        <View style={{ backgroundColor: colors.lightBackground, borderTopColor: colors.pageBorder, borderTopWidth: 1, height: Platform.OS == 'ios' ? height-70 : height-80}}>
+                        <View style={{ backgroundColor: colors.lightBackground, borderTopColor: colors.pageBorder, borderTopWidth: 1, height: IS_IPHONE_X ? height-150 : height-80}}>
                             <View style={{width: 0, height: 0, backgroundColor: 'transparent', borderStyle: 'solid', borderLeftWidth: 50, borderTopWidth: 50, borderLeftColor: 'transparent', borderTopColor: colors.darkBackground, right: 0, position: 'absolute', top: -1 }} />
                             <View style={{ height: 10, width: '100%' }}/>
                             <View style={{ width: 1, height: 70, backgroundColor: colors.pageBorder, transform: I18nManager.isRTL ? [{ rotate: '45deg'}] : [{ rotate: '-45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
                             { this.renderLoader(colors) }
-                            <KeyboardAvoidingView behavior={ Platform.OS == 'ios' ? 'padding' : 'height'} style={{width:'100%', flexDirection:'column', flex: 1, zIndex: -1, marginTop: -77 }}>
+                            <KeyboardAvoidingView keyboardVerticalOffset={50 + this.state.statusBarHeight} behavior={this.behavior()} style={{width:'100%', flexDirection:'column', flex: 1, zIndex: -1, marginTop: -77 }}>
                                 <ScrollView
                                     ref={ref => this.scrollView = ref}
                                     onContentSizeChange={(contentWidth, contentHeight)=>{

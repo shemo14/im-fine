@@ -84,8 +84,9 @@ class VideoRecorder extends React.Component {
         const record = await this.camera.recordAsync({ quality: '360' , maxDuration: 30})
 
             .then((data) => {
-				this.props.navigation.navigate('notFine' , {
-					recording : data
+                const mapRegion = this.props.navigation.state.params.mapRegion;
+				this.props.navigation.navigate('home' , {
+					recording : data, mapRegion
 				});
             }).catch((err) => {
 
@@ -99,8 +100,6 @@ class VideoRecorder extends React.Component {
 
         await this.camera.stopRecording();
         this.setState(state => ({ ...state, recording: false, duration: 0 }));
-
-
 
     }
 
@@ -212,7 +211,8 @@ const styles = StyleSheet.create({
     containerCenter: {
         flex: 1,
         flexDirection: 'column',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        backgroundColor: '#000'
     },
     containerCamera: {
         flex: 1,

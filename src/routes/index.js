@@ -27,6 +27,8 @@ const CustomDrawerContentComponent = (props) => (<CustomDrawer { ...props }/>);
 const DrawerNavigator = createDrawerNavigator({
     home: Home,
     profile: Profile,
+	emergencyList: EmergencyList,
+	confirmStatus: ConfirmStatus,
     complaint: Complaint,
     shareApp: ShareApp,
 	areUFine: AreUFine,
@@ -119,14 +121,14 @@ const appStack = createStackNavigator({
 	},
 });
 const authStack = createStackNavigator({
-    init: {screen: InitScreen, navigationOptions: {header: null}},
     login: {screen: Login, navigationOptions: {header: null}},
-    activeCode: {screen: ActiveCode, navigationOptions: {header: null}},
     register: {screen: Register, navigationOptions: {header: null}},
+	activeCode: {screen: ActiveCode, navigationOptions: {header: null}},
     loginOrRegister: {screen: LoginOrRegister, navigationOptions: {header: null}},
 });
 
 const AppNavigator = createSwitchNavigator({
+	init: {screen: InitScreen, navigationOptions: {header: null}},
     auth: authStack,
     app: appStack,
 });

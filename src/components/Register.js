@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, Image, TouchableOpacity, ImageBackground, I18nManager, Dimensions} from "react-native";
+import { View, Text, Image, TouchableOpacity, ImageBackground, I18nManager, Dimensions, ScrollView, AsyncStorage} from "react-native";
 import {
 	Container,
 	Content,
@@ -32,8 +32,6 @@ import themeImages from '../consts/Images'
 import axios from 'axios'
 import Modal from "react-native-modal";
 import CONST from "../consts";
-import {AsyncStorage} from "react-native-web";
-import {Notifications} from "expo";
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
@@ -83,19 +81,21 @@ class Register extends Component {
         }else if (this.state.location.length <= 0) {
             isError = true;
             msg = i18n.t('locationRequired');
-        }else if (this.state.base64 === null) {
-            isError = true;
-            msg = i18n.t('base64Required');
         }else if(this.state.countryCode == null){
             isError = true;
             msg = i18n.t('countryValidation');
         }
+
         if (msg != ''){
             Toast.show({
                 text: msg,
                 type: "danger",
-                style : { fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' , textAlign : 'center'},
-                duration: 3000
+                duration: 3000,
+				textStyle   	: {
+					color       	: "white",
+					fontFamily  	: I18nManager.isRTL ? 'tajawal' : 'openSans',
+					textAlign   	: 'center'
+				}
             });
         }
         return isError;
@@ -130,12 +130,9 @@ class Register extends Component {
 			this.setState({ terms: response.data.data.terms, })
 		});
 
-        const deviceId = await Notifications.getExpoPushTokenAsync();
-        this.setState({ deviceId });
-
         let { status } = await Permissions.askAsync(Permissions.LOCATION);
         if (status !== 'granted') {
-            alert('صلاحيات تحديد موقعك الحالي ملغاه');
+            return;
         }else {
             const { coords: { latitude, longitude } } = await Location.getCurrentPositionAsync({});
             const userLocation = { latitude, longitude };
@@ -158,39 +155,45 @@ class Register extends Component {
         }
     }
 
- //   onFocus(){}
-
 
     onLoginPressed() {
         const err = this.validate();
         if (!err){
             this.setState({ isSubmitted: true });
 
-            axios.post(CONST.url + 'sign-up', {
-                phone: this.state.phone,
-                name: this.state.name,
-                country_code: this.state.countryCode,
-                email :this.state.email,
-                image : this.state.base64,
-                lang: this.props.lang ,
-                device_id :  this.state.deviceId,
-                lat : this.state.lat,
-                lng : this.state.lng,
-                address : this.state.location,
-            }).then(response => {
-                if(response.data.status == 200){
-                    this.setState({ isSubmitted: false });
-                    this.props.navigation.navigate('activeCode', { data: response.data.data, code: response.data.extra.code });
-                }else{
-                    this.setState({ isSubmitted: false });
-                    Toast.show({
-                        text: response.data.msg,
-                        type: "danger",
-                        duration: 3000
-                    });
-                }
-            }).catch(error => {
-                console.log(error.message)
+			AsyncStorage.getItem('fcmToken').then(device_id => {
+				console.log('device_id____', device_id);
+				axios.post(CONST.url + 'sign-up', {
+					phone: this.state.phone,
+					name: this.state.name,
+					country_code: this.state.countryCode,
+					email :this.state.email,
+					image : this.state.base64,
+					lang: this.props.lang ,
+					device_id,
+					lat : this.state.lat,
+					lng : this.state.lng,
+					address : this.state.location,
+				}).then(response => {
+					if(response.data.status == 200){
+						this.setState({ isSubmitted: false });
+						this.props.navigation.navigate('activeCode', { data: response.data.data, code: response.data.extra.code, device_id, register: true });
+					}else{
+						this.setState({ isSubmitted: false });
+						Toast.show({
+							text: response.data.msg,
+							type: "danger",
+							duration: 3000,
+							textStyle   	: {
+								color       	: "white",
+								fontFamily  	: I18nManager.isRTL ? 'tajawal' : 'openSans',
+								textAlign   	: 'center'
+							}
+						});
+					}
+				}).catch(error => {
+					console.log('error_', error.message)
+				});
             });
         }
     }
@@ -233,12 +236,12 @@ class Register extends Component {
 
         return (
             <Container style={{ backgroundColor: colors.darkBackground }}>
-                <NavigationEvents onWillFocus={() => this.onFocus()} />
+                {/*<NavigationEvents onWillFocus={() => this.onFocus()} />*/}
 				<Header style={[styles.header , styles.plateformMarginTop, { height: 30 }]} noShadow>
 					<View style={[styles.headerView  , styles.animatedHeader ,{ backgroundColor: colors.darkBackground }]}>
 						<Right style={styles.flex0}>
 							<TouchableOpacity onPress={() => this.props.navigation.openDrawer()} style={{ flexDirection: 'row', marginTop: 20 }}>
-								<Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 15 , color: colors.labelFont }} />
+								<Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: colors.labelFont }} />
 							</TouchableOpacity>
 						</Right>
 						<Body style={[styles.headerText , styles.headerTitle]} />
@@ -264,14 +267,15 @@ class Register extends Component {
                         <Form style={{ width: '100%', paddingHorizontal: 40, marginTop: 10 }}>
                             <View style={{ borderRadius: 3, borderWidth: 1, borderColor: colors.labelFont, height: 45,marginTop: 10, padding: 5, flexDirection: 'row'  }}>
                                 <Item style={{ alignSelf: 'flex-start', borderBottomWidth: 0, top: -18, marginTop: 0 ,position:'absolute', width:'88%', paddingHorizontal: 5 }} bordered>
-                                    <Label style={{ top:5, paddingRight: 10, paddingLeft: 10, backgroundColor: colors.darkBackground, alignSelf: 'flex-start', color: colors.labelFont, fontSize: 14, position: 'absolute' }}>{ i18n.t('username') }</Label>
-                                    <Input value={this.state.name} placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('username') + '...'} onChangeText={(name) => this.setState({name})} style={{ width: '100%', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontSize: 15, top: 15 }} />
+                                    <Label style={{ top:5, paddingRight: 10, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', paddingLeft: 10, backgroundColor: colors.darkBackground, alignSelf: 'flex-start', color: colors.labelFont, position: 'absolute' }}>{ i18n.t('username') }</Label>
+                                    <Input value={this.state.name} placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('username') + '...'} onChangeText={(name) => this.setState({name})} style={{ width: '100%', color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', textAlign: I18nManager.isRTL ? 'right' : 'left', top: 15 }} />
                                  </Item>
                                 <Image source={images.user} style={{ height: 22, width: 22, right: 15, top: 9, position: 'absolute', flex: 1 }} resizeMode={'contain'} />
                             </View>
                             <View>
                                 <Item style={[styles.itemPicker, { borderColor: colors.labelFont }]} regular >
                                     <Picker
+										textStyle={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', }}
                                         mode="dropdown"
                                         style={[styles.picker, { color: colors.labelFont } ]}
                                         placeholderStyle={{ color: "#e5d7bb" }}
@@ -291,25 +295,24 @@ class Register extends Component {
                             </View>
                             <View style={{ borderRadius: 3, borderWidth: 1, borderColor: colors.labelFont, height: 45, marginTop: 20, padding: 5, flexDirection: 'row'  }}>
                                 <Item style={{ alignSelf: 'flex-start', borderBottomWidth: 0, top: -18, marginTop: 0 ,position:'absolute', width:'88%', paddingHorizontal: 5 }} bordered>
-                                    <Label style={{ top:5,  paddingRight: 10, paddingLeft: 10, backgroundColor: colors.darkBackground, alignSelf: 'flex-start', color: colors.labelFont, fontSize: 14, position: 'absolute' }}>{ i18n.t('phoneNumber') }</Label>
-                                    <Input value={this.state.phone}  placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('phoneNumber') + '...'} onChangeText={(phone) => this.setState({phone})} keyboardType={'number-pad'} style={{ width: '100%', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontSize: 15, top: 15 }}  />
+                                    <Label style={{ top:5, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', paddingRight: 10, paddingLeft: 10, backgroundColor: colors.darkBackground, alignSelf: 'flex-start', color: colors.labelFont, position: 'absolute' }}>{ i18n.t('phoneNumber') }</Label>
+                                    <Input value={this.state.phone}  placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('phoneNumber') + '...'} onChangeText={(phone) => this.setState({phone})} keyboardType={'number-pad'} style={{ width: '100%', color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', textAlign: I18nManager.isRTL ? 'right' : 'left', top: 15 }}  />
                                  </Item>
                                 <Image source={images.phone} style={{ height: 22, width: 22, right: 15, top: 9, position: 'absolute', flex: 1 }} resizeMode={'contain'} />
                             </View>
 
                             <View style={{ borderRadius: 3, borderWidth: 1, borderColor: colors.labelFont, height: 45, marginTop: 20, padding: 5, flexDirection: 'row'  }}>
                                 <Item style={{ alignSelf: 'flex-start', borderBottomWidth: 0, top: -18, marginTop: 0 ,position:'absolute', width:'88%', paddingHorizontal: 5 }} bordered>
-                                    <Label style={{ top:5,  paddingRight: 10, paddingLeft: 10, backgroundColor: colors.darkBackground, alignSelf: 'flex-start', color: colors.labelFont, fontSize: 14, position: 'absolute' }}>{ i18n.t('email') }</Label>
-                                    <Input  value={this.state.email} placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('email') + '...'} onChangeText={(email) => this.setState({email})} style={{ width: '100%', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontSize: 15, top: 15 }}  />
+                                    <Label style={{ top:5, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', paddingRight: 10, paddingLeft: 10, backgroundColor: colors.darkBackground, alignSelf: 'flex-start', color: colors.labelFont, position: 'absolute' }}>{ i18n.t('email') }</Label>
+                                    <Input  value={this.state.email} placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('email') + '...'} onChangeText={(email) => this.setState({email})} style={{ width: '100%', color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', textAlign: I18nManager.isRTL ? 'right' : 'left', top: 15 }}  />
                                  </Item>
                                 <Image source={images.email} style={{ height: 22, width: 22, right: 15, top: 9, position: 'absolute', flex: 1 }} resizeMode={'contain'} />
                             </View>
 
                             <View style={{ borderRadius: 3, borderWidth: 1, borderColor: colors.labelFont, height: 45, marginTop: 20, padding: 5, flexDirection: 'row'  }}>
                                 <Item style={{ alignSelf: 'flex-start', borderBottomWidth: 0, top: -18, marginTop: 0 ,position:'absolute', width:'88%', paddingHorizontal: 5 }} bordered>
-
-                                    <Label style={{ top:5,  paddingRight: 10, paddingLeft: 10, backgroundColor: colors.darkBackground, alignSelf: 'flex-start', color: colors.labelFont, fontSize: 14, position: 'absolute' }}>{ i18n.t('location') }</Label>
-                                    <Input value={this.state.location} disabled placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('location') + '...'} onChangeText={(phone) => this.setState({phone})} keyboardType={'number-pad'} style={{ width: '100%', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontSize: 15, top: 15 }}  />
+                                    <Label style={{ top:5, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', paddingRight: 10, paddingLeft: 10, backgroundColor: colors.darkBackground, alignSelf: 'flex-start', color: colors.labelFont, position: 'absolute' }}>{ i18n.t('location') }</Label>
+                                    <Input value={(this.state.location).substring(1, 30) + '...'} disabled placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('location') + '...'} onChangeText={(phone) => this.setState({phone})} keyboardType={'number-pad'} style={{ width: '100%', fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', top: 15 }}  />
                                  </Item>
                                 <Image source={images.location} style={{ height: 22, width: 22, right: 15, top: 9, position: 'absolute', flex: 1 }} resizeMode={'contain'} />
                             </View>
@@ -318,13 +321,11 @@ class Register extends Component {
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                             <TouchableOpacity onPress={() => this.setState({ checked: !this.state.checked })} style={[ styles.inputMarginTop ,styles.directionRow]}>
                                 <CheckBox onPress={() => this.setState({ checked: !this.state.checked })} checked={this.state.checked} color={colors.orange} style={styles.checkBox} />
-                                <Text style={[styles.agreeText, { color: colors.labelFont }]}>{ i18n.t('agreeTo') } <Text onPress={() => this.setState({ isModalVisible: !this.state.isModalVisible })} style={[styles.termsText, { color: colors.orange }]}>{ i18n.t('terms') }</Text></Text>
+                                <Text style={[styles.agreeText, { color: colors.labelFont, fontSize: 16 }]}>{ i18n.t('agreeTo') } <Text onPress={() => this.setState({ isModalVisible: !this.state.isModalVisible })} style={[styles.termsText, { color: colors.orange, fontSize: 16 }]}>{ i18n.t('terms') }</Text></Text>
                             </TouchableOpacity>
                         </View>
 
-                        {
-                            this.render_submit(colors)
-                        }
+                        { this.render_submit(colors) }
                     </View>
                 </Content>
                 <Modal onBackdropPress={()=> this.setState({ isModalVisible : false })} isVisible={this.state.isModalVisible}>
@@ -338,7 +339,9 @@ class Register extends Component {
                             <View style={{ width: 1, height: 90, backgroundColor: '#ddd', transform: I18nManager.isRTL ? [{ rotate: '45deg'}] : [{ rotate: '-45deg'}], right: 47, position: 'absolute', top: -13 }} />
                             <Image source={images.small_logo} style={{ width: 120, height: 120, alignSelf: 'center', marginTop: -55 }} resizeMode={'contain'}/>
                             <View style={{ padding: 25 }}>
-                                <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 16, lineHeight: 22, textAlign: 'center' }}> { this.state.terms } </Text>
+								<ScrollView>
+                                    <Text style={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 16, lineHeight: 22, textAlign: 'center' }}> { this.state.terms } </Text>
+                                </ScrollView>
                             </View>
                         </View>
                         <View style={{ bottom: 30, flex: 1, alignSelf: 'center', alignItems: 'center', position: 'absolute' }}>

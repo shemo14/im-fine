@@ -178,12 +178,6 @@ class Settings extends Component {
 
                                 <View style={{backgroundColor:'#ad9bc1' , height:.5 , width:'100%' , marginVertical:20}}/>
 
-                                <TouchableOpacity onPress={() => this.props.navigation.navigate('emergencyList')} style={{flexDirection:'row' , justifyContent:'space-between' , alignItems:'center'}}>
-                                    <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 15 , color: colors.labelFont }}>{ i18n.t('emergencyList') }</Text>
-                                </TouchableOpacity>
-
-                                <View style={{backgroundColor:'#ad9bc1' , height:.5 , width:'100%' , marginVertical:20}}/>
-
                                 <View style={{flexDirection:'row' , justifyContent:'space-between', alignItems:'center'}}>
                                     <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 15 , color: colors.labelFont }}>{ i18n.t('language') }</Text>
                                     <Item style={[{borderWidth: 1,

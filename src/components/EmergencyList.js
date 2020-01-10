@@ -47,13 +47,14 @@ class EmergencyList extends Component {
         }
     }
 
-    checkRadio(selectedId){
-
-    }
+	static navigationOptions = () => ({
+		drawerLabel:  i18n.t('emergencyList')  ,
+		drawerIcon: (<Image source={require('../../assets/images/light_mode/emergency_side.png')} style={{width:22 , height:22}} resizeMode={'contain'} /> )
+	});
 
 	pushSelectedChecks(id){
 		selectedContacts.push(id);
-        this.setState({ selectedContacts  })
+        this.setState({ selectedContacts })
     }
 
 	pullSelectedChecks(id){
@@ -67,13 +68,19 @@ class EmergencyList extends Component {
     }
 
     addToEmergencyList(){
-		axios.post(CONST.url + 'add-to-emergency', { id: this.props.user.id, users: selectedContacts, lang: this.props.lang }).then(response => {
+		const userId = this.props.auth.data.id;
+		axios.post(CONST.url + 'add-to-emergency', { id: userId, users: selectedContacts, lang: this.props.lang }).then(response => {
 		   if(response.data.status === 200)
            {
                Toast.show({
                    text: response.data.msg,
                    type: "success",
-                   duration: 3000
+                   duration: 3000,
+				   textStyle   	: {
+					   color       	: "white",
+					   fontFamily  	: I18nManager.isRTL ? 'tajawal' : 'openSans',
+					   textAlign   	: 'center'
+				   }
                });
            }
 		})
@@ -124,7 +131,8 @@ class EmergencyList extends Component {
 
                 }
 
-                axios.post(CONST.url + 'contacts', { id: this.props.user.id, phones: phoneNumbers, lang: this.props.lang }).then(response => {
+				const userId = this.props.auth.data.id;
+                axios.post(CONST.url + 'contacts', { id: userId, phones: phoneNumbers, lang: this.props.lang }).then(response => {
                     this.setState({ contacts: response.data.data, loader: false })
                     if ((response.data.data).length > 0){
                         (response.data.data).map((contact) => {
@@ -137,7 +145,12 @@ class EmergencyList extends Component {
                         Toast.show({
                             text: 'No Contacts',
                             type: "danger",
-                            duration: 3000
+                            duration: 3000,
+							textStyle   	: {
+								color       	: "white",
+								fontFamily  	: I18nManager.isRTL ? 'tajawal' : 'openSans',
+								textAlign   	: 'center'
+							}
                         });
                     }
                 }).error(error => {
@@ -148,7 +161,12 @@ class EmergencyList extends Component {
                 Toast.show({
                     text: 'No Contacts',
                     type: "danger",
-                    duration: 3000
+                    duration: 3000,
+					textStyle   	: {
+						color       	: "white",
+						fontFamily  	: I18nManager.isRTL ? 'tajawal' : 'openSans',
+						textAlign   	: 'center'
+					}
                 });
             }
 
@@ -157,7 +175,12 @@ class EmergencyList extends Component {
             Toast.show({
                 text: 'No Contacts',
                 type: "danger",
-                duration: 3000
+                duration: 3000,
+				textStyle   	: {
+					color       	: "white",
+					fontFamily  	: I18nManager.isRTL ? 'tajawal' : 'openSans',
+					textAlign   	: 'center'
+				}
             });
         }
     }
@@ -196,7 +219,7 @@ class EmergencyList extends Component {
                         </Right>
                         <Body style={[styles.headerText , styles.headerTitle]}></Body>
                         <Left style={styles.flex0}>
-                            <TouchableOpacity onPress={() => this.props.navigation.navigate('settings')} style={{ marginTop: 20 }}>
+                            <TouchableOpacity onPress={() => this.props.navigation.goBack()} style={{ marginTop: 20 }}>
                                 <Image source={images.back} style={{ width: 25, height: 25, margin: 5, marginTop: 15, transform: I18nManager.isRTL ? [{rotateY : '0deg'}] : [{rotateY : '-180deg'}] }} resizeMode={'contain'} />
                             </TouchableOpacity>
                         </Left>
@@ -249,11 +272,12 @@ class EmergencyList extends Component {
     }
 }
 
-const mapStateToProps = ({ lang, profile, theme }) => {
+const mapStateToProps = ({ lang, profile, theme, auth }) => {
     return {
         lang: lang.lang,
         user: profile.user,
-        theme: theme.theme
+        theme: theme.theme,
+		auth: auth.user,
     };
 };
 

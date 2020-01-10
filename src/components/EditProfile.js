@@ -83,7 +83,12 @@ class EditProfile extends Component {
             Toast.show({
                 text: msg,
                 type: "danger",
-                duration: 3000
+                duration: 3000,
+				textStyle   	: {
+					color       	: "white",
+					fontFamily  	: I18nManager.isRTL ? 'tajawal' : 'openSans',
+					textAlign   	: 'center'
+				}
             });
         }
         return isError;
@@ -145,7 +150,12 @@ class EditProfile extends Component {
                 text: msg,
                 type: "danger",
                 style : {textAlign : 'center' ,  fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans'} ,
-                duration: 3000
+                duration: 3000,
+				textStyle   	: {
+					color       	: "white",
+					fontFamily  	: I18nManager.isRTL ? 'tajawal' : 'openSans',
+					textAlign   	: 'center'
+				}
             });
         }
         return isError;
@@ -188,7 +198,12 @@ class EditProfile extends Component {
                     Toast.show({
                         text: response.data.msg,
                         type: "success",
-                        duration: 3000
+                        duration: 3000,
+						textStyle   	: {
+							color       	: "white",
+							fontFamily  	: I18nManager.isRTL ? 'tajawal' : 'openSans',
+							textAlign   	: 'center'
+						}
                     });
 
                    this.props.profile(this.props.user.id, 'ar');
@@ -198,7 +213,12 @@ class EditProfile extends Component {
                     Toast.show({
                         text: response.data.msg,
                         type: "danger",
-                        duration: 3000
+                        duration: 3000,
+						textStyle   	: {
+							color       	: "white",
+							fontFamily  	: I18nManager.isRTL ? 'tajawal' : 'openSans',
+							textAlign   	: 'center'
+						}
                     });
                 }
                 this.setState({ isSubmitted: false });

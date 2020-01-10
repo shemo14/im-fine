@@ -1,7 +1,7 @@
 import axios from 'axios';
 import CONST from '../consts'
 import {Toast} from "native-base";
-import {AsyncStorage} from "react-native";
+import {AsyncStorage, I18nManager} from "react-native";
 
 
 export const profile = (id, lang) => {
@@ -41,13 +41,23 @@ export const updateProfile = (data) => {
             Toast.show({
                 text: response.data.msg,
                 type: response.data.status == 200 ? "success" : "danger",
-                duration: 3000
+                duration: 3000,
+				textStyle   	: {
+					color       	: "white",
+					fontFamily  	: I18nManager.isRTL ? 'tajawal' : 'openSans',
+					textAlign   	: 'center'
+				}
             });
         }).catch(() => {
             Toast.show({
                 text: 'لم يتم التعديل بعد , الرجاء المحاوله مره اخري',
                 type: "danger",
-                duration: 3000
+                duration: 3000,
+				textStyle   	: {
+					color       	: "white",
+					fontFamily  	: I18nManager.isRTL ? 'tajawal' : 'openSans',
+					textAlign   	: 'center'
+				}
             });
         })
     }

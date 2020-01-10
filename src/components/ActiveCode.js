@@ -10,6 +10,8 @@ import { userLogin, profile } from '../actions'
 import {DoubleBounce} from "react-native-loader";
 import {NavigationEvents} from "react-navigation";
 import Modal from "react-native-modal";
+import axios from "axios";
+import CONST from "../consts";
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
@@ -30,6 +32,7 @@ class ActiveCode extends Component {
         super(props);
         this.state = {
             code: '',
+			resendCode: null,
             isSubmitted: false,
             userId: null
         }
@@ -37,7 +40,7 @@ class ActiveCode extends Component {
 
     componentWillMount(){
         const code = this.props.navigation.state.params.code;
-        alert(code);
+        this.setState({ resendCode: code });
     }
 
     renderSubmit(colors){
@@ -60,14 +63,19 @@ class ActiveCode extends Component {
 
     onPressActive(){
         const data = this.props.navigation.state.params.data;
-        const code = this.props.navigation.state.params.code;
+        const code = this.state.resendCode;
         if (this.state.code == code){
-            this.props.userLogin({ id: data.id, code }, 'ar');
+            this.props.userLogin({ id: data.id, code }, this.props.lang);
         }else{
             Toast.show({
                 text: i18n.t('codeNotCorrect'),
                 type: "danger",
-                duration: 3000
+                duration: 3000,
+				textStyle   	: {
+					color       	: "white",
+					fontFamily  	: I18nManager.isRTL ? 'tajawal' : 'openSans',
+					textAlign   	: 'center'
+				}
             });
         }
     }
@@ -83,20 +91,44 @@ class ActiveCode extends Component {
                 this.props.profile(newProps.auth.data.id, this.props.lang);
             }
 
-            this.props.navigation.navigate('drawerNavigator');
+            const register = newProps.navigation.state.params.register;
+
+            this.props.navigation.navigate(register ? 'emergencyList' : 'drawerNavigator', { userId: newProps.auth.data.id });
         }
 
         if (newProps.auth !== null) {
             Toast.show({
                 text: newProps.auth.msg,
                 type: newProps.auth.status === 200 ? "success" : "danger",
-                duration: 3000
+                duration: 3000,
+				textStyle   	: {
+					color       	: "white",
+					fontFamily  	: I18nManager.isRTL ? 'tajawal' : 'openSans',
+					textAlign   	: 'center'
+				}
             });
         }
     }
 
-    onFocus(){
-
+	resendCode(){
+		const data      = this.props.navigation.state.params.data;
+		const device_id = this.props.navigation.state.params.device_id;
+		axios.post(CONST.url + 'sign-in', { phone: '0' + data.mobile, country_code: data.country_code, lang: this.props.lang, device_id}).then(response => {
+			if(response.data.status == 200){
+				this.setState({ resendCode: response.data.extra.code });
+			}else{
+				Toast.show({
+					text: response.data.msg,
+					type: "danger",
+					duration: 3000,
+					textStyle   	: {
+						color       	: "white",
+						fontFamily  	: I18nManager.isRTL ? 'tajawal' : 'openSans',
+						textAlign   	: 'center'
+					}
+				});
+			}
+		})
     }
 
     render() {
@@ -116,7 +148,6 @@ class ActiveCode extends Component {
 
         return (
             <Container style={{ backgroundColor: colors.darkBackground }}>
-                <NavigationEvents onWillFocus={() => this.onFocus()} />
                 <Content contentContainerStyle={{ flexGrow: 1 }}>
                     <View style={styles.contentBackground}>
                         <View style={{ alignItems: 'center', marginTop: 100 }}>
@@ -125,11 +156,14 @@ class ActiveCode extends Component {
                         <Form style={{ width: '100%', paddingHorizontal: 40, marginTop: 70 }}>
                             <View style={{ borderRadius: 3, borderWidth: 1, borderColor: colors.labelFont, height: 45, marginTop: 20, padding: 5, flexDirection: 'row'  }}>
                                 <Item style={{ alignSelf: 'flex-start', borderBottomWidth: 0, top: -18, marginTop: 0 ,position:'absolute', width:'88%', paddingHorizontal: 5 }} bordered>
-                                    <Label style={{ top:5, paddingRight: 10, paddingLeft: 10, backgroundColor: colors.darkBackground, alignSelf: 'flex-start', color: colors.labelFont, fontSize: 14, position: 'absolute' }}>{ i18n.t('activationCode') }</Label>
-                                    <Input placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('activationCode') + '...'} onChangeText={(code) => this.setState({code})} keyboardType={'number-pad'} style={{ width: '100%', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontSize: 15, top: 15 }}  />
+                                    <Label style={{ top:5, paddingRight: 10, paddingLeft: 10, backgroundColor: colors.darkBackground, alignSelf: 'flex-start', color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', position: 'absolute' }}>{ i18n.t('activationCode') }</Label>
+                                    <Input placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('activationCode') + '...'} onChangeText={(code) => this.setState({code})} keyboardType={'number-pad'} style={{ width: '100%', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', top: 15 }}  />
                                 </Item>
                                 <Image source={images.checkmark} style={{ height: 22, width: 22, right: 15, top: 9, position: 'absolute', flex: 1 }} resizeMode={'contain'} />
                             </View>
+                            <TouchableOpacity onPress={() => this.resendCode()} style={{ marginTop: 50, alignItems: 'center', width: '100%', height: 40, justifyContent: 'center' }}>
+                                <Text style={{ backgroundColor: colors.darkBackground, color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', }}>اعادة ارسال الكود</Text>
+                            </TouchableOpacity>
                         </Form>
 
                         { this.renderSubmit(colors) }

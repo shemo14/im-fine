@@ -9,7 +9,7 @@
       "android",
       "web"
     ],
-    "version": "1.0.3",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -26,6 +26,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.app.imfine",
+      "userInterfaceStyle": "light",
       "infoPlist": {
         "NSCameraUsageDescription": "App need this permission to update profile photo.",
         "NSPhotoLibraryAddUsageDescription": "App need this permission to update profile photo.",
@@ -33,7 +34,9 @@
         "NSContactsUsageDescription": "App need this permission to send your case to your contacts if you in risk.",
         "NSMicrophoneUsageDescription": "App need this permission to send voice record in your chat message.",
         "NSPhotoLibraryUsageDescription": "App need this permission to update profile photo."
-      }
+      },
+      "publishBundlePath": "ios/im-fine/Supporting/shell-app.bundle",
+      "publishManifestPath": "ios/im-fine/Supporting/shell-app-manifest.json"
     },
     "android": {
       "package": "com.app.imfine",
@@ -43,7 +46,15 @@
         "googleMaps": {
           "apiKey": "AIzaSyCmKUEnkSpC2E9aAUqcWDDc43mRQsf5S8c"
         }
-      }
-    }
+      },
+      "publishBundlePath": "android/app/src/main/assets/shell-app.bundle",
+      "publishManifestPath": "android/app/src/main/assets/shell-app-manifest.json"
+    },
+    "isDetached": true,
+    "detach": {
+      "iosExpoViewUrl": "https://s3.amazonaws.com/exp-exponent-view-code/ios-v2.13.0-sdk35.0.0-a30ebc9b-3db4-42f4-b677-e468076baf18.tar.gz",
+      "androidExpoViewUrl": "https://s3.amazonaws.com/exp-exponent-view-code/android-v119-sdk35.0.0-6758e9de-1e10-40f8-863d-ec8972895cf1.tar.gz"
+    },
+    "scheme": "exp2b7369ae5aa04e868a2dccf5d133d1d8"
   }
 }

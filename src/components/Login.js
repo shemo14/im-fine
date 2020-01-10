@@ -58,27 +58,7 @@ class Login extends Component {
     async componentWillMount(){
         axios.get(CONST.url + 'codes').then(response => {
             this.setState({ countries: response.data.data, loader: false })
-        })
-
-        const { status: existingStatus } = await Permissions.getAsync(
-            Permissions.NOTIFICATIONS
-        );
-
-        let finalStatus = existingStatus;
-
-        if (existingStatus !== 'granted') {
-            const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
-            finalStatus = status;
-        }
-
-        if (finalStatus !== 'granted') {
-            return;
-        }
-
-        const deviceId = await Notifications.getExpoPushTokenAsync();
-        this.setState({ deviceId, userId: null });
-
-        // AsyncStorage.setItem('deviceID', deviceId);
+        });
     }
 
     validate = () => {
@@ -97,7 +77,12 @@ class Login extends Component {
                 text: msg,
                 type: "danger",
                 style : {textAlign : 'center' ,  fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans'} ,
-                duration: 3000
+                duration: 3000,
+				textStyle   	: {
+					color       	: "white",
+					fontFamily  	: I18nManager.isRTL ? 'tajawal' : 'openSans',
+					textAlign   	: 'center'
+				}
             });
         }
         return isError;
@@ -125,19 +110,26 @@ class Login extends Component {
         const err = this.validate();
         if (!err){
             this.setState({ isSubmitted: true });
-            axios.post(CONST.url + 'sign-in', { phone: this.state.phone, country_code: this.state.countryCode, lang: this.props.lang, device_id: this.state.deviceId }).then(response => {
-                if(response.data.status == 200){
-                    this.setState({ isSubmitted: false });
-                    this.props.navigation.navigate('activeCode', { data: response.data.data, code: response.data.extra.code });
-                }else{
-                    this.setState({ isSubmitted: false });
-                    Toast.show({
-                        text: response.data.msg,
-                        type: "danger",
-                        duration: 3000
-                    });
-                }
-            })
+            AsyncStorage.getItem('fcmToken').then(device_id => {
+				axios.post(CONST.url + 'sign-in', { phone: this.state.phone, country_code: this.state.countryCode, lang: this.props.lang, device_id}).then(response => {
+					if(response.data.status == 200){
+						this.setState({ isSubmitted: false });
+						this.props.navigation.navigate('activeCode', { data: response.data.data, code: response.data.extra.code, device_id, register: false });
+					}else{
+						this.setState({ isSubmitted: false });
+						Toast.show({
+							text: response.data.msg,
+							type: "danger",
+							duration: 3000,
+							textStyle   	: {
+								color       	: "white",
+								fontFamily  	: I18nManager.isRTL ? 'tajawal' : 'openSans',
+								textAlign   	: 'center'
+							}
+						});
+					}
+				})
+			});
         }
     }
 
@@ -177,7 +169,7 @@ class Login extends Component {
 					<View style={[styles.headerView  , styles.animatedHeader ,{ backgroundColor: colors.darkBackground }]}>
 						<Right style={styles.flex0}>
 							<TouchableOpacity onPress={() => this.props.navigation.openDrawer()} style={{ flexDirection: 'row', marginTop: 20 }}>
-								<Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', fontSize: 15 , color: colors.labelFont }} />
+								<Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: colors.labelFont }} />
 							</TouchableOpacity>
 						</Right>
 						<Body style={[styles.headerText , styles.headerTitle]} />
@@ -201,7 +193,7 @@ class Login extends Component {
                                         <Picker
                                             mode="dropdown"
                                             style={[styles.picker, { color: colors.labelFont, width: (width*70)/100 } ]}
-											textStyle={{ color: colors.labelFont }}
+											textStyle={{ color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', }}
                                             selectedValue={this.state.countryCode}
                                             onValueChange={(value) => this.setState({ countryCode: value })}
                                         >
@@ -217,8 +209,8 @@ class Login extends Component {
                                 </View>
                                 <View style={{ borderRadius: 3, borderWidth: 1, borderColor: colors.labelFont, height: 45, marginTop: 20, padding: 5, flexDirection: 'row'  }}>
                                     <Item style={{ alignSelf: 'flex-start', borderBottomWidth: 0, top: -18, marginTop: 0 ,position:'absolute', width:'88%', paddingHorizontal: 5 }} bordered>
-                                        <Label style={{ top:5,  paddingRight: 10, paddingLeft: 10, backgroundColor: colors.darkBackground, alignSelf: 'flex-start', color: colors.labelFont, fontSize: 14, position: 'absolute' }}>{ i18n.t('phoneNumber') }</Label>
-                                        <Input placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('phoneNumber') + '...'} onChangeText={(phone) => this.setState({phone})} keyboardType={'number-pad'} style={{ width: '100%', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontSize: 15, top: 15 }}  />
+                                        <Label style={{ top:5,  paddingRight: 10, paddingLeft: 10, backgroundColor: colors.darkBackground, alignSelf: 'flex-start', color: colors.labelFont, fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', position: 'absolute' }}>{ i18n.t('phoneNumber') }</Label>
+                                        <Input placeholderTextColor={'#e5d7bb'} placeholder={ i18n.t('phoneNumber') + '...'} onChangeText={(phone) => this.setState({phone})} keyboardType={'number-pad'} style={{ width: '100%', color: colors.labelFont, textAlign: I18nManager.isRTL ? 'right' : 'left', fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', top: 15 }}  />
                                     </Item>
                                     <Image source={images.phone} style={{ height: 22, width: 22, right: 15, top: 9, position: 'absolute', flex: 1 }} resizeMode={'contain'} />
                                 </View>

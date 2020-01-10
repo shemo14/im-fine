@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, Image, TouchableOpacity, Animated, I18nManager, Dimensions, FlatList, Slider} from "react-native";
+import { View, Text, Image, TouchableOpacity, Animated, I18nManager, Dimensions, FlatList, Slider, Platform} from "react-native";
 import {Container, Content, Header, Left, Right, Body, Button, Icon, Item, Label, Input} from 'native-base'
 import lightStyles from '../../assets/styles/light'
 import darkStyles from '../../assets/styles/dark'
@@ -16,8 +16,10 @@ import VideoRecorder from "./VideoRecorder";
 import {connect} from "react-redux";
 import CONST from "../consts";
 
-const height = Dimensions.get('window').height;
-const width = Dimensions.get('window').width;
+const height 	= Dimensions.get('window').height;
+const width 	= Dimensions.get('window').width;
+
+const IS_IPHONE_X 	= (height === 812 || height === 896) && Platform.OS === 'ios';
 
 class NotFine extends Component {
     constructor(props){
@@ -89,7 +91,7 @@ class NotFine extends Component {
             Animated.timing(
                 this.state.fadeAnim,
                 {
-                    toValue: 0,
+                    toValue: IS_IPHONE_X ? -6 : 0,
                     duration: 800,
                 },
             ).start();
@@ -123,7 +125,7 @@ class NotFine extends Component {
             this.setState({ item })
         } else if (type === 6){
 			this.setState({ item });
-            this.props.navigation.navigate('VideoRecorder');
+            this.props.navigation.navigate('VideoRecorder', { mapRegion: this.state.mapRegion });
         }else{
 			this.playAudio();
             this.sendMsg(null, item);
@@ -177,13 +179,10 @@ class NotFine extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.navigation.state.params.recording){
+        if (nextProps.navigation.state.params && nextProps.navigation.state.params.recording !== undefined){
             const uri = nextProps.navigation.state.params.recording.uri;
             this.sendMsg(uri, this.state.item);
-
-            console.log('fuck props', nextProps);
         }
-
 	}
 
 
@@ -221,7 +220,8 @@ class NotFine extends Component {
 			lng: this.state.mapRegion.longitude,
 			seen:0,
 			status: status.type,
-			connected: 1
+			connected: 1,
+			lang: this.props.lang
 		}).then(response => {
 			if(msgType == 1 || msgType == 2){
 				formData.append('id', JSON.stringify(response.data.data));
@@ -263,100 +263,78 @@ class NotFine extends Component {
         }
 
         return (
-            <Container style={{ backgroundColor: colors.darkBackground }}>
-                <NavigationEvents onWillFocus={() => this.onFocus()} />
-                <Header style={[styles.header , styles.plateformMarginTop]} noShadow>
-                    <View style={[styles.headerView  , styles.animatedHeader ,{ backgroundColor: colors.darkBackground }]}>
-                        <Right style={styles.flex0}>
-                            {/*<TouchableOpacity onPress={() => this.props.navigation.openDrawer()} style={{ flexDirection: 'row', marginTop: 20 }}>*/}
-                                {/*<Image source={images.drawer} style={{ width: 25, height: 25, marginTop: 35, marginHorizontal: 8 }} resizeMode={'contain'} />*/}
-                                {/*<Image source={images.logo_tittle} style={{ width: 90, height: 90 }} resizeMode={'contain'} />*/}
-                            {/*</TouchableOpacity>*/}
-                        </Right>
-                        <Body style={[styles.headerText , styles.headerTitle]}></Body>
-                        <Left style={styles.flex0}>
-                            <TouchableOpacity onPress={() => this.props.navigation.goBack()} style={{ marginTop: 20 }}>
-                                <Image source={images.back} style={{ width: 25, height: 25, margin: 5, marginTop: 15, transform: I18nManager.isRTL ? [{rotateY : '0deg'}] : [{rotateY : '-180deg'}] }} resizeMode={'contain'} />
-                            </TouchableOpacity>
-                        </Left>
-                    </View>
-                </Header>
-                <Content style={{ backgroundColor: colors.darkBackground, marginTop: -25 }} contentContainerStyle={{ flexGrow: 1 }}>
-                    <View>
-                        <View style={{ marginTop: 10, backgroundColor: colors.lightBackground, borderTopColor: colors.pageBorder, borderTopWidth: 1}}>
-                            <View style={{width: 0, height: 0, backgroundColor: 'transparent', borderStyle: 'solid', borderLeftWidth: 50, borderTopWidth: 50, borderLeftColor: 'transparent', borderTopColor: colors.darkBackground, right: 0, position: 'absolute', top: -1 }} />
-                            <View style={{ flex: 1, height: 10, width: '100%' }}/>
-                            <View style={{ width: 1, height: 70, backgroundColor: colors.pageBorder, transform: I18nManager.isRTL ? [{ rotate: '45deg'}] : [{ rotate: '-45deg'}], left: -26, top: -21, alignSelf: 'flex-end' }} />
-                            <View style={{ marginTop: -40, height: height-115 }}>
-                                <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', color: colors.labelFont, fontSize: 18, marginHorizontal: 20, marginBottom: 40, textAlign: I18nManager.isRTL ? 'right' : 'left', alignSelf: 'flex-start'  }}>{ i18n.t('whyNotFine') }</Text>
-                                <FlatList
-                                    style={{ alignSelf: 'center', width: '100%'}}
-                                    data={this.state.status}
-                                    renderItem={({ item }) => this.renderItems(item, colors)}
-                                    numColumns={3}
-                                    keyExtractor={this._keyExtractor}
-                                    extraData={this.state.refreshed}
-                                />
+			<View style={{ flexDirection: 'column', justifyContent: 'space-between', height: IS_IPHONE_X ? height-250 : height-135, marginTop: IS_IPHONE_X ? 0 : -50}}>
+				<View>
+					<Text style={{ fontFamily: I18nManager.isRTL ? 'tajawalBold' : 'openSansBold', color: colors.labelFont, fontSize: 18, marginHorizontal: 20, marginBottom: 40, textAlign: I18nManager.isRTL ? 'right' : 'left', alignSelf: 'flex-start'  }}>{ i18n.t('whyNotFine') }</Text>
 
-                                <View style={{ flexDirection: 'row', alignSelf: 'center', margin: 20, borderWidth: 1, borderRadius: 30, borderColor: colors.border, padding: 5, marginBottom: 10 }}>
-                                    <Image source={images.place} style={{ height: 25, width: 25, marginHorizontal: 10 }} resizeMode={'contain'} />
-                                    <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: colors.labelFont, marginTop: 5 }}>{ (this.state.location).substring(1, 40) + '...' }</Text>
-                                </View>
-                                <Animated.View style={{ backgroundColor: colors.inboxInputBackground, flexDirection:'row' , flex: 1, width: '100%',height: 50, position:'absolute' , bottom: this.state.fadeAnim, padding: 3, paddingBottom: 6 }}>
-                                    <View style={{ width: '84%', paddingHorizontal: 20, paddingBottom: 10, marginLeft: -15 }}>
-                                        <Recorder
-                                            style={{flex: 1}}
-                                            onComplete={(i) => this.sendMsg(i.uri, this.state.item)}
-                                            maxDurationMillis={150000}
-                                            showDebug={false}
-                                            startRecord={this.state.startRecord}
-                                            resetRecord={this.state.resetRecord}
-                                            finishRecord={this.state.finishRecord}
-                                            showBackButton={true}
-                                            audioMode={{
-                                                allowsRecordingIOS: true,
-                                                interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
-                                                playsInSilentModeIOS: true,
-                                                playsInSilentLockedModeIOS: true,
-                                                staysActiveInBackground: true,
-                                                shouldDuckAndroid: true,
-                                                interruptionModeAndroid:
-                                                Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
-                                                playThroughEarpieceAndroid: false
-                                            }}
-                                            recordingCompleteButton={(renderProps) => {
-                                                return (
-                                                    <TouchableOpacity style={{ marginTop: 15, position: 'absolute', right: -80 }} onPress={renderProps.onPress}>
-                                                        <Image source={images.sendRecord} style={{ width: 30, height: 30 }} resizeMode={'contain'} />
-                                                    </TouchableOpacity>
-                                                );
-                                            }}
-                                            playbackSlider={(renderProps) => {
-                                                return (
-                                                    <Slider
-                                                        minimimValue={0}
-                                                        maximumValue={renderProps.maximumValue}
-                                                        onValueChange={renderProps.onSliderValueChange}
-                                                        value={renderProps.value}
-                                                        style={{ width: '100%', position: 'absolute' }}
-                                                        thumbTintColor={colors.orange}
-                                                        maximumTrackTintColor={"#dddddd"}
-                                                        minimumTrackTintColor={colors.orange}
-                                                    />
-                                                );
-                                            }}
-                                        />
-                                    </View>
-									<TouchableOpacity style={{ marginTop: 19, marginLeft: -7 }} onPress={() => this.cansleRecord() }>
-										<Image source={images.cansle} style={{ width: 20, height: 20 }} resizeMode={'contain'} />
+					<FlatList
+						style={{ alignSelf: 'center', width: '100%'}}
+						data={this.state.status}
+						renderItem={({ item }) => this.renderItems(item, colors)}
+						numColumns={3}
+						keyExtractor={this._keyExtractor}
+						extraData={this.state.refreshed}
+					/>
+
+				</View>
+
+
+				<View style={{ flexDirection: 'row', alignSelf: 'center', margin: 20, borderWidth: 1, borderRadius: 30, borderColor: colors.border, padding: 5, marginBottom: 10, bottom: 10, position: 'absolute' }}>
+					<Image source={images.place} style={{ height: 25, width: 25, marginHorizontal: 10 }} resizeMode={'contain'} />
+					<Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: colors.labelFont, marginTop: 5 }}>{ (this.state.location).substring(1, 40) + '...' }</Text>
+				</View>
+
+				<Animated.View style={{ backgroundColor: colors.inboxInputBackground, flexDirection:'row' , flex: 1, width: '100%',height: 50, position:'absolute' , bottom: this.state.fadeAnim, padding: 3, paddingBottom: 6 }}>
+					<View style={{ width: '84%', paddingHorizontal: 20, paddingBottom: 10, marginLeft: -15 }}>
+						<Recorder
+							style={{flex: 1}}
+							onComplete={(i) => this.sendMsg(i.uri, this.state.item)}
+							maxDurationMillis={150000}
+							showDebug={false}
+							startRecord={this.state.startRecord}
+							resetRecord={this.state.resetRecord}
+							finishRecord={this.state.finishRecord}
+							showBackButton={true}
+							audioMode={{
+								allowsRecordingIOS: true,
+								interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+								playsInSilentModeIOS: true,
+								playsInSilentLockedModeIOS: true,
+								staysActiveInBackground: true,
+								shouldDuckAndroid: true,
+								interruptionModeAndroid:
+								Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
+								playThroughEarpieceAndroid: false
+							}}
+							recordingCompleteButton={(renderProps) => {
+								return (
+									<TouchableOpacity style={{ marginTop: 15, position: 'absolute', right: -80 }} onPress={renderProps.onPress}>
+										<Image source={images.sendRecord} style={{ width: 30, height: 30 }} resizeMode={'contain'} />
 									</TouchableOpacity>
-									<View style={{ height: 35, width: 1, backgroundColor: '#ddd', marginRight: 9, marginTop: 10, marginLeft: 12 }} />
-                                </Animated.View>
-                            </View>
-                        </View>
-                    </View>
-                </Content>
-            </Container>
+								);
+							}}
+							playbackSlider={(renderProps) => {
+								return (
+									<Slider
+										minimimValue={0}
+										maximumValue={renderProps.maximumValue}
+										onValueChange={renderProps.onSliderValueChange}
+										value={renderProps.value}
+										style={{ width: '100%', position: 'absolute' }}
+										thumbTintColor={colors.orange}
+										maximumTrackTintColor={"#dddddd"}
+										minimumTrackTintColor={colors.orange}
+									/>
+								);
+							}}
+						/>
+					</View>
+					<TouchableOpacity style={{ marginTop: 19, marginLeft: -7 }} onPress={() => this.cansleRecord() }>
+						<Image source={images.cansle} style={{ width: 20, height: 20 }} resizeMode={'contain'} />
+					</TouchableOpacity>
+					<View style={{ height: 35, width: 1, backgroundColor: '#ddd', marginRight: 9, marginTop: 10, marginLeft: 12 }} />
+				</Animated.View>
+			</View>
         );
     }
 }

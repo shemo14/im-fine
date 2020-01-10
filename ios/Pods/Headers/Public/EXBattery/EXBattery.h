@@ -1,0 +1,1 @@
+../../../../../node_modules/expo-battery/ios/EXBattery/EXBattery.h

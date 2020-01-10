@@ -7,8 +7,8 @@ import COLORS from '../consts/colors'
 import i18n from '../../locale/i18n'
 import { connect } from 'react-redux';
 import { chooseTheme, chooseLang } from '../actions'
-import {Notifications} from "expo";
-import * as Permissions from "expo-permissions";
+import firebase from 'react-native-firebase';
+
 
 const themeImages = {
     lightImages: {
@@ -36,31 +36,117 @@ class LoginOrRegister extends Component {
     }
 
     async componentWillMount() {
-		setTimeout(() => this.allowNotification(), 10000);
+
+		// setTimeout(() => this.allowNotification(), 10000);
 	}
 
-	async allowNotification(){
-		const { status: existingStatus } = await Permissions.getAsync(
-			Permissions.NOTIFICATIONS
-		);
-
-		let finalStatus = existingStatus;
-
-		if (existingStatus !== 'granted') {
-			const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
-			finalStatus = status;
-		}
-
-		if (finalStatus !== 'granted') {
-			return;
-		}
-
-		const deviceId = await Notifications.getExpoPushTokenAsync();
-		this.setState({ deviceId, userId: null });
-		AsyncStorage.setItem('deviceID', deviceId);
-
-		console.log(deviceId);
+	async componentDidMount() {
+		this.checkPermission();
+		this.createNotificationListeners()
 	}
+
+
+	async checkPermission() {
+		const enabled = await firebase.messaging().hasPermission();
+		if (enabled) {
+			this.getToken();
+		} else {
+			this.requestPermission();
+		}
+	}
+
+	//3
+	async getToken() {
+		let fcmToken = await AsyncStorage.getItem('fcmToken');
+		if (!fcmToken) {
+			fcmToken = await firebase.messaging().getToken();
+			if (fcmToken) {
+				// user has a device token
+				console.log('fcm token____', fcmToken);
+				await AsyncStorage.setItem('fcmToken', fcmToken);
+			}
+		}
+	}
+
+	//2
+	async requestPermission() {
+		try {
+			await firebase.messaging().requestPermission();
+			// User has authorised
+			this.getToken();
+		} catch (error) {
+			// User has rejected permissions
+			console.log('permission rejected');
+		}
+	}
+
+	async createNotificationListeners() {
+		/*
+		* Triggered when a particular notification has been received in foreground
+		* */
+		this.notificationListener = firebase.notifications().onNotification((notification) => {
+			const { title, body } = notification;
+			console.log('onNotification:' , notification);
+
+			const localNotification = new firebase.notifications.Notification({
+				sound: 'alarm.wav',
+				show_in_foreground: true,
+			}).setSound('alarm.wav')
+				.setNotificationId(notification.notificationId)
+				.setTitle(notification.title)
+				.setBody(notification.body)
+				.android.setChannelId('fcm_FirebaseNotifiction_default_channel') // e.g. the id you chose above
+				.android.setSmallIcon('@drawable/ic_launcher') // create this icon in Android Studio
+				.android.setColor('#000000') // you can set a color here
+				.android.setPriority(firebase.notifications.Android.Priority.High);
+
+			firebase.notifications()
+				.displayNotification(localNotification)
+				.catch(err => console.error(err));
+		});
+
+
+		/*
+		  * Triggered when a particular notification has been received in foreground
+		* */
+		this.notificationListener = firebase.notifications().onNotification((notification) => {
+			const { title, body } = notification;
+		});
+
+
+		const channel = new firebase.notifications.Android.Channel('fcm_FirebaseNotifiction_default_channel', 'Demo app name', firebase.notifications.Android.Importance.High)
+			.setDescription('Demo app description')
+			.setSound('alarm.wav');
+		firebase.notifications().android.createChannel(channel);
+
+		/*
+		* If your app is in background, you can listen for when a notification is clicked / tapped / opened as follows:
+		* */
+		this.notificationOpenedListener = firebase.notifications().onNotificationOpened((notificationOpen) => {
+			const { title, body } = notificationOpen.notification;
+			console.log('onNotificationOpened:', notificationOpen);
+			// Alert.alert(title, body)
+		});
+
+		/*
+		* If your app is closed, you can check if it was opened by a notification being clicked / tapped / opened as follows:
+		* */
+		const notificationOpen = await firebase.notifications().getInitialNotification();
+		if (notificationOpen) {
+			const { title, body } = notificationOpen.notification;
+			console.log('getInitialNotification:', notificationOpen);
+		//	Alert.alert(title, body)
+		}
+
+		/*
+		* Triggered for data only payload in foreground
+		* */
+		this.messageListener = firebase.messaging().onMessage((message) => {
+			//process data message
+			console.log("JSON.stringify:", JSON.stringify(message));
+		});
+	}
+
 
 	render() {
         let styles  = lightStyles;
@@ -115,6 +201,7 @@ class LoginOrRegister extends Component {
         );
     }
 }
+
 
 const mapStateToProps = ({ theme, lang }) => {
     return {

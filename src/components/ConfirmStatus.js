@@ -36,6 +36,10 @@ class ConfirmStatus extends Component {
         }
     }
 
+	static navigationOptions = () => ({
+		drawerLabel:  ()=> null,
+	});
+
     onFocus(){
 
     }
@@ -68,9 +72,9 @@ class ConfirmStatus extends Component {
                                 <Image source={images.logo_tittle} style={{ width: 90, height: 90 }} resizeMode={'contain'} />
                             </TouchableOpacity>
                         </Right>
-                        <Body style={[styles.headerText , styles.headerTitle]}></Body>
+                        <Body style={[styles.headerText , styles.headerTitle]} />
                         <Left style={styles.flex0}>
-                            <TouchableOpacity onPress={() => this.props.navigation.navigate('notFine')} style={{ marginTop: 20 }}>
+                            <TouchableOpacity onPress={() => this.props.navigation.navigate('home')} style={{ marginTop: 20 }}>
                                 <Image source={images.back} style={{ width: 25, height: 25, margin: 5, marginTop: 15, transform: I18nManager.isRTL ? [{rotateY : '0deg'}] : [{rotateY : '-180deg'}] }} resizeMode={'contain'} />
                             </TouchableOpacity>
                         </Left>
@@ -89,7 +93,7 @@ class ConfirmStatus extends Component {
                                     </View>
                                     <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: colors.labelFont, marginTop: 10 }}>{ i18n.t('confirmSendStatus') }</Text>
 
-                                    <Button onPress={() => this.props.navigation.navigate('drawerNavigator')} style={{ backgroundColor: colors.orange, width: 150, height: 35, marginTop: 40, alignItems: 'center', justifyContent: 'center' }} >
+                                    <Button onPress={() => this.props.navigation.navigate('home')} style={{ backgroundColor: colors.orange, width: 150, height: 35, marginTop: 40, alignItems: 'center', justifyContent: 'center' }} >
                                         <Text style={{ fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans', color: '#472d35', textAlign: 'center'}}>{ i18n.t('backHome') }</Text>
                                     </Button>
                                 </View>

@@ -1,4 +1,4 @@
 
 export default {
-    url: 'http://ahmed-taha.arabsdesign.com/ImFine/api/',
+    url: 'https://ahmed-taha.arabsdesign.com/ImFine/api/',
 };
