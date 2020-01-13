@@ -1,5 +1,22 @@
 import React, { Component } from "react";
-import { View, Text, Image, TouchableOpacity, Animated, I18nManager, Dimensions, KeyboardAvoidingView, ScrollView, Slider, Keyboard, Linking, NativeModules, Platform, StatusBarIOS} from "react-native";
+import {
+	View,
+	Text,
+	Image,
+	TouchableOpacity,
+	Animated,
+	I18nManager,
+	Dimensions,
+	KeyboardAvoidingView,
+	ScrollView,
+	Slider,
+	Keyboard,
+	Linking,
+	NativeModules,
+	Platform,
+	StatusBarIOS,
+	ActivityIndicator
+} from "react-native";
 import {Container, Content, Header, Left, Right, Body, Item, Input} from 'native-base'
 import lightStyles from '../../assets/styles/light'
 import darkStyles from '../../assets/styles/dark'
@@ -54,7 +71,8 @@ class Inbox extends Component {
             loader: false,
             bottom: 0,
             is_active: false,
-			statusBarHeight: 0
+			statusBarHeight: 0,
+			videoLoader: false
         };
 
         const data = this.props.navigation.state.params.data;
@@ -452,9 +470,9 @@ class Inbox extends Component {
         if (msgType == 1)
             this.cansleRecord();
 
-        console.log('fuck uri', uri);
 
         if (uri){
+			this.setState({ videoLoader: true });
             let localUri = uri;
             filename = localUri.split('/').pop();
 
@@ -481,6 +499,7 @@ class Inbox extends Component {
             if(msgType == 1 || msgType == 2){
                 formData.append('id', JSON.stringify([ response.data.data.id ]));
                 axios.post(CONST.url + 'upload', formData).then(res => {
+					this.setState({ videoLoader: false });
                     this.emitSendMsg(response.data.data.room, response.data.data.msg);
                     this.scrollView.scrollToEnd({animated: true});
                     return this.componentWillMount();
@@ -510,6 +529,18 @@ class Inbox extends Component {
         else return 'height';
     }
 
+
+	renderVideoLoader(){
+		if (this.state.videoLoader){
+			return(
+				<View style={{ width, height, justifyContent: 'center', alignItems: 'center', backgroundColor: '#000000b5', position: 'absolute', zIndex: 1 }}>
+					<ActivityIndicator size="large" color="#ddd" />
+					<Text style={{ color: '#ddd', marginTop: 10 , fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>{ i18n.t('videoUpload') + '...' }</Text>
+				</View>
+			)
+		}
+	}
+
     onFocus(){
 
     }
@@ -536,6 +567,7 @@ class Inbox extends Component {
 
         return (
             <Container style={{ backgroundColor: colors.darkBackground }}>
+				{ this.renderVideoLoader() }
                 <NavigationEvents onWillFocus={() => this.onFocus()} />
                 <Header style={[styles.header , styles.plateformMarginTop, { height: IS_IPHONE_X ? 90 : 75 }]} noShadow>
                     <View style={[styles.headerView  , styles.animatedHeader ,{ backgroundColor: colors.darkBackground }]}>
@@ -559,7 +591,7 @@ class Inbox extends Component {
                     </View>
                 </Header>
 
-                <Content bounces={false} scrollEnabled={false} style={{ backgroundColor: colors.darkBackground, marginTop: IS_IPHONE_X ? -10 : -30 }} contentContainerStyle={{ flexGrow: 1 }}>
+                <Content bounces={false} scrollEnabled={false} style={{ backgroundColor: colors.darkBackground, marginTop: IS_IPHONE_X ? -10 : -30,  }} contentContainerStyle={{ flexGrow: 1 }}>
                     <View>
                         <View style={{ backgroundColor: colors.lightBackground, borderTopColor: colors.pageBorder, borderTopWidth: 1, height: IS_IPHONE_X ? height-150 : height-80}}>
                             <View style={{width: 0, height: 0, backgroundColor: 'transparent', borderStyle: 'solid', borderLeftWidth: 50, borderTopWidth: 50, borderLeftColor: 'transparent', borderTopColor: colors.darkBackground, right: 0, position: 'absolute', top: -1 }} />
@@ -568,6 +600,7 @@ class Inbox extends Component {
                             { this.renderLoader(colors) }
                             <KeyboardAvoidingView keyboardVerticalOffset={50 + this.state.statusBarHeight} behavior={this.behavior()} style={{width:'100%', flexDirection:'column', flex: 1, zIndex: -1, marginTop: -77 }}>
                                 <ScrollView
+                                    style={{ height: IS_IPHONE_X ? height-150 : height-80 }}
                                     ref={ref => this.scrollView = ref}
                                     onContentSizeChange={(contentWidth, contentHeight)=>{
                                         this.scrollView.scrollToEnd({animated: true});

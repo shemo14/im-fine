@@ -178,14 +178,6 @@ class NotFine extends Component {
         }
     }
 
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.navigation.state.params && nextProps.navigation.state.params.recording !== undefined){
-            const uri = nextProps.navigation.state.params.recording.uri;
-            this.sendMsg(uri, this.state.item);
-        }
-	}
-
-
 	sendMsg(uri = null, status){
 		let formData = new FormData();
 

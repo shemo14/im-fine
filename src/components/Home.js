@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, Image, TouchableOpacity, Animated, I18nManager, Dimensions, Platform, ScrollView } from "react-native";
+import { View, Text, Image, TouchableOpacity, Animated, I18nManager, Dimensions, Platform, ScrollView, ActivityIndicator } from "react-native";
 import {Container, Content, Header, Left, Right, Body, Item, Label, Input, Toast} from 'native-base'
 import lightStyles from '../../assets/styles/light'
 import darkStyles from '../../assets/styles/dark'
@@ -18,7 +18,6 @@ import * as Battery from "expo-battery";
 import { Appearance, AppearanceProvider, useColorScheme } from 'react-native-appearance';
 import NotFine from './NotFine'
 import firebase from 'react-native-firebase';
-
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
@@ -42,7 +41,8 @@ class Home extends Component {
             rooms: [],
             loader: false,
             standBySubmit: false,
-            dailySubmit: false
+            dailySubmit: false,
+			videoLoader: false
         }
     }
 
@@ -104,6 +104,7 @@ class Home extends Component {
 		this.notificationOpenedListener = firebase.notifications().onNotificationOpened((notificationOpen) => {
 			const { title, body } = notificationOpen.notification;
 			console.log('onNotificationOpened:', notificationOpen);
+			this.props.navigation.navigate('areUFine');
 			// Alert.alert(title, body)
 		});
 
@@ -114,6 +115,7 @@ class Home extends Component {
 		if (notificationOpen) {
 			const { title, body } = notificationOpen.notification;
 			console.log('getInitialNotification:', notificationOpen);
+			this.props.navigation.navigate('areUFine');
 			//	Alert.alert(title, body)
 		}
 
@@ -172,6 +174,17 @@ class Home extends Component {
             this.setState({ loader: false, rooms: response.data.data, type: 1 });
         })
     }
+
+    renderVideoLoader(){
+    	if (this.state.videoLoader){
+    		return(
+    			<View style={{ width, height, justifyContent: 'center', alignItems: 'center', backgroundColor: '#000000b5', position: 'absolute', zIndex: 1 }}>
+					<ActivityIndicator size="large" color="#ddd" />
+					<Text style={{ color: '#ddd', marginTop: 10 , fontFamily: I18nManager.isRTL ? 'tajawal' : 'openSans' }}>{ i18n.t('videoUpload') + '...' }</Text>
+				</View>
+			)
+		}
+	}
 
     renderStandBySubmit(colors){
         if (this.state.startTime == '' || this.state.endTime == ''){
@@ -298,14 +311,13 @@ class Home extends Component {
 			connected: 1,
 			lang: this.props.lang
 		}).then(response => {
-			if(msgType == 1 || msgType == 2){
-				formData.append('id', JSON.stringify(response.data.data));
-				axios.post(CONST.url + 'upload', formData).then(res => {
-					this.emitSendMsg(response.data.data.room, response.data.data.msg);
-					this.scrollView.scrollToEnd({animated: true});
-					return this.componentWillMount();
-				});
-			}
+			formData.append('id', JSON.stringify(response.data.data));
+			formData.append('user_id', JSON.stringify(this.props.user.id));
+			axios.post(CONST.url + 'upload', formData).then(res => {
+				this.setState({ videoLoader: false });
+				this.scrollView.scrollToEnd({animated: true});
+				return this.componentWillMount();
+			});
 
 			axios.post(CONST.url + 'stop_ready', { user_id: this.props.user.id, lang: this.props.lang }).then(response => {
 				this.setState({ setCallBack: 200 });
@@ -320,6 +332,7 @@ class Home extends Component {
 
     componentWillReceiveProps(nextProps) {
 		if (nextProps.navigation.state.params && nextProps.navigation.state.params.recording !== undefined){
+			this.setState({ videoLoader: true });
 			const uri = nextProps.navigation.state.params.recording.uri;
 			const mapRegion = nextProps.navigation.state.params.mapRegion;
 			this.sendMsg(uri, mapRegion);
@@ -562,6 +575,7 @@ class Home extends Component {
 
         return (
             <Container style={{ backgroundColor: colors.darkBackground }}>
+				{ this.renderVideoLoader() }
                 <NavigationEvents onWillFocus={() => this.onFocus()} />
                 <Header style={[styles.header , styles.plateformMarginTop]} noShadow>
                     <View style={[styles.headerView  , styles.animatedHeader ,{ backgroundColor: colors.darkBackground }]}>
